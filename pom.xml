@@ -30,4 +30,10 @@
     <scm.repo.detail>org.eclipse.daanse.jdbc.db</scm.repo.detail>
   </properties>
 
+  <modules>
+    <module>api</module>
+    <module>record</module>
+    <module>core</module>
+  </modules>
+
 </project>
