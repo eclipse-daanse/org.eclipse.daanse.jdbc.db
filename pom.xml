@@ -34,6 +34,7 @@
     <module>api</module>
     <module>record</module>
     <module>core</module>
+    <module>rdb</module>
   </modules>
 
 </project>
