@@ -11,15 +11,18 @@
 *   SmartCity Jena - initial
 *   Stefan Bischof (bipolis.org) - initial
 */
-package org.eclipse.daanse.jdbc.db.record.sql;
+package org.eclipse.daanse.jdbc.db.record.meta;
 
 import java.util.List;
 
+import org.eclipse.daanse.jdbc.db.api.meta.StructureInfo;
+import org.eclipse.daanse.jdbc.db.api.schema.CatalogReference;
 import org.eclipse.daanse.jdbc.db.api.schema.ColumnDefinition;
+import org.eclipse.daanse.jdbc.db.api.schema.ImportedKey;
+import org.eclipse.daanse.jdbc.db.api.schema.SchemaReference;
 import org.eclipse.daanse.jdbc.db.api.schema.TableDefinition;
-import org.eclipse.daanse.jdbc.db.api.sql.CreateSqlStatement;
 
-public record CreateContainerSqlStatementR(TableDefinition table, List<ColumnDefinition> columnDefinitions,
-        boolean ifNotExists) implements CreateSqlStatement {
+public record StructureInfoR(List<CatalogReference> catalogs, List<SchemaReference> schemas,
+        List<TableDefinition> tables, List<ColumnDefinition> columns, List<ImportedKey> importedKeys) implements StructureInfo {
 
 }

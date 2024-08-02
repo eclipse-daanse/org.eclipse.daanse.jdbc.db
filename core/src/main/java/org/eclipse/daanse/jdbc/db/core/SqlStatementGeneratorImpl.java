@@ -22,6 +22,7 @@ import org.eclipse.daanse.jdbc.db.api.schema.ColumnDefinition;
 import org.eclipse.daanse.jdbc.db.api.schema.ColumnMetaData;
 import org.eclipse.daanse.jdbc.db.api.schema.ColumnReference;
 import org.eclipse.daanse.jdbc.db.api.schema.Named;
+import org.eclipse.daanse.jdbc.db.api.schema.TableDefinition;
 import org.eclipse.daanse.jdbc.db.api.schema.TableReference;
 import org.eclipse.daanse.jdbc.db.api.sql.CreateSchemaSqlStatement;
 import org.eclipse.daanse.jdbc.db.api.sql.CreateSqlStatement;
@@ -108,19 +109,19 @@ public class SqlStatementGeneratorImpl implements SqlStatementGenerator {
     }
 
     private StringBuilder writeCreateSqlStatement(CreateSqlStatement statement) {
-        TableReference table = statement.table();
+        TableDefinition table = statement.table();
 
         StringBuilder sb = new StringBuilder(20);
         sb.append("CREATE ");
 
-        sb.append(table.type());
+        sb.append(table.table().type());
         sb.append(" ");
 
         if (statement.ifNotExists()) {
             sb.append("IF NOT EXISTS ");
         }
 
-        quoteContainerReference(sb, table);
+        quoteContainerReference(sb, table.table());
 
         sb.append("( ");
 
@@ -136,7 +137,7 @@ public class SqlStatementGeneratorImpl implements SqlStatementGenerator {
             quoteReference(sb, columnDefinition.column());
             sb.append(" ");
 
-            ColumnMetaData dataType = columnDefinition.columnType();
+            ColumnMetaData dataType = columnDefinition.columnMetaData();
 
             Optional<TypeInfo> oTypeInfo = metaInfo.typeInfos().stream().filter(t -> {
                 return t.dataType() == dataType.dataType();

@@ -11,12 +11,22 @@
 *   SmartCity Jena - initial
 *   Stefan Bischof (bipolis.org) - initial
 */
-package org.eclipse.daanse.jdbc.db.record.schema;
+package org.eclipse.daanse.jdbc.db.api.schema;
 
-import org.eclipse.daanse.jdbc.db.api.schema.ColumnDefinition;
-import org.eclipse.daanse.jdbc.db.api.schema.ColumnMetaData;
-import org.eclipse.daanse.jdbc.db.api.schema.ColumnReference;
+import java.util.Optional;
 
-public record ColumnDefinitionR(ColumnReference column, ColumnMetaData columnMetaData) implements ColumnDefinition {
+public interface TableMetaData {
+
+    Optional<String> remarks();
+
+    Optional<String> typeCatalog();
+
+    Optional<String> typeSchema();
+
+    Optional<String> typeName();
+
+    Optional<String> selfReferencingColumnName();
+
+    Optional<String> referencingGenerationa();
 
 }

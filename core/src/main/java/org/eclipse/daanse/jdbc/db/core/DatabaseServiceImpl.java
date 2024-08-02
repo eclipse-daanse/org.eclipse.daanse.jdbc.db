@@ -28,30 +28,32 @@ import org.eclipse.daanse.jdbc.db.api.DatabaseService;
 import org.eclipse.daanse.jdbc.db.api.SqlStatementGenerator;
 import org.eclipse.daanse.jdbc.db.api.meta.DatabaseInfo;
 import org.eclipse.daanse.jdbc.db.api.meta.IdentifierInfo;
-import org.eclipse.daanse.jdbc.db.api.meta.ImportedKey;
 import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
-import org.eclipse.daanse.jdbc.db.api.meta.TableDefinition;
+import org.eclipse.daanse.jdbc.db.api.meta.StructureInfo;
 import org.eclipse.daanse.jdbc.db.api.meta.TypeInfo;
-import org.eclipse.daanse.jdbc.db.api.meta.TableDefinition.TableMetaData;
 import org.eclipse.daanse.jdbc.db.api.meta.TypeInfo.Nullable;
 import org.eclipse.daanse.jdbc.db.api.meta.TypeInfo.Searchable;
 import org.eclipse.daanse.jdbc.db.api.schema.CatalogReference;
 import org.eclipse.daanse.jdbc.db.api.schema.ColumnDefinition;
 import org.eclipse.daanse.jdbc.db.api.schema.ColumnReference;
+import org.eclipse.daanse.jdbc.db.api.schema.ImportedKey;
 import org.eclipse.daanse.jdbc.db.api.schema.SchemaReference;
+import org.eclipse.daanse.jdbc.db.api.schema.TableDefinition;
+import org.eclipse.daanse.jdbc.db.api.schema.TableMetaData;
 import org.eclipse.daanse.jdbc.db.api.schema.TableReference;
 import org.eclipse.daanse.jdbc.db.record.meta.DatabaseInfoR;
 import org.eclipse.daanse.jdbc.db.record.meta.IdentifierInfoR;
-import org.eclipse.daanse.jdbc.db.record.meta.ImportedKeyR;
 import org.eclipse.daanse.jdbc.db.record.meta.MetaInfoR;
-import org.eclipse.daanse.jdbc.db.record.meta.TableDefinitionR;
-import org.eclipse.daanse.jdbc.db.record.meta.TableMetaDataR;
+import org.eclipse.daanse.jdbc.db.record.meta.StructureInfoR;
 import org.eclipse.daanse.jdbc.db.record.meta.TypeInfoR;
 import org.eclipse.daanse.jdbc.db.record.schema.CatalogReferenceR;
 import org.eclipse.daanse.jdbc.db.record.schema.ColumnDefinitionR;
 import org.eclipse.daanse.jdbc.db.record.schema.ColumnMetaDataR;
 import org.eclipse.daanse.jdbc.db.record.schema.ColumnReferenceR;
+import org.eclipse.daanse.jdbc.db.record.schema.ImportedKeyR;
 import org.eclipse.daanse.jdbc.db.record.schema.SchemaReferenceR;
+import org.eclipse.daanse.jdbc.db.record.schema.TableDefinitionR;
+import org.eclipse.daanse.jdbc.db.record.schema.TableMetaDataR;
 import org.eclipse.daanse.jdbc.db.record.schema.TableReferenceR;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ServiceScope;
@@ -80,8 +82,24 @@ public class DatabaseServiceImpl implements DatabaseService {
         DatabaseInfo databaseInfo = readDatabaseInfo(databaseMetaData);
         IdentifierInfo identifierInfo = readIdentifierInfo(databaseMetaData);
         List<TypeInfo> typeInfos = getTypeInfo(databaseMetaData);
+        StructureInfo structureInfo = getStructureInfo(databaseMetaData);
+        return new MetaInfoR(databaseInfo, structureInfo, identifierInfo, typeInfos);
+    }
+
+    private StructureInfo getStructureInfo(DatabaseMetaData databaseMetaData) throws SQLException {
         List<CatalogReference> catalogs = getCatalogs(databaseMetaData);
-        return new MetaInfoR(databaseInfo, identifierInfo, typeInfos, catalogs);
+        List<SchemaReference> schemas = getSchemas(databaseMetaData);
+        List<TableDefinition> tables = getTableDefinitions(databaseMetaData);
+        List<ColumnDefinition> columns = getColumnDefinitions(databaseMetaData);
+
+        List<ImportedKey> importedKeys = new ArrayList<ImportedKey>();
+        for (TableDefinition tableDefinition : tables) {
+            List<ImportedKey> iks = getImportedKeys(databaseMetaData, tableDefinition.table());
+            importedKeys.addAll(iks);
+        }
+
+        StructureInfo structureInfo = new StructureInfoR(catalogs, schemas, tables, columns, importedKeys);
+        return structureInfo;
     }
 
     @Override
@@ -196,9 +214,8 @@ public class DatabaseServiceImpl implements DatabaseService {
         String schema = oSchema.map(SchemaReference::name).orElse(null);
         Optional<CatalogReference> oCatalog = oSchema.flatMap(SchemaReference::catalog);
         String catalog = oCatalog.map(CatalogReference::name).orElse(null);
-        String[] typesArr = new String[] { table.type() };
 
-        return getTableDefinitions(databaseMetaData, catalog, schema, table.name(), typesArr);
+        return getTableDefinitions(databaseMetaData, catalog, schema, table.name(), null);
     }
 
     @Override
@@ -241,9 +258,8 @@ public class DatabaseServiceImpl implements DatabaseService {
         String schema = oSchema.map(SchemaReference::name).orElse(null);
         Optional<CatalogReference> oCatalog = oSchema.flatMap(SchemaReference::catalog);
         String catalog = oCatalog.map(CatalogReference::name).orElse(null);
-        String[] typesArr = new String[] { table.type() };
 
-        return tableExists(databaseMetaData, catalog, schema, table.name(), typesArr);
+        return tableExists(databaseMetaData, catalog, schema, table.name(), null);
     }
 
     @Override
@@ -336,6 +352,12 @@ public class DatabaseServiceImpl implements DatabaseService {
     @Override
     public SqlStatementGenerator createSqlStatementGenerator(MetaInfo metaInfo) {
         return new SqlStatementGeneratorImpl(metaInfo);
+    }
+
+    @Override
+    public List<ColumnDefinition> getColumnDefinitions(DatabaseMetaData databaseMetaData) throws SQLException {
+        return getColumnDefinitions(databaseMetaData, null, null, null, null);
+
     }
 
     @Override

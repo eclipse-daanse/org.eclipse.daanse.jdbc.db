@@ -21,14 +21,14 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.eclipse.daanse.jdbc.db.api.meta.ImportedKey;
 import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
-import org.eclipse.daanse.jdbc.db.api.meta.TableDefinition;
 import org.eclipse.daanse.jdbc.db.api.meta.TypeInfo;
 import org.eclipse.daanse.jdbc.db.api.schema.CatalogReference;
 import org.eclipse.daanse.jdbc.db.api.schema.ColumnDefinition;
 import org.eclipse.daanse.jdbc.db.api.schema.ColumnReference;
+import org.eclipse.daanse.jdbc.db.api.schema.ImportedKey;
 import org.eclipse.daanse.jdbc.db.api.schema.SchemaReference;
+import org.eclipse.daanse.jdbc.db.api.schema.TableDefinition;
 import org.eclipse.daanse.jdbc.db.api.schema.TableReference;
 
 /**
@@ -237,6 +237,17 @@ public interface DatabaseService {
      */
     List<SchemaReference> getSchemas(DatabaseMetaData databaseMetaData, CatalogReference catalog) throws SQLException;
 
+
+    /**
+     * return a {@link List} of {@link ColumnDefinition}
+     * {@link DatabaseMetaData#getColumns(String, String, String, String)}.
+     *
+     * @param databaseMetaData
+     * @return {@link List<ColumnDefinition>}
+     * @throws SQLException
+     */
+    List<ColumnDefinition> getColumnDefinitions(DatabaseMetaData databaseMetaData) throws SQLException;
+
     /**
      * return a {@link List} of {@link ColumnDefinition}
      * {@link DatabaseMetaData#getColumns(String, String, String, String)} for a
@@ -321,5 +332,7 @@ public interface DatabaseService {
      * @throws SQLException
      */
     List<ImportedKey> getImportedKeys(DatabaseMetaData databaseMetaData, TableReference table) throws SQLException;
+
+
 
 }

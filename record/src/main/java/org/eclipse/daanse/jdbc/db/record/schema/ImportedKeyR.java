@@ -11,12 +11,11 @@
 *   SmartCity Jena - initial
 *   Stefan Bischof (bipolis.org) - initial
 */
+package org.eclipse.daanse.jdbc.db.record.schema;
 
-package org.eclipse.daanse.jdbc.db.record.meta;
+import org.eclipse.daanse.jdbc.db.api.schema.ColumnReference;
+import org.eclipse.daanse.jdbc.db.api.schema.ImportedKey;
 
-import org.eclipse.daanse.jdbc.db.api.meta.TableDefinition;
-import org.eclipse.daanse.jdbc.db.api.schema.TableReference;
-
-public record TableDefinitionR(TableReference table, TableMetaData metaData) implements TableDefinition {
+public record ImportedKeyR(ColumnReference primaryKeyColumn, ColumnReference foreignKeyColumn) implements ImportedKey {
 
 }

@@ -18,11 +18,10 @@ import java.util.List;
 import org.eclipse.daanse.jdbc.db.api.meta.DatabaseInfo;
 import org.eclipse.daanse.jdbc.db.api.meta.IdentifierInfo;
 import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
+import org.eclipse.daanse.jdbc.db.api.meta.StructureInfo;
 import org.eclipse.daanse.jdbc.db.api.meta.TypeInfo;
-import org.eclipse.daanse.jdbc.db.api.schema.CatalogReference;
 
-public record MetaInfoR(DatabaseInfo databaseInfo, IdentifierInfo identifierInfo, List<TypeInfo> typeInfos,
-        List<CatalogReference> catalogs)
+public record MetaInfoR(DatabaseInfo databaseInfo,StructureInfo structureInfo , IdentifierInfo identifierInfo, List<TypeInfo> typeInfos)
         implements MetaInfo {
 
 }

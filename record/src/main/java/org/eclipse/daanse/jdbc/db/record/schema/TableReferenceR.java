@@ -21,14 +21,16 @@ import org.eclipse.daanse.jdbc.db.api.schema.TableReference;
 public record TableReferenceR(Optional<SchemaReference> schema, String name, String type) implements TableReference {
 
     public TableReferenceR(String name) {
-        this(Optional.empty(), name);
-    }
-
-    public TableReferenceR(Optional<SchemaReference> schema, String name) {
-        this(schema, name, "TABLE");
+        this(name, TableReference.TYPE_TABLE);
     }
 
     public TableReferenceR(String name, String type) {
         this(Optional.empty(), name, type);
     }
+
+
+    public TableReferenceR(Optional<SchemaReference> schema, String name) {
+        this(Optional.empty(), name, TableReference.TYPE_TABLE);
+    }
+
 }
