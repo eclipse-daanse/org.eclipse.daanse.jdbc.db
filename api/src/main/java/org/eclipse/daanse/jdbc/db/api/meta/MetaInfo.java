@@ -16,8 +16,6 @@ package org.eclipse.daanse.jdbc.db.api.meta;
 import java.sql.DatabaseMetaData;
 import java.util.List;
 
-import org.eclipse.daanse.jdbc.db.api.schema.CatalogReference;
-
 /**
  * MetaInfo holds all essential values of the {@link DatabaseMetaData} in an
  * easy accessible way.
@@ -44,11 +42,10 @@ public interface MetaInfo {
     List<TypeInfo> typeInfos();
 
     /**
-     * A list of all {@link CatalogReference} according
-     * {@link DatabaseMetaData#getCatalogs()}
-     *
-     * @return the catalogs
+     * Subset of the {@link MetaInfo} holds all Structure related values of the
+     * {@link DatabaseMetaData} like informations about: Catalogs, Schema, Tables
+     * and Columns.
      */
-    List<CatalogReference> catalogs();
+    StructureInfo structureInfo();
 
 }

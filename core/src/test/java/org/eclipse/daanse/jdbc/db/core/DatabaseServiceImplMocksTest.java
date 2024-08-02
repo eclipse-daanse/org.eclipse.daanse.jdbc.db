@@ -27,10 +27,10 @@ import org.eclipse.daanse.jdbc.db.api.DatabaseService;
 import org.eclipse.daanse.jdbc.db.api.meta.DatabaseInfo;
 import org.eclipse.daanse.jdbc.db.api.meta.IdentifierInfo;
 import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
-import org.eclipse.daanse.jdbc.db.core.DatabaseServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -60,6 +60,13 @@ class DatabaseServiceImplMocksTest {
         when(databaseMetaData.getDatabaseProductVersion()).thenReturn("a");
         when(databaseMetaData.getTypeInfo()).thenReturn(resultSet);
         when(databaseMetaData.getCatalogs()).thenReturn(resultSet);
+//        when(databaseMetaData.getSchemas()).thenReturn(resultSet);
+        when(databaseMetaData.getSchemas(Mockito.any(), Mockito.any())).thenReturn(resultSet);
+        when(databaseMetaData.getTables(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+                .thenReturn(resultSet);
+        when(databaseMetaData.getColumns(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+                .thenReturn(resultSet);
+//        when(databaseMetaData.getImportedKeys(Mockito.any(),Mockito.any(),Mockito.any())).thenReturn(resultSet);
 
         when(resultSet.next()).thenReturn(false);
 

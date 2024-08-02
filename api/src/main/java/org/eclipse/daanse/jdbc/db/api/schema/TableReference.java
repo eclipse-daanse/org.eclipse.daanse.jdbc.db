@@ -25,8 +25,8 @@ public interface TableReference extends Named {
     public static final String TYPE_ALIAS = "ALIAS";
     public static final String TYPE_SYNONYM = "SYNONYM";
 
-    Optional<SchemaReference> schema();
-
     String type();
+
+    Optional<SchemaReference> schema();
 
 }

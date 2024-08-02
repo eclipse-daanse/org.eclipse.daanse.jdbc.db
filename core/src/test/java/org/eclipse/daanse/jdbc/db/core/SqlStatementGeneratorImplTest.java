@@ -22,7 +22,6 @@ import java.util.Optional;
 
 import org.eclipse.daanse.jdbc.db.api.SqlStatementGenerator;
 import org.eclipse.daanse.jdbc.db.api.meta.TypeInfo;
-import org.eclipse.daanse.jdbc.db.core.SqlStatementGeneratorImpl;
 import org.eclipse.daanse.jdbc.db.record.meta.DatabaseInfoR;
 import org.eclipse.daanse.jdbc.db.record.meta.IdentifierInfoR;
 import org.eclipse.daanse.jdbc.db.record.meta.MetaInfoR;
@@ -30,6 +29,7 @@ import org.eclipse.daanse.jdbc.db.record.schema.ColumnDefinitionR;
 import org.eclipse.daanse.jdbc.db.record.schema.ColumnMetaDataR;
 import org.eclipse.daanse.jdbc.db.record.schema.ColumnReferenceR;
 import org.eclipse.daanse.jdbc.db.record.schema.SchemaReferenceR;
+import org.eclipse.daanse.jdbc.db.record.schema.TableDefinitionR;
 import org.eclipse.daanse.jdbc.db.record.schema.TableReferenceR;
 import org.eclipse.daanse.jdbc.db.record.sql.CreateContainerSqlStatementR;
 import org.eclipse.daanse.jdbc.db.record.sql.CreateSchemaSqlStatementR;
@@ -58,8 +58,7 @@ class SqlStatementGeneratorImplTest {
     }
 
     private SqlStatementGenerator generator = new SqlStatementGeneratorImpl(new MetaInfoR(
-            new DatabaseInfoR("", "", 0, 0), new IdentifierInfoR("#"), List.of(typeInfoVarchar, typeInfoInt),
-            List.of()));
+            new DatabaseInfoR("", "", 0, 0), null, new IdentifierInfoR("#"), List.of(typeInfoVarchar, typeInfoInt)));
 
     @Test
     void dropTableNoSchemaNoExist() {
@@ -166,7 +165,8 @@ class SqlStatementGeneratorImplTest {
     void createTableWithSchema() {
 
         String sql = generator.getSqlOfStatement(new CreateContainerSqlStatementR(
-                new TableReferenceR(Optional.of(new SchemaReferenceR("theSchemaName")), "theTableName", "TABLE"),
+                new TableDefinitionR(new TableReferenceR(Optional.of(new SchemaReferenceR("theSchemaName")),
+                        "theTableName", "TABLE")),
                 List.of(new ColumnDefinitionR(new ColumnReferenceR("Col1"),
                         new ColumnMetaDataR(JDBCType.INTEGER, Optional.empty(), Optional.empty(), Optional.empty()))),
                 true));
@@ -178,7 +178,8 @@ class SqlStatementGeneratorImplTest {
     @Test
     void createTableWithColumDetails() {
         String sql = generator.getSqlOfStatement(new CreateContainerSqlStatementR(
-                new TableReferenceR(Optional.of(new SchemaReferenceR("theSchemaName")), "theTableName", "TABLE"),
+                new TableDefinitionR(new TableReferenceR(Optional.of(new SchemaReferenceR("theSchemaName")),
+                        "theTableName", "TABLE")),
                 List.of(new ColumnDefinitionR(new ColumnReferenceR("Col1"),
                         new ColumnMetaDataR(JDBCType.VARCHAR, Optional.of(200), Optional.empty(), Optional.empty()))),
                 true));
@@ -189,12 +190,12 @@ class SqlStatementGeneratorImplTest {
     @Test
     void createTableWithMiltiColumn() {
         String sql = generator.getSqlOfStatement(new CreateContainerSqlStatementR(
-                new TableReferenceR(Optional.of(new SchemaReferenceR("theSchemaName")), "theTableName", "TABLE"),
+                new TableDefinitionR(new TableReferenceR(Optional.of(new SchemaReferenceR("theSchemaName")),
+                        "theTableName", "TABLE")),
                 List.of(new ColumnDefinitionR(new ColumnReferenceR("Col1"),
                         new ColumnMetaDataR(JDBCType.INTEGER, Optional.empty(), Optional.empty(), Optional.empty())),
-                        new ColumnDefinitionR(new ColumnReferenceR("Col2"),
-                                new ColumnMetaDataR(JDBCType.INTEGER, Optional.empty(), Optional.empty(),
-                                        Optional.empty()))),
+                        new ColumnDefinitionR(new ColumnReferenceR("Col2"), new ColumnMetaDataR(JDBCType.INTEGER,
+                                Optional.empty(), Optional.empty(), Optional.empty()))),
                 true));
         assertThat(sql).isEqualTo("CREATE TABLE IF NOT EXISTS #theSchemaName#.#theTableName#( #Col1# int, #Col2# int)");
     }

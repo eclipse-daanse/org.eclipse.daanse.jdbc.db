@@ -25,12 +25,11 @@ import javax.sql.DataSource;
 
 import org.eclipse.daanse.jdbc.db.api.DatabaseService;
 import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
-import org.eclipse.daanse.jdbc.db.api.meta.TableDefinition;
 import org.eclipse.daanse.jdbc.db.api.meta.TypeInfo;
 import org.eclipse.daanse.jdbc.db.api.schema.CatalogReference;
 import org.eclipse.daanse.jdbc.db.api.schema.SchemaReference;
+import org.eclipse.daanse.jdbc.db.api.schema.TableDefinition;
 import org.eclipse.daanse.jdbc.db.api.schema.TableReference;
-import org.eclipse.daanse.jdbc.db.core.DatabaseServiceImpl;
 import org.eclipse.daanse.jdbc.db.record.schema.CatalogReferenceR;
 import org.eclipse.daanse.jdbc.db.record.schema.ColumnReferenceR;
 import org.eclipse.daanse.jdbc.db.record.schema.SchemaReferenceR;
