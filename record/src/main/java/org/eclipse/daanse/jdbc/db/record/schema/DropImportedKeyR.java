@@ -11,9 +11,11 @@
 *   SmartCity Jena - initial
 *   Stefan Bischof (bipolis.org) - initial
 */
-package org.eclipse.daanse.jdbc.db.api.sql;
+package org.eclipse.daanse.jdbc.db.record.schema;
 
-public sealed interface SqlStatement permits DropContainerSqlStatement, CreateSqlStatement, CreateSchemaSqlStatement,
-        TruncateTableSqlStatement, DropSchemaSqlStatement, InsertSqlStatement, CreateConstraintStatement, DropConstraintStatement {
+import org.eclipse.daanse.jdbc.db.api.schema.DropImportedKey;
+import org.eclipse.daanse.jdbc.db.api.schema.TableReference;
+
+public record DropImportedKeyR(TableReference table, String name) implements DropImportedKey {
 
 }

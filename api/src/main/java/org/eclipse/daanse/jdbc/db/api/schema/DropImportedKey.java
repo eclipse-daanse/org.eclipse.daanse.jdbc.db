@@ -11,9 +11,22 @@
 *   SmartCity Jena - initial
 *   Stefan Bischof (bipolis.org) - initial
 */
-package org.eclipse.daanse.jdbc.db.api.sql;
+package org.eclipse.daanse.jdbc.db.api.schema;
 
-public sealed interface SqlStatement permits DropContainerSqlStatement, CreateSqlStatement, CreateSchemaSqlStatement,
-        TruncateTableSqlStatement, DropSchemaSqlStatement, InsertSqlStatement, CreateConstraintStatement, DropConstraintStatement {
+import java.sql.DatabaseMetaData;
+
+/**
+ *
+ * Imported Keys according *
+ * {@link DatabaseMetaData#getImportedKeys(String, String, String)}
+ */
+public interface DropImportedKey  extends Named {
+
+    /**
+     * The foreign key table {@link TableReference}
+     *
+     * @return
+     */
+    TableReference table();
 
 }

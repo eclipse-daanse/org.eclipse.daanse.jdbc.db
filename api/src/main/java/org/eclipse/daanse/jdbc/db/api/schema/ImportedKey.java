@@ -20,7 +20,7 @@ import java.sql.DatabaseMetaData;
  * Imported Keys according *
  * {@link DatabaseMetaData#getImportedKeys(String, String, String)}
  */
-public interface ImportedKey {
+public interface ImportedKey  extends Named {
 
     /**
      * The primary key site of the {@link ColumnReference}

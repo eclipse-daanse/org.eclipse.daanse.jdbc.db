@@ -16,6 +16,6 @@ package org.eclipse.daanse.jdbc.db.record.schema;
 import org.eclipse.daanse.jdbc.db.api.schema.ColumnReference;
 import org.eclipse.daanse.jdbc.db.api.schema.ImportedKey;
 
-public record ImportedKeyR(ColumnReference primaryKeyColumn, ColumnReference foreignKeyColumn) implements ImportedKey {
+public record ImportedKeyR(ColumnReference primaryKeyColumn, ColumnReference foreignKeyColumn, String name) implements ImportedKey {
 
 }

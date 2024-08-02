@@ -482,8 +482,10 @@ public class DatabaseServiceImpl implements DatabaseService {
                 Optional<SchemaReference> oSchemaRefFk = oSchemaNameFk.map(sn -> new SchemaReferenceR(oCatRefFk, sn));
                 TableReference tableReferenceFk = new TableReferenceR(oSchemaRefFk, tableNameFk);
                 ColumnReference foreignKeyColumn = new ColumnReferenceR(Optional.of(tableReferenceFk), columNameFk);
-
-                ImportedKey importedKey = new ImportedKeyR(primaryKeyColumn, foreignKeyColumn);
+                StringBuilder sb = new StringBuilder();
+                sb.append("fk_").append(tableReferenceFk.name()).append("_").append(foreignKeyColumn.name())
+                .append("_").append(tableReferencePk.name()).append("_").append(primaryKeyColumn.name());
+                ImportedKey importedKey = new ImportedKeyR(primaryKeyColumn, foreignKeyColumn, sb.toString());
                 importedKeys.add(importedKey);
             }
         }
