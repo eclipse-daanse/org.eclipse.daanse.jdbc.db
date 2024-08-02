@@ -13,7 +13,11 @@
 */
 package org.eclipse.daanse.jdbc.db.api.sql;
 
-public sealed interface SqlStatement permits DropContainerSqlStatement, CreateSqlStatement, CreateSchemaSqlStatement,
-        TruncateTableSqlStatement, DropSchemaSqlStatement, InsertSqlStatement, CreateConstraintStatement, DropConstraintStatement {
+import org.eclipse.daanse.jdbc.db.api.schema.DropImportedKey;
 
+public non-sealed interface DropConstraintStatement extends SqlStatement {
+
+    DropImportedKey dropImportedKey();
+
+    boolean ifExists();
 }

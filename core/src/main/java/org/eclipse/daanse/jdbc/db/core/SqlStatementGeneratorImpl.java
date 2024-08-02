@@ -1,16 +1,16 @@
 /*
-* Copyright (c) 2024 Contributors to the Eclipse Foundation.
-*
-* This program and the accompanying materials are made
-* available under the terms of the Eclipse Public License 2.0
-* which is available at https://www.eclipse.org/legal/epl-2.0/
-*
-* SPDX-License-Identifier: EPL-2.0
-*
-* Contributors:
-*   SmartCity Jena - initial
-*   Stefan Bischof (bipolis.org) - initial
-*/
+ * Copyright (c) 2024 Contributors to the Eclipse Foundation.
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ * Contributors:
+ *   SmartCity Jena - initial
+ *   Stefan Bischof (bipolis.org) - initial
+ */
 package org.eclipse.daanse.jdbc.db.core;
 
 import java.util.Optional;
@@ -21,11 +21,14 @@ import org.eclipse.daanse.jdbc.db.api.meta.TypeInfo;
 import org.eclipse.daanse.jdbc.db.api.schema.ColumnDefinition;
 import org.eclipse.daanse.jdbc.db.api.schema.ColumnMetaData;
 import org.eclipse.daanse.jdbc.db.api.schema.ColumnReference;
+import org.eclipse.daanse.jdbc.db.api.schema.ImportedKey;
 import org.eclipse.daanse.jdbc.db.api.schema.Named;
 import org.eclipse.daanse.jdbc.db.api.schema.TableDefinition;
 import org.eclipse.daanse.jdbc.db.api.schema.TableReference;
+import org.eclipse.daanse.jdbc.db.api.sql.CreateConstraintStatement;
 import org.eclipse.daanse.jdbc.db.api.sql.CreateSchemaSqlStatement;
 import org.eclipse.daanse.jdbc.db.api.sql.CreateSqlStatement;
+import org.eclipse.daanse.jdbc.db.api.sql.DropConstraintStatement;
 import org.eclipse.daanse.jdbc.db.api.sql.DropContainerSqlStatement;
 import org.eclipse.daanse.jdbc.db.api.sql.DropSchemaSqlStatement;
 import org.eclipse.daanse.jdbc.db.api.sql.InsertSqlStatement;
@@ -60,11 +63,43 @@ public class SqlStatementGeneratorImpl implements SqlStatementGenerator {
         case TruncateTableSqlStatement ts -> writeTruncateTableSqlStatement(ts);
         case CreateSqlStatement cc -> writeCreateSqlStatement(cc);
         case InsertSqlStatement is -> writeInsertSqlStatement(is);
+        case CreateConstraintStatement is -> writeCreateConstraintSqlStatement(is);
+        case DropConstraintStatement is -> writeDropConstraintSqlStatement(is);
         };
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Generated SqlStatement: {}", sb.toString());
         }
         return sb.toString();
+    }
+
+    private StringBuilder writeDropConstraintSqlStatement(DropConstraintStatement statement) {
+        //ALTER TABLE foo DROP CONSTRAINT IF EXISTS bar;
+        TableReference table = statement.dropImportedKey().table();
+        StringBuilder sb = new StringBuilder(20);
+        sb.append("ALTER TABLE ").append(table.name());
+        sb.append(" DROP CONSTRAINT ");
+        if (statement.ifExists()) {
+            sb.append("IF EXISTS ");
+        }
+        sb.append(statement.dropImportedKey().name());
+        return sb;
+    }
+
+    private StringBuilder writeCreateConstraintSqlStatement(CreateConstraintStatement statement) {
+        // ALTER TABLE table1 ADD CONSTRAINT `fk_table1_id1_table2_id2` FOREIGN KEY (`id1`) REFERENCES table2(`id2`)
+        // ON DELETE NO ACTION ON UPDATE NO ACTION;
+        ImportedKey ik = statement.importedKey();
+        StringBuilder sb = new StringBuilder(20);
+        sb.append("ALTER TABLE ").append(ik.foreignKeyColumn().table().get().name());
+        sb.append(" ADD CONSTRAINT  ");
+        sb.append(ik.name());
+        sb.append(" FOREIGN KEY (");
+        sb.append(ik.foreignKeyColumn().name());
+        sb.append(") REFERENCES ");
+        sb.append(ik.primaryKeyColumn().table().get().name());
+        sb.append("(").append(ik.primaryKeyColumn().name()).append(")");
+        sb.append(" ON DELETE NO ACTION ON UPDATE NO ACTION");
+        return sb;
     }
 
     private StringBuilder writeInsertSqlStatement(InsertSqlStatement statement) {
@@ -233,7 +268,7 @@ public class SqlStatementGeneratorImpl implements SqlStatementGenerator {
     private void quoteIdentifier(final StringBuilder sb, final String identifiert) {
 
         if ((quoteString.equals(NO_QUOTE_FROM_METADATA))
-                || (identifiert.startsWith(quoteString) && identifiert.endsWith(quoteString))) {
+            || (identifiert.startsWith(quoteString) && identifiert.endsWith(quoteString))) {
             // no quote or already quoted
             sb.append(identifiert);
             return;
