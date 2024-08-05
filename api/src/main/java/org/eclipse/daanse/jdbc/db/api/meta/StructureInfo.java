@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.eclipse.daanse.jdbc.db.api.schema.CatalogReference;
 import org.eclipse.daanse.jdbc.db.api.schema.ColumnDefinition;
+import org.eclipse.daanse.jdbc.db.api.schema.ImportedKey;
 import org.eclipse.daanse.jdbc.db.api.schema.SchemaReference;
 import org.eclipse.daanse.jdbc.db.api.schema.TableDefinition;
 import org.eclipse.daanse.jdbc.db.api.schema.TableReference;
@@ -54,5 +55,13 @@ public interface StructureInfo {
      * @return the columnDefinitions
      */
     List<ColumnDefinition> columns();
+
+    /**
+     * A list of all {@link ImportedKey} according
+     * {@link DatabaseMetaData#getImportedKeys(String, String, String)}
+     *
+     * @return the imported keys
+     */
+    List<ImportedKey> importedKeys();
 
 }
