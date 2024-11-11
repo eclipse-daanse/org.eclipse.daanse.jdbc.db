@@ -15,14 +15,23 @@ package org.eclipse.daanse.jdbc.db.api.schema;
 
 import java.sql.JDBCType;
 import java.util.Optional;
+import java.util.OptionalInt;
 
 public interface ColumnMetaData {
 
     JDBCType dataType();
 
-    Optional<Integer> columnSize();
+    String typeName();
 
-    Optional<Integer> decimalDigits();
+    OptionalInt columnSize();
+
+    OptionalInt decimalDigits();
+
+    OptionalInt numPrecRadix();
+
+    OptionalInt nullable();
+
+    OptionalInt charOctetLength();
 
     Optional<String> remarks();
 }

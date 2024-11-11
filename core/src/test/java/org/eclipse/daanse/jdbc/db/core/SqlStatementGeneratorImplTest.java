@@ -19,6 +19,7 @@ import static org.mockito.Mockito.when;
 import java.sql.JDBCType;
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalInt;
 
 import org.eclipse.daanse.jdbc.db.api.SqlStatementGenerator;
 import org.eclipse.daanse.jdbc.db.api.meta.TypeInfo;
@@ -168,7 +169,8 @@ class SqlStatementGeneratorImplTest {
                 new TableDefinitionR(new TableReferenceR(Optional.of(new SchemaReferenceR("theSchemaName")),
                         "theTableName", "TABLE")),
                 List.of(new ColumnDefinitionR(new ColumnReferenceR("Col1"),
-                        new ColumnMetaDataR(JDBCType.INTEGER, Optional.empty(), Optional.empty(), Optional.empty()))),
+                        new ColumnMetaDataR(JDBCType.INTEGER, "fooType", OptionalInt.empty(), OptionalInt.empty(),
+                                OptionalInt.empty(), OptionalInt.empty(), OptionalInt.empty(), Optional.empty()))),
                 true));
 
         assertThat(sql).isEqualTo("CREATE TABLE IF NOT EXISTS #theSchemaName#.#theTableName#( #Col1# int)");
@@ -181,7 +183,8 @@ class SqlStatementGeneratorImplTest {
                 new TableDefinitionR(new TableReferenceR(Optional.of(new SchemaReferenceR("theSchemaName")),
                         "theTableName", "TABLE")),
                 List.of(new ColumnDefinitionR(new ColumnReferenceR("Col1"),
-                        new ColumnMetaDataR(JDBCType.VARCHAR, Optional.of(200), Optional.empty(), Optional.empty()))),
+                        new ColumnMetaDataR(JDBCType.VARCHAR, "fooType", OptionalInt.of(200), OptionalInt.empty(),OptionalInt.empty(),
+                                OptionalInt.empty(), OptionalInt.empty(), Optional.empty()))),
                 true));
         assertThat(sql).isEqualTo("CREATE TABLE IF NOT EXISTS #theSchemaName#.#theTableName#( #Col1# varchar(200))");
 
@@ -193,9 +196,12 @@ class SqlStatementGeneratorImplTest {
                 new TableDefinitionR(new TableReferenceR(Optional.of(new SchemaReferenceR("theSchemaName")),
                         "theTableName", "TABLE")),
                 List.of(new ColumnDefinitionR(new ColumnReferenceR("Col1"),
-                        new ColumnMetaDataR(JDBCType.INTEGER, Optional.empty(), Optional.empty(), Optional.empty())),
-                        new ColumnDefinitionR(new ColumnReferenceR("Col2"), new ColumnMetaDataR(JDBCType.INTEGER,
-                                Optional.empty(), Optional.empty(), Optional.empty()))),
+                        new ColumnMetaDataR(JDBCType.INTEGER, "fooType", OptionalInt.empty(), OptionalInt.empty(),OptionalInt.empty(),
+                                OptionalInt.empty(), OptionalInt.empty(), Optional.empty())),
+                        new ColumnDefinitionR(new ColumnReferenceR("Col2"),
+                                new ColumnMetaDataR(JDBCType.INTEGER, "footype", OptionalInt.empty(),
+                                        OptionalInt.empty(), OptionalInt.empty(), OptionalInt.empty(),OptionalInt.empty(),
+                                        Optional.empty()))),
                 true));
         assertThat(sql).isEqualTo("CREATE TABLE IF NOT EXISTS #theSchemaName#.#theTableName#( #Col1# int, #Col2# int)");
     }

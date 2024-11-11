@@ -15,10 +15,17 @@ package org.eclipse.daanse.jdbc.db.record.schema;
 
 import java.sql.JDBCType;
 import java.util.Optional;
+import java.util.OptionalInt;
 
 import org.eclipse.daanse.jdbc.db.api.schema.ColumnMetaData;
 
-public record ColumnMetaDataR(JDBCType dataType, Optional<Integer> columnSize, Optional<Integer> decimalDigits,
+public record ColumnMetaDataR(JDBCType dataType,
+        String typeName,
+        OptionalInt columnSize,
+        OptionalInt decimalDigits,
+        OptionalInt numPrecRadix,
+        OptionalInt nullable,
+        OptionalInt charOctetLength,
         Optional<String> remarks) implements ColumnMetaData {
 
 }
