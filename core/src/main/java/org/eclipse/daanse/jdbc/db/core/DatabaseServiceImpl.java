@@ -21,6 +21,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalInt;
 
 import javax.sql.DataSource;
 
@@ -399,9 +400,38 @@ public class DatabaseServiceImpl implements DatabaseService {
                 final Optional<String> oSchemaName = Optional.ofNullable(rs.getString("TABLE_SCHEM"));
                 final String tableName = rs.getString("TABLE_NAME");
                 final String columName = rs.getString("COLUMN_NAME");
+
+                final String typeName = rs.getString("TYPE_NAME");
+                OptionalInt oColumnSize = OptionalInt.of(rs.getInt("COLUMN_SIZE"));
+
+                if (rs.wasNull()) {
+                    oColumnSize = OptionalInt.empty();
+                }
+
+                OptionalInt oDecimalDigits =  OptionalInt.of(rs.getInt("DECIMAL_DIGITS"));
+                if (rs.wasNull()) {
+                    oDecimalDigits = OptionalInt.empty();
+                }
+
+                OptionalInt oNumPrecRadix = OptionalInt.of(rs.getInt("NUM_PREC_RADIX"));
+                 if (rs.wasNull()) {
+                     oNumPrecRadix=   OptionalInt.empty();
+                 }
+
+                 OptionalInt oNullable = OptionalInt.of( rs.getInt("NULLABLE"));
+                 if (rs.wasNull()) {
+                     oNullable = OptionalInt.empty();
+                 }
+
+
+                 OptionalInt oCharOctetLength = OptionalInt.of( rs.getInt("CHAR_OCTET_LENGTH"));
+                 if (rs.wasNull()) {
+                     oCharOctetLength = OptionalInt.empty();
+                 }
+
+
                 final int dataType = rs.getInt("DATA_TYPE");
-                final int columnSize = rs.getInt("COLUMN_SIZE");
-                final Optional<Integer> decimalDigits = Optional.ofNullable(rs.getInt("DECIMAL_DIGITS"));
+
                 final Optional<String> remarks = Optional.ofNullable(rs.getString("REMARKS"));
 
                 Optional<CatalogReference> oCatRef = oCatalogName.map(cn -> new CatalogReferenceR(cn));
@@ -412,7 +442,7 @@ public class DatabaseServiceImpl implements DatabaseService {
 
                 ColumnReference columnReference = new ColumnReferenceR(Optional.of(tableReference), columName);
                 ColumnDefinition columnDefinition = new ColumnDefinitionR(columnReference,
-                        new ColumnMetaDataR(jdbcType, Optional.of(columnSize), decimalDigits, remarks));
+                        new ColumnMetaDataR(jdbcType,typeName, oColumnSize, oDecimalDigits,oNumPrecRadix,oNullable,oCharOctetLength, remarks));
 
                 columnDefinitions.add(columnDefinition);
             }
@@ -483,8 +513,8 @@ public class DatabaseServiceImpl implements DatabaseService {
                 TableReference tableReferenceFk = new TableReferenceR(oSchemaRefFk, tableNameFk);
                 ColumnReference foreignKeyColumn = new ColumnReferenceR(Optional.of(tableReferenceFk), columNameFk);
                 StringBuilder sb = new StringBuilder();
-                sb.append("fk_").append(tableReferenceFk.name()).append("_").append(foreignKeyColumn.name())
-                .append("_").append(tableReferencePk.name()).append("_").append(primaryKeyColumn.name());
+                sb.append("fk_").append(tableReferenceFk.name()).append("_").append(foreignKeyColumn.name()).append("_")
+                        .append(tableReferencePk.name()).append("_").append(primaryKeyColumn.name());
                 ImportedKey importedKey = new ImportedKeyR(primaryKeyColumn, foreignKeyColumn, sb.toString());
                 importedKeys.add(importedKey);
             }
