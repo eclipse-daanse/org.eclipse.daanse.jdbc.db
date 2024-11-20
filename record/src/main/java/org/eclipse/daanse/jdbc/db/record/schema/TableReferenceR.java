@@ -30,7 +30,7 @@ public record TableReferenceR(Optional<SchemaReference> schema, String name, Str
 
 
     public TableReferenceR(Optional<SchemaReference> schema, String name) {
-        this(Optional.empty(), name, TableReference.TYPE_TABLE);
+        this(schema, name, TableReference.TYPE_TABLE);
     }
 
 }
