@@ -27,6 +27,7 @@ import org.eclipse.daanse.jdbc.db.api.schema.CatalogReference;
 import org.eclipse.daanse.jdbc.db.api.schema.ColumnDefinition;
 import org.eclipse.daanse.jdbc.db.api.schema.ColumnReference;
 import org.eclipse.daanse.jdbc.db.api.schema.ImportedKey;
+import org.eclipse.daanse.jdbc.db.api.schema.IndexInfo;
 import org.eclipse.daanse.jdbc.db.api.schema.SchemaReference;
 import org.eclipse.daanse.jdbc.db.api.schema.TableDefinition;
 import org.eclipse.daanse.jdbc.db.api.schema.TableReference;
@@ -333,6 +334,14 @@ public interface DatabaseService {
      */
     List<ImportedKey> getImportedKeys(DatabaseMetaData databaseMetaData, TableReference table) throws SQLException;
 
-
+    /**
+     * returns list of IndexInfo
+     *
+     * @param databaseMetaData
+     * @param table
+     * @return
+     * @throws SQLException
+     */
+    List<IndexInfo> getIndexInfo(DatabaseMetaData databaseMetaData, TableReference table) throws SQLException;
 
 }
