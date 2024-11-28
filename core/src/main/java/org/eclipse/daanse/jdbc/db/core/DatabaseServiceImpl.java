@@ -38,6 +38,7 @@ import org.eclipse.daanse.jdbc.db.api.schema.CatalogReference;
 import org.eclipse.daanse.jdbc.db.api.schema.ColumnDefinition;
 import org.eclipse.daanse.jdbc.db.api.schema.ColumnReference;
 import org.eclipse.daanse.jdbc.db.api.schema.ImportedKey;
+import org.eclipse.daanse.jdbc.db.api.schema.IndexInfo;
 import org.eclipse.daanse.jdbc.db.api.schema.SchemaReference;
 import org.eclipse.daanse.jdbc.db.api.schema.TableDefinition;
 import org.eclipse.daanse.jdbc.db.api.schema.TableMetaData;
@@ -52,6 +53,7 @@ import org.eclipse.daanse.jdbc.db.record.schema.ColumnDefinitionR;
 import org.eclipse.daanse.jdbc.db.record.schema.ColumnMetaDataR;
 import org.eclipse.daanse.jdbc.db.record.schema.ColumnReferenceR;
 import org.eclipse.daanse.jdbc.db.record.schema.ImportedKeyR;
+import org.eclipse.daanse.jdbc.db.record.schema.IndexInfoR;
 import org.eclipse.daanse.jdbc.db.record.schema.SchemaReferenceR;
 import org.eclipse.daanse.jdbc.db.record.schema.TableDefinitionR;
 import org.eclipse.daanse.jdbc.db.record.schema.TableMetaDataR;
@@ -65,6 +67,10 @@ import org.slf4j.LoggerFactory;
 public class DatabaseServiceImpl implements DatabaseService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseServiceImpl.class);
+    private static final int NONUNIQUE_COLUMN = 4;
+    private static final int TYPE_COLUMN = 7;
+    private static final int COLUMN_NAME = 9;
+    private static final int CARDINALITY_COLUMN = 11;
 
     @Override
     public MetaInfo createMetaInfo(DataSource dataSource) throws SQLException {
@@ -85,6 +91,32 @@ public class DatabaseServiceImpl implements DatabaseService {
         List<TypeInfo> typeInfos = getTypeInfo(databaseMetaData);
         StructureInfo structureInfo = getStructureInfo(databaseMetaData);
         return new MetaInfoR(databaseInfo, structureInfo, identifierInfo, typeInfos);
+    }
+
+    @Override
+    public List<IndexInfo> getIndexInfo(DatabaseMetaData databaseMetaData, TableReference table) throws SQLException{
+        String catalog = null;
+        String schema = null;
+        List<IndexInfo> indexInfos = new ArrayList<>();
+        Optional<SchemaReference> oSchema = table.schema();
+
+        if (oSchema.isPresent()) {
+            SchemaReference sr = oSchema.get();
+            schema = oSchema.get().name();
+            if (sr.catalog().isPresent()) {
+                catalog = sr.catalog().get().name();
+            }
+        }
+        try (ResultSet resultSet = databaseMetaData.getIndexInfo(catalog, schema, table.name(), false, true)) {
+            while (resultSet.next()) {
+                int type = resultSet.getInt(TYPE_COLUMN);
+                String columnName = resultSet.getString(COLUMN_NAME);
+                int cardinalityColumn = resultSet.getInt(CARDINALITY_COLUMN);
+                boolean unique = !resultSet.getBoolean(NONUNIQUE_COLUMN);
+                indexInfos.add(new IndexInfoR(type, columnName, cardinalityColumn, unique));
+            }
+        }
+        return List.copyOf(indexInfos);
     }
 
     private StructureInfo getStructureInfo(DatabaseMetaData databaseMetaData) throws SQLException {
@@ -414,20 +446,20 @@ public class DatabaseServiceImpl implements DatabaseService {
                 }
 
                 OptionalInt oNumPrecRadix = OptionalInt.of(rs.getInt("NUM_PREC_RADIX"));
-                 if (rs.wasNull()) {
-                     oNumPrecRadix=   OptionalInt.empty();
-                 }
+                if (rs.wasNull()) {
+                    oNumPrecRadix=   OptionalInt.empty();
+                }
 
-                 OptionalInt oNullable = OptionalInt.of( rs.getInt("NULLABLE"));
-                 if (rs.wasNull()) {
-                     oNullable = OptionalInt.empty();
-                 }
+                OptionalInt oNullable = OptionalInt.of( rs.getInt("NULLABLE"));
+                if (rs.wasNull()) {
+                    oNullable = OptionalInt.empty();
+                }
 
 
-                 OptionalInt oCharOctetLength = OptionalInt.of( rs.getInt("CHAR_OCTET_LENGTH"));
-                 if (rs.wasNull()) {
-                     oCharOctetLength = OptionalInt.empty();
-                 }
+                OptionalInt oCharOctetLength = OptionalInt.of( rs.getInt("CHAR_OCTET_LENGTH"));
+                if (rs.wasNull()) {
+                    oCharOctetLength = OptionalInt.empty();
+                }
 
 
                 final int dataType = rs.getInt("DATA_TYPE");
