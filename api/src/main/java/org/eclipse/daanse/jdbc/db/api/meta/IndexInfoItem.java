@@ -11,9 +11,9 @@
 *   SmartCity Jena - initial
 *   Stefan Bischof (bipolis.org) - initial
 */
-package org.eclipse.daanse.jdbc.db.api.schema;
+package org.eclipse.daanse.jdbc.db.api.meta;
 
-public interface IndexInfo {
+public interface IndexInfoItem {
 
     int type();
 

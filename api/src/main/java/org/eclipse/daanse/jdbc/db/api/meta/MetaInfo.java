@@ -48,4 +48,8 @@ public interface MetaInfo {
      */
     StructureInfo structureInfo();
 
+    /**
+     * @return indexInfo list
+     */
+    List<IndexInfo> indexInfos();
 }
