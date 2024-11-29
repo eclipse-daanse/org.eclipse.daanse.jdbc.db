@@ -13,13 +13,8 @@
 */
 package org.eclipse.daanse.jdbc.db.record.schema;
 
-import java.util.List;
-
-import org.eclipse.daanse.jdbc.db.api.meta.IndexInfo;
 import org.eclipse.daanse.jdbc.db.api.meta.IndexInfoItem;
-import org.eclipse.daanse.jdbc.db.api.schema.TableDefinition;
-import org.eclipse.daanse.jdbc.db.api.schema.TableReference;
 
-public record IndexInfoR(TableReference tableReference, List<IndexInfoItem> indexInfoItems) implements IndexInfo {
+public record IndexInfoItemR(int type, String columnName, int cardinalityColumn, boolean unique) implements IndexInfoItem {
 
 }

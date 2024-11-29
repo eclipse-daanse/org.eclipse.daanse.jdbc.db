@@ -11,15 +11,15 @@
 *   SmartCity Jena - initial
 *   Stefan Bischof (bipolis.org) - initial
 */
-package org.eclipse.daanse.jdbc.db.record.schema;
+package org.eclipse.daanse.jdbc.db.api.meta;
 
 import java.util.List;
 
-import org.eclipse.daanse.jdbc.db.api.meta.IndexInfo;
-import org.eclipse.daanse.jdbc.db.api.meta.IndexInfoItem;
-import org.eclipse.daanse.jdbc.db.api.schema.TableDefinition;
 import org.eclipse.daanse.jdbc.db.api.schema.TableReference;
 
-public record IndexInfoR(TableReference tableReference, List<IndexInfoItem> indexInfoItems) implements IndexInfo {
+public interface IndexInfo {
 
+    TableReference tableReference();
+
+    List<IndexInfoItem> indexInfoItems();
 }

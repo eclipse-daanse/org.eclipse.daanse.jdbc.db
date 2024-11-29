@@ -17,11 +17,12 @@ import java.util.List;
 
 import org.eclipse.daanse.jdbc.db.api.meta.DatabaseInfo;
 import org.eclipse.daanse.jdbc.db.api.meta.IdentifierInfo;
+import org.eclipse.daanse.jdbc.db.api.meta.IndexInfo;
 import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
 import org.eclipse.daanse.jdbc.db.api.meta.StructureInfo;
 import org.eclipse.daanse.jdbc.db.api.meta.TypeInfo;
 
-public record MetaInfoR(DatabaseInfo databaseInfo,StructureInfo structureInfo , IdentifierInfo identifierInfo, List<TypeInfo> typeInfos)
+public record MetaInfoR(DatabaseInfo databaseInfo,StructureInfo structureInfo , IdentifierInfo identifierInfo, List<TypeInfo> typeInfos,  List<IndexInfo> indexInfos)
         implements MetaInfo {
 
 }

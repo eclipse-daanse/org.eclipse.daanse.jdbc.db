@@ -22,6 +22,7 @@ import java.util.Optional;
 import java.util.OptionalInt;
 
 import org.eclipse.daanse.jdbc.db.api.SqlStatementGenerator;
+import org.eclipse.daanse.jdbc.db.api.meta.IndexInfo;
 import org.eclipse.daanse.jdbc.db.api.meta.TypeInfo;
 import org.eclipse.daanse.jdbc.db.record.meta.DatabaseInfoR;
 import org.eclipse.daanse.jdbc.db.record.meta.IdentifierInfoR;
@@ -48,8 +49,11 @@ class SqlStatementGeneratorImplTest {
 
     static TypeInfo typeInfoInt;
 
+    static IndexInfo indexInfo;
+
     @BeforeAll
     static void beforeAll() {
+        indexInfo = Mockito.mock(IndexInfo.class);
         typeInfoVarchar = Mockito.mock(TypeInfo.class);
         typeInfoInt = Mockito.mock(TypeInfo.class);
         when(typeInfoVarchar.typeName()).thenReturn("varchar");
@@ -59,7 +63,7 @@ class SqlStatementGeneratorImplTest {
     }
 
     private SqlStatementGenerator generator = new SqlStatementGeneratorImpl(new MetaInfoR(
-            new DatabaseInfoR("", "", 0, 0), null, new IdentifierInfoR("#"), List.of(typeInfoVarchar, typeInfoInt)));
+            new DatabaseInfoR("", "", 0, 0), null, new IdentifierInfoR("#"), List.of(typeInfoVarchar, typeInfoInt), List.of(indexInfo)));
 
     @Test
     void dropTableNoSchemaNoExist() {
