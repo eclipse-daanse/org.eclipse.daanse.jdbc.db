@@ -13,6 +13,9 @@
 */
 package org.eclipse.daanse.jdbc.db.api.meta;
 
+import java.util.List;
+import java.util.Set;
+
 public interface IdentifierInfo {
 
     /**
@@ -22,5 +25,19 @@ public interface IdentifierInfo {
      * @return the quoting string or a space if quoting is not supported
      */
     String quoteString();
+
+    /**
+     *
+     * @return max column name length
+     */
+    int maxColumnNameLength();
+
+    /**
+     *
+     * @return is read only flag
+     */
+    boolean readOnly();
+
+    Set<List<Integer>> supportedResultSetStyles();
 
 }

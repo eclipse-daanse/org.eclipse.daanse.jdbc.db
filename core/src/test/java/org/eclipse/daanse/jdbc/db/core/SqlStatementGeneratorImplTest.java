@@ -20,6 +20,7 @@ import java.sql.JDBCType;
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalInt;
+import java.util.Set;
 
 import org.eclipse.daanse.jdbc.db.api.SqlStatementGenerator;
 import org.eclipse.daanse.jdbc.db.api.meta.IndexInfo;
@@ -63,7 +64,7 @@ class SqlStatementGeneratorImplTest {
     }
 
     private SqlStatementGenerator generator = new SqlStatementGeneratorImpl(new MetaInfoR(
-            new DatabaseInfoR("", "", 0, 0), null, new IdentifierInfoR("#"), List.of(typeInfoVarchar, typeInfoInt), List.of(indexInfo)));
+            new DatabaseInfoR("", "", 0, 0), null, new IdentifierInfoR("#", 10, false, Set.of()), List.of(typeInfoVarchar, typeInfoInt), List.of(indexInfo)));
 
     @Test
     void dropTableNoSchemaNoExist() {
