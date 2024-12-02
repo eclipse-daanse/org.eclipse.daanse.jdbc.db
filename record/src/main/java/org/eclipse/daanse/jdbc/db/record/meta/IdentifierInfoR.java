@@ -13,8 +13,11 @@
 */
 package org.eclipse.daanse.jdbc.db.record.meta;
 
+import java.util.List;
+import java.util.Set;
+
 import org.eclipse.daanse.jdbc.db.api.meta.IdentifierInfo;
 
-public record IdentifierInfoR(String quoteString) implements IdentifierInfo {
+public record IdentifierInfoR(String quoteString, int maxColumnNameLength, boolean readOnly, Set<List<Integer>> supportedResultSetStyles) implements IdentifierInfo {
 
 }

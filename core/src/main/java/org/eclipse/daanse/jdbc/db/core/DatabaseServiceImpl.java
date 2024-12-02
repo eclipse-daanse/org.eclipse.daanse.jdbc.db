@@ -19,9 +19,12 @@ import java.sql.JDBCType;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalInt;
+import java.util.Set;
 
 import javax.sql.DataSource;
 
@@ -73,6 +76,15 @@ public class DatabaseServiceImpl implements DatabaseService {
     private static final int TYPE_COLUMN = 7;
     private static final int COLUMN_NAME = 9;
     private static final int CARDINALITY_COLUMN = 11;
+
+    private static final int[] RESULT_SET_TYPE_VALUES = {
+            ResultSet.TYPE_FORWARD_ONLY,
+            ResultSet.TYPE_SCROLL_INSENSITIVE,
+            ResultSet.TYPE_SCROLL_SENSITIVE};
+
+        private static final int[] CONCURRENCY_VALUES = {
+            ResultSet.CONCUR_READ_ONLY,
+            ResultSet.CONCUR_UPDATABLE};
 
     @Override
     public MetaInfo createMetaInfo(DataSource dataSource) throws SQLException {
@@ -381,12 +393,18 @@ public class DatabaseServiceImpl implements DatabaseService {
     private static IdentifierInfo readIdentifierInfo(DatabaseMetaData databaseMetaData) {
 
         String quoteString = " ";
+        boolean readOnly = true;
+        int maxColumnNameLength = 0;
+        Set<List<Integer>> supportedResultSetStyles = Set.of();
         try {
             quoteString = databaseMetaData.getIdentifierQuoteString();
+            maxColumnNameLength = databaseMetaData.getMaxColumnNameLength();
+            readOnly = databaseMetaData.isReadOnly();
+            supportedResultSetStyles = supportedResultSetStyles(databaseMetaData);
         } catch (SQLException e) {
             LOGGER.error("Exception while reading quoteString", e);
         }
-        return new IdentifierInfoR(quoteString);
+        return new IdentifierInfoR(quoteString, maxColumnNameLength, readOnly, supportedResultSetStyles);
     }
 
     @Override
@@ -559,6 +577,38 @@ public class DatabaseServiceImpl implements DatabaseService {
             }
         }
         return List.copyOf(importedKeys);
+    }
+
+    private static Set<List<Integer>> supportedResultSetStyles(
+        DatabaseMetaData databaseMetaData) throws SQLException
+    {
+        Set<List<Integer>> supports = new HashSet<>();
+        for (int type : RESULT_SET_TYPE_VALUES) {
+            for (int concurrency : CONCURRENCY_VALUES) {
+                if (databaseMetaData.supportsResultSetConcurrency(
+                    type, concurrency))
+                {
+                    String driverName =
+                        databaseMetaData.getDriverName();
+                    if (type != ResultSet.TYPE_FORWARD_ONLY
+                        && driverName.equals(
+                        "JDBC-ODBC Bridge (odbcjt32.dll)"))
+                    {
+                        // In JDK 1.6, the Jdbc-Odbc bridge announces
+                        // that it can handle TYPE_SCROLL_INSENSITIVE
+                        // but it does so by generating a 'COUNT(*)'
+                        // query, and this query is invalid if the query
+                        // contains a single-quote. So, override the
+                        // driver.
+                        continue;
+                    }
+                    supports.add(
+                        new ArrayList<>(
+                            Arrays.asList(type, concurrency)));
+                }
+            }
+        }
+        return supports;
     }
 
 }
