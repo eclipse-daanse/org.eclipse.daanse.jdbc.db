@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<!--
+/*********************************************************************
+* Copyright (c) 2024 Contributors to the Eclipse Foundation.
+*
+* This program and the accompanying materials are made
+* available under the terms of the Eclipse Public License 2.0
+* which is available at https://www.eclipse.org/legal/epl-2.0/
+*
+* SPDX-License-Identifier: EPL-2.0
+**********************************************************************/
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.eclipse.daanse</groupId>
+    <artifactId>org.eclipse.daanse.jdbc.db.dialect</artifactId>
+    <version>${revision}</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+  <artifactId>org.eclipse.daanse.jdbc.db.dialect.db</artifactId>
+  <packaging>pom</packaging>
+  <modules>
+    <module>common</module>
+    <module>mysql</module>
+    <module>access</module>
+    <module>clickhouse</module>
+    <module>db2</module>
+    <module>derby</module>
+    <module>firebird</module>
+    <module>googlebigquery</module>
+    <module>greenplum</module>
+    <module>hive</module>
+    <module>hsqldb</module>
+    <module>h2</module>
+    <module>impala</module>
+    <module>infobright</module>
+    <module>informix</module>
+    <module>ingres</module>
+    <module>interbase</module>
+    <module>luciddb</module>
+    <module>mariadb</module>
+    <module>monetdb</module>
+    <module>mssqlserver</module>
+    <module>neoview</module>
+    <module>netezza</module>
+    <module>nuodb</module>
+    <module>oracle</module>
+    <module>pdidataservice</module>
+    <module>postgresql</module>
+    <module>redshift</module>
+    <module>snowflake</module>
+    <module>sqlite</module>
+    <module>sqlstream</module>
+    <module>sybase</module>
+    <module>teradata</module>
+    <module>vectorwise</module>
+    <module>vertica</module>
+  </modules>
+</project>
