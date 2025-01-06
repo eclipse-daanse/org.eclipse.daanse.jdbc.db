@@ -20,7 +20,7 @@ public class Constants {
     private Constants() {
     }
 
-    public static final String PID_IMPORTER_FILEWATCHER = "org.eclipse.daanse.jdbc.db.importer.csv.FileWatchingImporter";
+    public static final String PID_CSV_DATA_IMPORTER = "org.eclipse.daanse.jdbc.db.importer.csv.CsvDataImporter";
 
     public static final String PROPERETY_CSV_NULL_VALUE = "nullValue";
     public static final String PROPERETY_CSV_QUOTE_CHARACHTER = "quoteCharacter";

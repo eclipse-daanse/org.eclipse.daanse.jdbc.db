@@ -72,7 +72,7 @@ import de.siegmar.fastcsv.reader.NamedCsvRecord;
 
 @Designate(ocd = CsvDataImporterConfig.class, factory = true)
 @FileSystemWatcherListenerProperties(kinds = EventKind.ENTRY_MODIFY, pattern = ".*.csv", recursive = true)
-@Component(scope = ServiceScope.SINGLETON, service = FileSystemWatcherListener.class, configurationPid = Constants.PID_IMPORTER_FILEWATCHER)
+@Component(scope = ServiceScope.SINGLETON, service = FileSystemWatcherListener.class, configurationPid = Constants.PID_CSV_DATA_IMPORTER)
 public class CsvDataImporter implements FileSystemWatcherListener {
 
     private static final String EXCEPTION_WHILE_WRITING_DATA = "Exception while writing Data";
