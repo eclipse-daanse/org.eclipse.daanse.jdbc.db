@@ -110,7 +110,7 @@ class CscDataLoaderTest {
 
     private void setupCsvDataLoadServiceImpl(String nullValue, Character quote, Character fieldSeparator,
             String encoding, String stringPath) throws IOException {
-        conf = ca.getFactoryConfiguration(Constants.PID_IMPORTER_FILEWATCHER, "1", "?");
+        conf = ca.getFactoryConfiguration(Constants.PID_CSV_DATA_IMPORTER, "1", "?");
         Dictionary<String, Object> dict = new Hashtable<>();
         if (nullValue != null) {
 
