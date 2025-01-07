@@ -56,16 +56,38 @@ public class SqlStatementGeneratorImpl implements SqlStatementGenerator {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Input SqlStatementObject: {}", statement);
         }
-        StringBuilder sb = switch (statement) {
-        case DropContainerSqlStatement dc -> writeDropContainerSqlStatement(dc);
-        case DropSchemaSqlStatement ds -> writeDropSchemaSqlStatement(ds);
-        case CreateSchemaSqlStatement cs -> writeCreateSchemaSqlStatement(cs);
-        case TruncateTableSqlStatement ts -> writeTruncateTableSqlStatement(ts);
-        case CreateSqlStatement cc -> writeCreateSqlStatement(cc);
-        case InsertSqlStatement is -> writeInsertSqlStatement(is);
-        case CreateConstraintStatement is -> writeCreateConstraintSqlStatement(is);
-        case DropConstraintStatement is -> writeDropConstraintSqlStatement(is);
-        };
+
+//Post Java 17
+//        StringBuilder sb = switch (statement) {
+//        case DropContainerSqlStatement dc -> writeDropContainerSqlStatement(dc);
+//        case DropSchemaSqlStatement ds -> writeDropSchemaSqlStatement(ds);
+//        case CreateSchemaSqlStatement cs -> writeCreateSchemaSqlStatement(cs);
+//        case TruncateTableSqlStatement ts -> writeTruncateTableSqlStatement(ts);
+//        case CreateSqlStatement cc -> writeCreateSqlStatement(cc);
+//        case InsertSqlStatement is -> writeInsertSqlStatement(is);
+//        case CreateConstraintStatement is -> writeCreateConstraintSqlStatement(is);
+//        case DropConstraintStatement is -> writeDropConstraintSqlStatement(is);
+//        };
+
+        StringBuilder sb = null;
+        if (statement instanceof DropContainerSqlStatement dc) {
+            sb = writeDropContainerSqlStatement(dc);
+        }else if (statement instanceof DropSchemaSqlStatement ds) {
+            sb = writeDropSchemaSqlStatement(ds);
+        }else if (statement instanceof CreateSchemaSqlStatement cs) {
+            sb = writeCreateSchemaSqlStatement(cs);
+        }else if (statement instanceof TruncateTableSqlStatement ts) {
+            sb = writeTruncateTableSqlStatement(ts);
+        }else if (statement instanceof CreateSqlStatement cc) {
+            sb = writeCreateSqlStatement(cc);
+        }else if (statement instanceof InsertSqlStatement is) {
+            sb = writeInsertSqlStatement(is);
+        }else if (statement instanceof CreateConstraintStatement ccs) {
+            sb = writeCreateConstraintSqlStatement(ccs);
+        }else if (statement instanceof DropConstraintStatement dc) {
+            sb = writeDropConstraintSqlStatement(dc);
+        }
+
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Generated SqlStatement: {}", sb.toString());
         }
