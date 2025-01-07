@@ -31,6 +31,12 @@
     <slf4j.version>2.0.9</slf4j.version>
     <mockito.version>4.9.0</mockito.version>
     <assertj.version>3.24.2</assertj.version>
+
+    <java.version>17</java.version>
+    <java.release>17</java.release>
+
+    <maven.compiler.source>${java.version}</maven.compiler.source>
+    <maven.compiler.target>${java.version}</maven.compiler.target>
   </properties>
 
   <dependencyManagement>
