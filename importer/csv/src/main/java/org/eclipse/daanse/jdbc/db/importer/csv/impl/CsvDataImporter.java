@@ -144,7 +144,9 @@ public class CsvDataImporter implements FileSystemWatcherListener {
             try {
                 connection.createStatement().execute(statementCreateSchema);
             } catch (SQLException e) {
-                throw new CsvDataImporterException(EXCEPTION_WHILE_CREATING_SCHEMA, e);
+                // https://github.com/h2database/h2database/issues/4188
+                // throw new CsvDataImporterException(EXCEPTION_WHILE_CREATING_SCHEMA, e);
+                LOGGER.error(EXCEPTION_WHILE_CREATING_SCHEMA, e);
             }
         });
 
