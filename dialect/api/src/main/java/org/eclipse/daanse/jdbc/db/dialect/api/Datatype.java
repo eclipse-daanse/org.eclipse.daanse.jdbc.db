@@ -35,6 +35,14 @@ public enum Datatype {
         }
     },
 
+    VARCHAR("Varchar") {
+        @Override
+        public void quoteValue(
+            StringBuilder buf, Dialect dialect, String value) {
+            dialect.quoteStringLiteral(buf, value);
+        }
+    },
+
     NUMERIC("Numeric") {
         @Override
         public void quoteValue(
@@ -49,6 +57,83 @@ public enum Datatype {
     },
 
     INTEGER("Integer") {
+        @Override
+        public void quoteValue(
+            StringBuilder buf, Dialect dialect, String value) {
+            dialect.quoteNumericLiteral(buf, value);
+        }
+
+        @Override
+        public boolean isNumeric() {
+            return true;
+        }
+    },
+    DECIMAL("Decimal") {
+        @Override
+        public void quoteValue(
+            StringBuilder buf, Dialect dialect, String value) {
+            dialect.quoteNumericLiteral(buf, value);
+        }
+
+        @Override
+        public boolean isNumeric() {
+            return true;
+        }
+    },
+
+    FLOAT("Float") {
+        @Override
+        public void quoteValue(
+            StringBuilder buf, Dialect dialect, String value) {
+            dialect.quoteNumericLiteral(buf, value);
+        }
+
+        @Override
+        public boolean isNumeric() {
+            return true;
+        }
+    },
+
+    REAL("Real") {
+        @Override
+        public void quoteValue(
+            StringBuilder buf, Dialect dialect, String value) {
+            dialect.quoteNumericLiteral(buf, value);
+        }
+
+        @Override
+        public boolean isNumeric() {
+            return true;
+        }
+    },
+
+    BIGINT("Bigint") {
+        @Override
+        public void quoteValue(
+            StringBuilder buf, Dialect dialect, String value) {
+            dialect.quoteNumericLiteral(buf, value);
+        }
+
+        @Override
+        public boolean isNumeric() {
+            return true;
+        }
+    },
+
+    SMALLINT("Smallint") {
+        @Override
+        public void quoteValue(
+            StringBuilder buf, Dialect dialect, String value) {
+            dialect.quoteNumericLiteral(buf, value);
+        }
+
+        @Override
+        public boolean isNumeric() {
+            return true;
+        }
+    },
+
+    DOUBLE("Double") {
         @Override
         public void quoteValue(
             StringBuilder buf, Dialect dialect, String value) {
