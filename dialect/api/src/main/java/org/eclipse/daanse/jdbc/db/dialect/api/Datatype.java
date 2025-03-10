@@ -100,7 +100,7 @@ public enum Datatype {
         }
     },
 
-    BIGINT("Bigint") {
+    BIGINT("BigInt") {
         @Override
         public void quoteValue(
             StringBuilder buf, Dialect dialect, String value) {
@@ -113,7 +113,7 @@ public enum Datatype {
         }
     },
 
-    SMALLINT("Smallint") {
+    SMALLINT("SmallInt") {
         @Override
         public void quoteValue(
             StringBuilder buf, Dialect dialect, String value) {
