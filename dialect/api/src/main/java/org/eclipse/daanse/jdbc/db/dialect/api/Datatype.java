@@ -27,13 +27,6 @@ import java.util.stream.Stream;
  * Datatype of a column.
  */
 public enum Datatype {
-    STRING("String") {
-        @Override
-        public void quoteValue(
-            StringBuilder buf, Dialect dialect, String value) {
-            dialect.quoteStringLiteral(buf, value);
-        }
-    },
 
     VARCHAR("Varchar") {
         @Override
