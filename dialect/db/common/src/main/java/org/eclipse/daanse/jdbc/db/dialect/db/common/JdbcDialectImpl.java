@@ -585,7 +585,7 @@ public abstract class JdbcDialectImpl implements Dialect {
         for (int i = 0; i < columnTypes.size(); i++) {
             String columnType = columnTypes.get(i);
             Datatype datatype = Datatype.fromValue(columnType);
-            if (datatype == Datatype.STRING) {
+            if (datatype == Datatype.VARCHAR) {
                 maxLengths[i] = getMaxLen(valueList, i);
             }
         }
