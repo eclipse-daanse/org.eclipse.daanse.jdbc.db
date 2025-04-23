@@ -55,4 +55,27 @@ public class ClickHouseDialect extends JdbcDialectImpl {
     public String getDialectName() {
         return SUPPORTED_PRODUCT_NAME.toLowerCase();
     }
+    
+    @Override
+    public StringBuilder generateAndBitAggregation(CharSequence operand) {
+    	StringBuilder buf = new StringBuilder(64);
+        buf.append("groupBitAnd(").append(operand).append(")");
+        return buf;
+
+    }
+
+    @Override
+    public StringBuilder generateOrBitAggregation(CharSequence operand) {
+        StringBuilder buf = new StringBuilder(64);
+        buf.append("groupBitOr(").append(operand).append(")");
+        return buf;
+    }
+
+    @Override
+    public StringBuilder generateXorBitAggregation(CharSequence operand) {
+        StringBuilder buf = new StringBuilder(64);
+        buf.append("groupBitXor(").append(operand).append(")");
+        return buf;
+    }
+
 }

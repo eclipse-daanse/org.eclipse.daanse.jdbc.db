@@ -36,6 +36,8 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.naming.OperationNotSupportedException;
+
 import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
 import org.eclipse.daanse.jdbc.db.dialect.api.BestFitColumnType;
 import org.eclipse.daanse.jdbc.db.dialect.api.Datatype;
@@ -1057,4 +1059,20 @@ public abstract class JdbcDialectImpl implements Dialect {
     protected Set<List<Integer>> deduceSupportedResultSetStyles(MetaInfo metaInfo) {
         return metaInfo.identifierInfo().supportedResultSetStyles();
     }
+
+    @Override
+    public StringBuilder generateAndBitAggregation(CharSequence operand) {
+        throw new RuntimeException("and Bit Aggregation not supported");
+    }
+
+    @Override
+    public StringBuilder generateOrBitAggregation(CharSequence operand) {
+        throw new RuntimeException("OR Bit Aggregation not supported");
+    }
+
+    @Override
+    public StringBuilder generateXorBitAggregation(CharSequence operand) {
+        throw new RuntimeException("XOR Bit Aggregation not supported");
+    }
+
 }
