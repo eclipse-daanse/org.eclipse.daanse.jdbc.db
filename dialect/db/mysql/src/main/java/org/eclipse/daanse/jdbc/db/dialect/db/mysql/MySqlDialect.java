@@ -265,4 +265,25 @@ public class MySqlDialect extends JdbcDialectImpl {
     public String getDialectName() {
         return SUPPORTED_PRODUCT_NAME.toLowerCase();
     }
+
+    @Override
+    public StringBuilder generateAndBitAggregation(CharSequence operand) {
+        StringBuilder buf = new StringBuilder(64);
+        buf.append("BIT_AND(").append(operand).append(")");
+        return buf;
+    }
+
+    @Override
+    public StringBuilder generateOrBitAggregation(CharSequence operand) {
+        StringBuilder buf = new StringBuilder(64);
+        buf.append("BIT_OR(").append(operand).append(")");
+        return buf;
+    }
+
+    @Override
+    public StringBuilder generateXorBitAggregation(CharSequence operand) {
+        StringBuilder buf = new StringBuilder(64);
+        buf.append("BIT_XOR(").append(operand).append(")");
+        return buf;
+    }
 }

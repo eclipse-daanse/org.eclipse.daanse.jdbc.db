@@ -718,4 +718,10 @@ public interface Dialect {
     String createSchema(String schemaName, boolean ifExists);
 
     StringBuilder generateUnionAllSql(List<Map<String, Map.Entry<Datatype, Object>>> valueList);
+
+    StringBuilder generateAndBitAggregation(CharSequence operand);
+
+    StringBuilder generateOrBitAggregation(CharSequence operand);
+
+    StringBuilder generateXorBitAggregation(CharSequence operand);
 }

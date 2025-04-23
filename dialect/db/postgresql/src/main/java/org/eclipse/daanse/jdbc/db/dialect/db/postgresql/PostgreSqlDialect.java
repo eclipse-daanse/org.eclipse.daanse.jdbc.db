@@ -110,4 +110,26 @@ public class PostgreSqlDialect extends JdbcDialectImpl {
         return "postgres";
     }
 
+    @Override
+    public StringBuilder generateAndBitAggregation(CharSequence operand) {
+    	StringBuilder buf = new StringBuilder(64);
+        buf.append("bit_and(").append(operand).append(")");
+        return buf;
+
+    }
+
+    @Override
+    public StringBuilder generateOrBitAggregation(CharSequence operand) {
+        StringBuilder buf = new StringBuilder(64);
+        buf.append("bit_or(").append(operand).append(")");
+        return buf;
+    }
+
+    @Override
+    public StringBuilder generateXorBitAggregation(CharSequence operand) {
+        StringBuilder buf = new StringBuilder(64);
+        buf.append("bit_xor(").append(operand).append(")");
+        return buf;
+    }
+
 }
