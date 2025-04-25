@@ -39,8 +39,8 @@ public interface Dialect {
     /**
      * Warps an {@link CharSequence} expression into an 'to upper case' SQL function
      * call.
-     *
-     *
+     * <p>
+     * <p>
      * "foo.bar" -> "UPPER(foo.bar)"
      * "foo.bar" -> "UCASE(foo.bar)"
      *
@@ -52,11 +52,9 @@ public interface Dialect {
     /**
      * Warps an {@link CharSequence} expression into an 'If Then Else' SQL function
      * call.
-     *
+     * <p>
      * "case when ifValue then thenValue else elseValue end"
      * ""Iif( ifValue , thenValue, elseValue)
-     *
-     *
      *
      * @param idCondition    {@link CharSequence} with the IF-Condition
      * @param thenExpression {@link CharSequence} with the Then-Expression
@@ -68,8 +66,8 @@ public interface Dialect {
 
     /**
      * Encloses an identifier in quotation marks appropriate for this Dialect.
-     *
-     *
+     * <p>
+     * <p>
      * For example, quoteIdentifier("emp") yields a string containing
      * "emp" in Oracle, and a string containing [emp] in
      * Access.
@@ -103,11 +101,10 @@ public interface Dialect {
     /**
      * Appends to a buffer a list of identifiers, quoted appropriately for this
      * Dialect.
-     *
-     *
+     * <p>
+     * <p>
      * Names in the list may be null, but there must be at least one non-null name
      * in the list.
-     *
      *
      * @param buf   Buffer
      * @param names List of names to be quoted
@@ -124,8 +121,8 @@ public interface Dialect {
 
     /**
      * Appends to a buffer a single-quoted SQL string.
-     *
-     *
+     * <p>
+     * <p>
      * For example, in the default dialect,
      * quoteStringLiteral(buf, "Can't") appends "'Can''t'"
      * to buf.
@@ -137,8 +134,8 @@ public interface Dialect {
 
     /**
      * Appends to a buffer a numeric literal.
-     *
-     *
+     * <p>
+     * <p>
      * In the default dialect, numeric literals are printed as is.
      *
      * @param buf   Buffer to append to
@@ -148,8 +145,8 @@ public interface Dialect {
 
     /**
      * Appends to a buffer a boolean literal.
-     *
-     *
+     * <p>
+     * <p>
      * In the default dialect, boolean literals are printed as is.
      *
      * @param buf   Buffer to append to
@@ -159,8 +156,8 @@ public interface Dialect {
 
     /**
      * Appends to a buffer a date literal.
-     *
-     *
+     * <p>
+     * <p>
      * For example, in the default dialect,
      * quoteStringLiteral(buf, "1969-03-17") appends
      * DATE '1969-03-17'.
@@ -172,8 +169,8 @@ public interface Dialect {
 
     /**
      * Appends to a buffer a time literal.
-     *
-     *
+     * <p>
+     * <p>
      * For example, in the default dialect,
      * quoteStringLiteral(buf, "12:34:56") appends
      * TIME '12:34:56'.
@@ -185,8 +182,8 @@ public interface Dialect {
 
     /**
      * Appends to a buffer a timestamp literal.
-     *
-     *
+     * <p>
+     * <p>
      * For example, in the default dialect,
      * quoteStringLiteral(buf, "1969-03-17 12:34:56") appends
      * TIMESTAMP '1969-03-17 12:34:56'.
@@ -198,8 +195,8 @@ public interface Dialect {
 
     /**
      * Appends to a buffer a decimal literal.
-     *
-     *
+     * <p>
+     * <p>
      * For example, in the default dialect,
      * quoteDecimalLiteral(buf, "12.58") appends
      * FLOAT('12.58') for DB2.
@@ -229,7 +226,7 @@ public interface Dialect {
     /**
      * Returns whether this Dialect allows a subquery in the from clause, for
      * example
-     *
+     * <p>
      * SELECT * FROM (SELECT * FROM t) AS
      * x
      *
@@ -241,7 +238,7 @@ public interface Dialect {
     /**
      * Returns whether this Dialect allows multiple arguments to the
      * COUNT(DISTINCT ...) aggregate function, for example
-     *
+     * <p>
      * SELECT COUNT(DISTINCT x, y) FROM t
      *
      * @return whether Dialect allows multiple arguments to COUNT DISTINCT
@@ -252,8 +249,8 @@ public interface Dialect {
 
     /**
      * Returns whether this Dialect supports distinct aggregations.
-     *
-     *
+     * <p>
+     * <p>
      * For example, Access does not allow
      * select count(distinct x) from t
      *
@@ -264,12 +261,12 @@ public interface Dialect {
     /**
      * Returns whether this Dialect supports more than one distinct aggregation in
      * the same query.
-     *
-     *
+     * <p>
+     * <p>
      * In Derby 10.1,  select couunt(distinct x) from t
-     *  is OK, but
+     * is OK, but
      * select couunt(distinct x), count(distinct y) from t
-     *  gives "Multiple DISTINCT aggregates are not supported at this
+     * gives "Multiple DISTINCT aggregates are not supported at this
      * time."
      *
      * @return whether this Dialect supports more than one distinct aggregation in
@@ -289,7 +286,7 @@ public interface Dialect {
     /**
      * Returns whether this Dialect supports distinct aggregations with other
      * aggregations in the same query.
-     *
+     * <p>
      * This may be enabled for performance reasons (Vertica)
      *
      * @return whether this Dialect supports more than one distinct aggregation in
@@ -299,22 +296,21 @@ public interface Dialect {
 
     /**
      * Generates a SQL statement to represent an inline dataset.
-     *
-     *
+     * <p>
+     * <p>
      * For example, for Oracle, generates
-     *
-     *
+     * <p>
+     * <p>
      * SELECT 1 AS FOO, 'a' AS BAR FROM dual
      * UNION ALL
      * SELECT 2 AS FOO, 'b' AS BAR FROM dual
-     *
-     *
-     *
+     * <p>
+     * <p>
+     * <p>
      * For ANSI SQL, generates:
-     *
-     *
+     * <p>
+     * <p>
      * VALUES (1, 'a'), (2, 'b')
-     *
      *
      * @param columnNames List of column names
      * @param columnTypes List of column types ("String" or "Numeric")
@@ -347,8 +343,8 @@ public interface Dialect {
      * Returns whether this dialect supports common SQL Data Definition Language
      * (DDL) statements such as CREATE TABLE and
      * DROP INDEX.
-     *
-     *
+     * <p>
+     * <p>
      * Access seems to allow DDL iff the .mdb file is writeable.
      *
      * @return whether this Dialect supports DDL
@@ -397,19 +393,18 @@ public interface Dialect {
     /**
      * Returns true if this Dialect can include expressions in the GROUP BY clause
      * only by adding an expression to the SELECT clause and using its alias.
-     *
-     *
+     * <p>
+     * <p>
      * For example, in such a dialect,
      * SELECT x, x FROM t GROUP BY x  would be illegal,
      * but  SELECT x AS a, x AS b FROM t ORDER BY a, b
-     *
-     *
+     * <p>
+     * <p>
      * would be legal.
-     *
-     *
-     *
+     * <p>
+     * <p>
+     * <p>
      * Infobright is the only such dialect.
-     *
      *
      * @return Whether this Dialect can include expressions in the GROUP BY clause
      * only by adding an expression to the SELECT clause and using its alias
@@ -419,19 +414,18 @@ public interface Dialect {
     /**
      * Returns true if this Dialect can include expressions in the ORDER BY clause
      * only by adding an expression to the SELECT clause and using its alias.
-     *
-     *
+     * <p>
+     * <p>
      * For example, in such a dialect,
      * SELECT x FROM t ORDER BY x + y  would be illegal,
      * but  SELECT x, x + y AS z FROM t ORDER BY z
-     *
-     *
+     * <p>
+     * <p>
      * would be legal.
-     *
-     *
-     *
+     * <p>
+     * <p>
+     * <p>
      * MySQL, DB2 and Ingres are examples of such dialects.
-     *
      *
      * @return Whether this Dialect can include expressions in the ORDER BY clause
      * only by adding an expression to the SELECT clause and using its alias
@@ -441,19 +435,18 @@ public interface Dialect {
     /**
      * Returns true if this Dialect can include expressions in the HAVING clause
      * only by adding an expression to the SELECT clause and using its alias.
-     *
-     *
+     * <p>
+     * <p>
      * For example, in such a dialect,
      * SELECT CONCAT(x) as foo FROM t HAVING CONCAT(x) LIKE "%"
-     *  would be illegal, but
+     * would be illegal, but
      * SELECT CONCAT(x) as foo FROM t HAVING foo LIKE "%"
-     *
+     * <p>
      * would be legal.
-     *
-     *
-     *
+     * <p>
+     * <p>
+     * <p>
      * MySQL is an example of such dialects.
-     *
      *
      * @return Whether this Dialect can include expressions in the HAVING clause
      * only by adding an expression to the SELECT clause and using its alias
@@ -463,18 +456,17 @@ public interface Dialect {
     /**
      * Returns true if aliases defined in the SELECT clause can be used as
      * expressions in the ORDER BY clause.
-     *
-     *
+     * <p>
+     * <p>
      * For example, in such a dialect,
      * SELECT x, x + y AS z FROM t ORDER BY z
-     *
+     * <p>
      * would be legal.
-     *
-     *
-     *
+     * <p>
+     * <p>
+     * <p>
      * MySQL, DB2 and Ingres are examples of dialects where this is true; Access is
      * a dialect where this is false.
-     *
      *
      * @return Whether aliases defined in the SELECT clause can be used as
      * expressions in the ORDER BY clause.
@@ -484,25 +476,25 @@ public interface Dialect {
     /**
      * Returns true if this dialect allows only integers in the ORDER BY clause of a
      * UNION (or other set operation) query.
-     *
-     *
+     * <p>
+     * <p>
      * For example,
-     *
+     * <p>
      * SELECT x, y + z FROM t
      * UNION ALL
      * SELECT x, y + z FROM t
      * ORDER BY 1, 2
-     *
+     * <p>
      * is allowed but
-     *
+     * <p>
      * SELECT x, y, z FROM t
      * UNION ALL
      * SELECT x, y, z FROM t
      * ORDER BY x
-     *
+     * <p>
      * is not.
-     *
-     *
+     * <p>
+     * <p>
      * Teradata is an example of a dialect with this restriction.
      *
      * @return whether this dialect allows only integers in the ORDER BY clause of a
@@ -513,22 +505,22 @@ public interface Dialect {
     /**
      * Returns true if this dialect allows an expression in the ORDER BY clause of a
      * UNION (or other set operation) query only if it occurs in the SELECT clause.
-     *
-     *
+     * <p>
+     * <p>
      * For example,
-     *
+     * <p>
      * SELECT x, y + z FROM t
      * UNION ALL
      * SELECT x, y + z FROM t
      * ORDER BY y + z
      * is allowed but
-     *
+     * <p>
      * SELECT x, y, z FROM t
      * UNION ALL
      * SELECT x, y, z FROM t
      * ORDER BY y + z SELECT x, y, z FROM t ORDER BY y + z
      * is not.
-     *
+     * <p>
      * Access is an example of a dialect with this restriction.
      *
      * @return whether this dialect allows an expression in the ORDER BY clause of a
@@ -539,7 +531,7 @@ public interface Dialect {
 
     /**
      * Returns true if this dialect supports multi-value IN expressions. E.g.,
-     *
+     * <p>
      * WHERE (col1, col2) IN ((val1a, val2a), (val1b, val2b))
      *
      * @return true if the dialect supports multi-value IN expressions
@@ -549,7 +541,7 @@ public interface Dialect {
     /**
      * Returns whether this Dialect supports the given concurrency type in
      * combination with the given result set type.
-     *
+     * <p>
      * The result is similar to
      * {@link java.sql.DatabaseMetaData#supportsResultSetConcurrency(int, int)},
      * except that the JdbcOdbc bridge in JDK 1.6 overstates its abilities. See bug
@@ -584,11 +576,11 @@ public interface Dialect {
     /**
      * Returns whether this Dialect object can be used for all connections from the
      * same data source.
-     *
+     * <p>
      * The default implementation returns {@code true}, and this allows dialects to
      * be cached and reused in environments where connections are allocated from a
      * pool based on the same data source.
-     *
+     * <p>
      * Data sources are deemed 'equal' by the same criteria used by Java
      * collections, namely the {@link Object#equals(Object)} and
      * {@link Object#hashCode()} methods.
@@ -603,13 +595,13 @@ public interface Dialect {
      * SELECT clause expressions that are not listed in the GROUP BY clause. The SQL
      * standard allows this if the database can deduce that the expression is
      * functionally dependent on columns in the GROUP BY clause.
-     *
+     * <p>
      * For example, {@code SELECT empno, first_name || ' ' || last_name FROM
      * emps GROUP BY empno} is valid because {@code empno} is the primary key of the
      * {@code emps} table, and therefore all columns are dependent on it. For a
      * given value of {@code empno}, {@code first_name || ' ' || last_name} has a
      * unique value.
-     *
+     * <p>
      * Most databases do not, MySQL is an example of one that does (if the
      * functioality is enabled).
      *
@@ -658,7 +650,7 @@ public interface Dialect {
      * generateRegularExpression(
      * "'foodmart'.'customer_name'", ".*oo.*") ->
      * REGEXP_LIKE('foodmart'.'customer_name', ".*oo.*")
-     *
+     * <p>
      * Dialects are allowed to return null if the dialect cannot convert that
      * particular regular expression into something that the database would support.
      *
@@ -673,7 +665,7 @@ public interface Dialect {
     /**
      * Chooses the most appropriate type for accessing the values of a column in a
      * result set for a dialect.
-     *
+     * <p>
      * Dialect-specific nuances involving type representation should be encapsulated
      * in implementing methods. For example, if a dialect has implicit rules
      * involving scale or precision, they should be handled within this method so
@@ -725,11 +717,23 @@ public interface Dialect {
 
     StringBuilder generateXorBitAggregation(CharSequence operand);
 
+    StringBuilder generateNAndBitAggregation(CharSequence operand);
+
+    StringBuilder generateNOrBitAggregation(CharSequence operand);
+
+    StringBuilder generateNXorBitAggregation(CharSequence operand);
+
     boolean supportsBitAndAgg();
 
     boolean supportsBitOrAgg();
 
     boolean supportsBitXorAgg();
+
+    boolean supportsBitNAndAgg();
+
+    boolean supportsBitNOrAgg();
+
+    boolean supportsBitNXorAgg();
 
     boolean supportsPercentileContAgg();
 

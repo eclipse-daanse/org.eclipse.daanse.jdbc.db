@@ -200,16 +200,34 @@ public class OracleDialect extends JdbcDialectImpl {
         return buf;
     }
 
+    @Override
     public boolean supportsBitAndAgg() {
         return true;
     }
 
+    @Override
     public boolean supportsBitOrAgg() {
         return true;
     }
 
+    @Override
     public boolean supportsBitXorAgg() {
         return true;
+    }
+
+    @Override
+    public boolean supportsBitNAndAgg() {
+        return false;
+    }
+
+    @Override
+    public boolean supportsBitNOrAgg() {
+        return false;
+    }
+
+    @Override
+    public boolean supportsBitNXorAgg() {
+        return false;
     }
 
     @Override

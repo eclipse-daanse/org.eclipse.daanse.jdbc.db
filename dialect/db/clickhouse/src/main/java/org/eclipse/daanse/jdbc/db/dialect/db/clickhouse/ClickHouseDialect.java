@@ -78,6 +78,28 @@ public class ClickHouseDialect extends JdbcDialectImpl {
         return buf;
     }
 
+    @Override
+    public StringBuilder generateNAndBitAggregation(CharSequence operand) {
+        StringBuilder buf = new StringBuilder(64);
+        buf.append("NOT(groupBitAnd(").append(operand).append("))");
+        return buf;
+
+    }
+
+    @Override
+    public StringBuilder generateNOrBitAggregation(CharSequence operand) {
+        StringBuilder buf = new StringBuilder(64);
+        buf.append("NOT(groupBitOr(").append(operand).append("))");
+        return buf;
+    }
+
+    @Override
+    public StringBuilder generateNXorBitAggregation(CharSequence operand) {
+        StringBuilder buf = new StringBuilder(64);
+        buf.append("NOT(groupBitXor(").append(operand).append("))");
+        return buf;
+    }
+
     public boolean supportsBitAndAgg() {
         return true;
     }
@@ -86,8 +108,23 @@ public class ClickHouseDialect extends JdbcDialectImpl {
         return true;
     }
 
+    @Override
     public boolean supportsBitXorAgg() {
         return true;
     }
 
+    @Override
+    public boolean supportsBitNAndAgg() {
+        return true;
+    }
+
+    @Override
+    public boolean supportsBitNOrAgg() {
+        return true;
+    }
+
+    @Override
+    public boolean supportsBitNXorAgg() {
+        return true;
+    }
 }
