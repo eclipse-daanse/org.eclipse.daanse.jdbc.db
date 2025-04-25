@@ -286,4 +286,62 @@ public class MySqlDialect extends JdbcDialectImpl {
         buf.append("BIT_XOR(").append(operand).append(")");
         return buf;
     }
+
+    @Override
+    public boolean supportsBitAndAgg() {
+        return true;
+    }
+
+    @Override
+    public boolean supportsBitOrAgg() {
+        return true;
+    }
+
+    @Override
+    public boolean supportsBitXorAgg() {
+        return true;
+    }
+
+    @Override
+    public StringBuilder generatePercentileDisc(double percentile, boolean desc, String tableName, String columnName) {
+        StringBuilder buf = new StringBuilder(64);
+        buf.append("PERCENTILE_DISC(").append(percentile).append(")").append(" WITHIN GROUP (ORDER BY ");
+        if (tableName != null) {
+            quoteIdentifier(buf, tableName, columnName);
+        } else {
+            quoteIdentifier(buf, columnName);
+        }
+        if (desc) {
+            buf.append(" ").append(DESC);
+        }
+        buf.append(")");
+        return buf;
+    }
+
+    @Override
+    public StringBuilder generatePercentileCont(double percentile, boolean desc, String tableName, String columnName) {
+        StringBuilder buf = new StringBuilder(64);
+        buf.append("PERCENTILE_CONT(").append(percentile).append(")").append(" WITHIN GROUP (ORDER BY ");
+        if (tableName != null) {
+            quoteIdentifier(buf, tableName, columnName);
+        } else {
+            quoteIdentifier(buf, columnName);
+        }
+        if (desc) {
+            buf.append(" ").append(DESC);
+        }
+        buf.append(")");
+        return buf;
+    }
+
+    @Override
+    public boolean supportsPercentileDisc() {
+        return productVersion.compareTo("8.0") >= 0;
+    }
+
+    @Override
+    public boolean supportsPercentileCont() {
+        return productVersion.compareTo("8.0") >= 0;
+    }
+
 }

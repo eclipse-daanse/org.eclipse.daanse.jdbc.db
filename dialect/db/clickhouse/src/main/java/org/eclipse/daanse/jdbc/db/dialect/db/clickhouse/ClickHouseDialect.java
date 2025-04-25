@@ -55,10 +55,10 @@ public class ClickHouseDialect extends JdbcDialectImpl {
     public String getDialectName() {
         return SUPPORTED_PRODUCT_NAME.toLowerCase();
     }
-    
+
     @Override
     public StringBuilder generateAndBitAggregation(CharSequence operand) {
-    	StringBuilder buf = new StringBuilder(64);
+        StringBuilder buf = new StringBuilder(64);
         buf.append("groupBitAnd(").append(operand).append(")");
         return buf;
 
@@ -76,6 +76,18 @@ public class ClickHouseDialect extends JdbcDialectImpl {
         StringBuilder buf = new StringBuilder(64);
         buf.append("groupBitXor(").append(operand).append(")");
         return buf;
+    }
+
+    public boolean supportsBitAndAgg() {
+        return true;
+    }
+
+    public boolean supportsBitOrAgg() {
+        return true;
+    }
+
+    public boolean supportsBitXorAgg() {
+        return true;
     }
 
 }

@@ -112,7 +112,7 @@ public class PostgreSqlDialect extends JdbcDialectImpl {
 
     @Override
     public StringBuilder generateAndBitAggregation(CharSequence operand) {
-    	StringBuilder buf = new StringBuilder(64);
+        StringBuilder buf = new StringBuilder(64);
         buf.append("bit_and(").append(operand).append(")");
         return buf;
 
@@ -130,6 +130,60 @@ public class PostgreSqlDialect extends JdbcDialectImpl {
         StringBuilder buf = new StringBuilder(64);
         buf.append("bit_xor(").append(operand).append(")");
         return buf;
+    }
+
+    public boolean supportsBitAndAgg() {
+        return true;
+    }
+
+    public boolean supportsBitOrAgg() {
+        return true;
+    }
+
+    public boolean supportsBitXorAgg() {
+        return true;
+    }
+
+    @Override
+    public StringBuilder generatePercentileDisc(double percentile, boolean desc, String tableName, String columnName) {
+        StringBuilder buf = new StringBuilder(64);
+        buf.append("PERCENTILE_DISC(").append(percentile).append(")").append(" WITHIN GROUP (ORDER BY ");
+        if (tableName != null) {
+            quoteIdentifier(buf, tableName, columnName);
+        } else {
+            quoteIdentifier(buf, columnName);
+        }
+        if (desc) {
+            buf.append(" ").append(DESC);
+        }
+        buf.append(")");
+        return buf;
+    }
+
+    @Override
+    public StringBuilder generatePercentileCont(double percentile, boolean desc, String tableName, String columnName) {
+        StringBuilder buf = new StringBuilder(64);
+        buf.append("PERCENTILE_CONT(").append(percentile).append(")").append(" WITHIN GROUP (ORDER BY ");
+        if (tableName != null) {
+            quoteIdentifier(buf, tableName, columnName);
+        } else {
+            quoteIdentifier(buf, columnName);
+        }
+        if (desc) {
+            buf.append(" ").append(DESC);
+        }
+        buf.append(")");
+        return buf;
+    }
+
+    @Override
+    public boolean supportsPercentileDisc() {
+        return true;
+    }
+
+    @Override
+    public boolean supportsPercentileCont() {
+        return true;
     }
 
 }
