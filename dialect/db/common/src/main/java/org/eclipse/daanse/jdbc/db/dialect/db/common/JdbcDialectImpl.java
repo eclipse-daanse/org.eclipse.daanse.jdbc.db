@@ -1060,7 +1060,7 @@ public abstract class JdbcDialectImpl implements Dialect {
 
     @Override
     public StringBuilder generateAndBitAggregation(CharSequence operand) {
-        throw new RuntimeException("and Bit Aggregation not supported");
+        throw new RuntimeException("AND Bit Aggregation not supported");
     }
 
     @Override
@@ -1071,6 +1071,21 @@ public abstract class JdbcDialectImpl implements Dialect {
     @Override
     public StringBuilder generateXorBitAggregation(CharSequence operand) {
         throw new RuntimeException("XOR Bit Aggregation not supported");
+    }
+
+    @Override
+    public StringBuilder generateNAndBitAggregation(CharSequence operand) {
+        throw new RuntimeException("NOT AND Bit Aggregation not supported");
+    }
+
+    @Override
+    public StringBuilder generateNOrBitAggregation(CharSequence operand) {
+        throw new RuntimeException("NOT OR Bit Aggregation not supported");
+    }
+
+    @Override
+    public StringBuilder generateNXorBitAggregation(CharSequence operand) {
+        throw new RuntimeException("NOT XOR Bit Aggregation not supported");
     }
 
     @Override
@@ -1085,6 +1100,21 @@ public abstract class JdbcDialectImpl implements Dialect {
 
     @Override
     public boolean supportsBitXorAgg() {
+        return false;
+    }
+
+    @Override
+    public boolean supportsBitNAndAgg() {
+        return false;
+    }
+
+    @Override
+    public boolean supportsBitNOrAgg() {
+        return false;
+    }
+
+    @Override
+    public boolean supportsBitNXorAgg() {
         return false;
     }
 
