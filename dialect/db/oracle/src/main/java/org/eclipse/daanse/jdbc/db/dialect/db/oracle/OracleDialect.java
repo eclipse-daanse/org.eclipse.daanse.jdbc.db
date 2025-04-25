@@ -92,7 +92,7 @@ public class OracleDialect extends JdbcDialectImpl {
         }
         javaRegex = DialectUtil.cleanUnicodeAwareCaseFlag(javaRegex);
         StringBuilder mappedFlags = new StringBuilder();
-        String[][] mapping = new String[][] { { "c", "c" }, { "i", "i" }, { "m", "m" } };
+        String[][] mapping = new String[][]{{"c", "c"}, {"i", "i"}, {"m", "m"}};
         javaRegex = extractEmbeddedFlags(javaRegex, mapping, mappedFlags);
 
         final Matcher escapeMatcher = escapePattern.matcher(javaRegex);
@@ -115,7 +115,7 @@ public class OracleDialect extends JdbcDialectImpl {
     /**
      * Chooses the most appropriate type for accessing the values of a column in a
      * result set.
-     *
+     * <p>
      * The OracleDialect implementation handles some of the specific quirks of
      * Oracle: e.g. scale = -127 has special meaning with NUMERIC types and may
      * indicate a FLOAT value if precision is non-zero.
@@ -123,9 +123,8 @@ public class OracleDialect extends JdbcDialectImpl {
      * @param metaData    Resultset metadata
      * @param columnIndex index of the column in the result set
      * @return For Types.NUMERIC and Types.DECIMAL, getType() will return a
-     *         Type.INT, Type.DOUBLE, or Type.OBJECT based on scale, precision, and
-     *         column name.
-     *
+     * Type.INT, Type.DOUBLE, or Type.OBJECT based on scale, precision, and
+     * column name.
      * @throws SQLException
      */
     @Override
@@ -181,7 +180,7 @@ public class OracleDialect extends JdbcDialectImpl {
 
     @Override
     public StringBuilder generateAndBitAggregation(CharSequence operand) {
-    	StringBuilder buf = new StringBuilder(64);
+        StringBuilder buf = new StringBuilder(64);
         buf.append("BIT_AND_AGG(").append(operand).append(")");
         return buf;
 
@@ -199,6 +198,60 @@ public class OracleDialect extends JdbcDialectImpl {
         StringBuilder buf = new StringBuilder(64);
         buf.append("BIT_XOR(").append(operand).append(")");
         return buf;
+    }
+
+    public boolean supportsBitAndAgg() {
+        return true;
+    }
+
+    public boolean supportsBitOrAgg() {
+        return true;
+    }
+
+    public boolean supportsBitXorAgg() {
+        return true;
+    }
+
+    @Override
+    public StringBuilder generatePercentileDisc(double percentile, boolean desc, String tableName, String columnName) {
+        StringBuilder buf = new StringBuilder(64);
+        buf.append("PERCENTILE_DISC(").append(percentile).append(")").append(" WITHIN GROUP (ORDER BY ");
+        if (tableName != null) {
+            quoteIdentifier(buf, tableName, columnName);
+        } else {
+            quoteIdentifier(buf, columnName);
+        }
+        if (desc) {
+            buf.append(" ").append(DESC);
+        }
+        buf.append(")");
+        return buf;
+    }
+
+    @Override
+    public StringBuilder generatePercentileCont(double percentile, boolean desc, String tableName, String columnName) {
+        StringBuilder buf = new StringBuilder(64);
+        buf.append("PERCENTILE_CONT(").append(percentile).append(")").append(" WITHIN GROUP (ORDER BY ");
+        if (tableName != null) {
+            quoteIdentifier(buf, tableName, columnName);
+        } else {
+            quoteIdentifier(buf, columnName);
+        }
+        if (desc) {
+            buf.append(" ").append(DESC);
+        }
+        buf.append(")");
+        return buf;
+    }
+
+    @Override
+    public boolean supportsPercentileDisc() {
+        return true;
+    }
+
+    @Override
+    public boolean supportsPercentileCont() {
+        return true;
     }
 
 }

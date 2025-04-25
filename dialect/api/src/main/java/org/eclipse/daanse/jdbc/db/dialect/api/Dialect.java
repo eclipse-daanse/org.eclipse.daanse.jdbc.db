@@ -724,4 +724,23 @@ public interface Dialect {
     StringBuilder generateOrBitAggregation(CharSequence operand);
 
     StringBuilder generateXorBitAggregation(CharSequence operand);
+
+    boolean supportsBitAndAgg();
+
+    boolean supportsBitOrAgg();
+
+    boolean supportsBitXorAgg();
+
+    boolean supportsPercentileContAgg();
+
+    boolean supportsPercentileDiscAgg();
+
+    StringBuilder generatePercentileDisc(double percentile, boolean desc, String tableName, String columnName);
+
+    StringBuilder generatePercentileCont(double percentile, boolean desc, String tableName, String columnName);
+
+    boolean supportsPercentileDisc();
+
+    boolean supportsPercentileCont();
+
 }

@@ -36,8 +36,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.naming.OperationNotSupportedException;
-
 import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
 import org.eclipse.daanse.jdbc.db.dialect.api.BestFitColumnType;
 import org.eclipse.daanse.jdbc.db.dialect.api.Datatype;
@@ -1073,6 +1071,51 @@ public abstract class JdbcDialectImpl implements Dialect {
     @Override
     public StringBuilder generateXorBitAggregation(CharSequence operand) {
         throw new RuntimeException("XOR Bit Aggregation not supported");
+    }
+
+    @Override
+    public boolean supportsBitAndAgg() {
+        return false;
+    }
+
+    @Override
+    public boolean supportsBitOrAgg() {
+        return false;
+    }
+
+    @Override
+    public boolean supportsBitXorAgg() {
+        return false;
+    }
+
+    @Override
+    public boolean supportsPercentileContAgg() {
+        return false;
+    }
+
+    @Override
+    public boolean supportsPercentileDiscAgg() {
+        return false;
+    }
+
+    @Override
+    public StringBuilder generatePercentileDisc(double percentile, boolean desc, String tableName, String columnName) {
+        throw new RuntimeException("PERCENTILE DISC Aggregation not supported");
+    }
+
+    @Override
+    public StringBuilder generatePercentileCont(double percentile, boolean desc, String tableName, String columnName) {
+        throw new RuntimeException("PERCENTILE CONT Aggregation not supported");
+    }
+
+    @Override
+    public boolean supportsPercentileDisc() {
+        return false;
+    }
+
+    @Override
+    public boolean supportsPercentileCont() {
+        return false;
     }
 
 }
