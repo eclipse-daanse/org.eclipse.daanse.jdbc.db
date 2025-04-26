@@ -29,6 +29,7 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
+import org.eclipse.daanse.jdbc.db.dialect.api.OrderedColumn;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.DialectUtil;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.JdbcDialectImpl;
 import org.slf4j.Logger;
@@ -378,6 +379,46 @@ public class MySqlDialect extends JdbcDialectImpl {
     @Override
     public boolean supportsPercentileCont() {
         return productVersion.compareTo("8.0") >= 0;
+    }
+
+    @Override
+    public StringBuilder generateListAgg(CharSequence operand, boolean distinct, String separator, String coalesce, String onOverflowTruncate, List<OrderedColumn> columns) {
+        StringBuilder buf = new StringBuilder(64);
+        buf.append("GROUP_CONCAT");
+        buf.append("( ");
+        if (distinct) {
+            buf.append("DISTINCT ");
+        }
+        buf.append(operand);
+        if (columns != null && !columns.isEmpty()) {
+            buf.append(" ORDER BY ");
+            boolean first = true;
+            for(OrderedColumn c : columns) {
+                if (!first) {
+                    buf.append(", ");
+                }
+                if (c.getTableName() != null) {
+                    quoteIdentifier(buf, c.getTableName(), c.getColumnName());
+                } else {
+                    quoteIdentifier(buf, c.getColumnName());
+                }
+                if (!c.isAscend()) {
+                    buf.append(DESC);
+                }
+                first = false;
+            }
+        }
+        if (separator != null) {
+            buf.append(" SEPARATOR '").append(separator).append("'");
+        }
+        buf.append(")");
+        //GROUP_CONCAT(DISTINCT cate_id ORDER BY cate_id ASC SEPARATOR ' ')
+        return buf;
+    }
+
+    @Override
+    public boolean supportsListAgg() {
+        return true;
     }
 
 }

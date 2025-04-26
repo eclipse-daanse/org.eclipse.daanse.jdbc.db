@@ -18,8 +18,11 @@
  */
 package org.eclipse.daanse.jdbc.db.dialect.db.clickhouse;
 
+import java.util.List;
+
 import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
 import org.eclipse.daanse.jdbc.db.dialect.api.Dialect;
+import org.eclipse.daanse.jdbc.db.dialect.api.OrderedColumn;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.JdbcDialectImpl;
 
 /**
@@ -125,6 +128,22 @@ public class ClickHouseDialect extends JdbcDialectImpl {
 
     @Override
     public boolean supportsBitNXorAgg() {
+        return true;
+    }
+
+    @Override
+    public StringBuilder generateListAgg(CharSequence operand, boolean distinct, String separator, String coalesce, String onOverflowTruncate, List<OrderedColumn> columns) {
+        StringBuilder buf = new StringBuilder(64);
+        buf.append("groupArrayArray");
+        buf.append("( ");
+        buf.append(operand);
+        buf.append(")");
+        //groupArrayArray(page_visits)
+        return buf;
+    }
+
+    @Override
+    public boolean supportsListAgg() {
         return true;
     }
 }

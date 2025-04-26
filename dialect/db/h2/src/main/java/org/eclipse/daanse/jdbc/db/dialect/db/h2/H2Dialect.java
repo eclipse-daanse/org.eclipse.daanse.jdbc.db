@@ -13,8 +13,11 @@
  */
 package org.eclipse.daanse.jdbc.db.dialect.db.h2;
 
+import java.util.List;
+
 import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
 import org.eclipse.daanse.jdbc.db.dialect.api.Dialect;
+import org.eclipse.daanse.jdbc.db.dialect.api.OrderedColumn;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.JdbcDialectImpl;
 
 /**
@@ -140,12 +143,68 @@ public class H2Dialect extends JdbcDialectImpl {
     }
 
     @Override
+    public StringBuilder generateListAgg(CharSequence operand, boolean distinct, String separator, String coalesce, String onOverflowTruncate, List<OrderedColumn> columns) {
+        StringBuilder buf = new StringBuilder(64);
+        buf.append("LISTAGG");
+        buf.append("( ");
+        if (distinct) {
+            buf.append("DISTINCT ");
+        }
+        if (coalesce != null) {
+            buf.append("COALESCE(").append(operand).append(", '").append(coalesce).append("')");
+        } else {
+            buf.append(operand);
+        }
+        buf.append(", '");
+        if (separator != null) {
+            buf.append(separator);
+        } else {
+            buf.append(", ");
+        }
+        buf.append("'");
+        if (onOverflowTruncate != null) {
+            buf.append(" ON OVERFLOW TRUNCATE '").append(onOverflowTruncate).append("' WITHOUT COUNT)");
+        } else {
+            buf.append(")");
+        }
+        if (columns != null && !columns.isEmpty()) {
+            buf.append(" WITHIN GROUP (ORDER BY ");
+            boolean first = true;
+            for(OrderedColumn c : columns) {
+                if (!first) {
+                    buf.append(", ");
+                }
+                if (c.getTableName() != null) {
+                    quoteIdentifier(buf, c.getTableName(), c.getColumnName());
+                } else {
+                    quoteIdentifier(buf, c.getColumnName());
+                }
+                if (!c.isAscend()) {
+                    buf.append(DESC);
+                }
+                first = false;
+            }
+            buf.append(")");
+        }
+        //LISTAGG(NAME, ', ') WITHIN GROUP (ORDER BY ID)
+        //LISTAGG(COALESCE(NAME, 'null'), ', ') WITHIN GROUP (ORDER BY ID)
+        //LISTAGG(ID, ', ') WITHIN GROUP (ORDER BY ID) OVER (ORDER BY ID)
+        //LISTAGG(ID, ';' ON OVERFLOW TRUNCATE 'etc' WITHOUT COUNT) WITHIN GROUP (ORDER BY ID)
+        return buf;
+    }
+
+    @Override
     public boolean supportsPercentileDisc() {
         return true;
     }
 
     @Override
     public boolean supportsPercentileCont() {
+        return true;
+    }
+
+    @Override
+    public boolean supportsListAgg() {
         return true;
     }
 

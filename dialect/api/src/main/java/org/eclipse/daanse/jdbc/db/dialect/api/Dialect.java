@@ -747,4 +747,8 @@ public interface Dialect {
 
     boolean supportsPercentileCont();
 
+    StringBuilder generateListAgg(CharSequence operand, boolean distinct, String separator, String coalesce, String onOverflowTruncate, List<OrderedColumn> columns);
+
+    boolean supportsListAgg();
+
 }
