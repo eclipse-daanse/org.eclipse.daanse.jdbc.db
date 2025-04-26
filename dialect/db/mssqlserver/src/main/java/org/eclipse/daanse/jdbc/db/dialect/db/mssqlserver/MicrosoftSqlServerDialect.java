@@ -29,6 +29,7 @@ import java.util.List;
 
 import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
 import org.eclipse.daanse.jdbc.db.dialect.api.Dialect;
+import org.eclipse.daanse.jdbc.db.dialect.api.OrderedColumn;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.JdbcDialectImpl;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.Util;
 
@@ -149,6 +150,51 @@ public class MicrosoftSqlServerDialect extends JdbcDialectImpl {
 
     @Override
     public boolean supportsPercentileCont() {
+        return true;
+    }
+
+    @Override
+    public StringBuilder generateListAgg(CharSequence operand, boolean distinct, String separator, String coalesce, String onOverflowTruncate, List<OrderedColumn> columns) {
+        StringBuilder buf = new StringBuilder(64);
+        buf.append("STRING_AGG");
+        buf.append("( ");
+        if (distinct) {
+            buf.append("DISTINCT ");
+        }
+        buf.append(operand);
+        buf.append(", '");
+        if (separator != null) {
+            buf.append(separator);
+        } else {
+            buf.append(", ");
+        }
+        buf.append("'");
+        buf.append(")");
+        if (columns != null && !columns.isEmpty()) {
+            buf.append(" WITHIN GROUP (ORDER BY ");
+            boolean first = true;
+            for(OrderedColumn c : columns) {
+                if (!first) {
+                    buf.append(", ");
+                }
+                if (c.getTableName() != null) {
+                    quoteIdentifier(buf, c.getTableName(), c.getColumnName());
+                } else {
+                    quoteIdentifier(buf, c.getColumnName());
+                }
+                if (!c.isAscend()) {
+                    buf.append(DESC);
+                }
+                first = false;
+            }
+            buf.append(")");
+        }
+        //STRING_AGG(CONVERT (NVARCHAR (MAX), EmailAddress), ';') WITHIN GROUP (ORDER BY EmailAddress ASC)
+        return buf;
+    }
+
+    @Override
+    public boolean supportsListAgg() {
         return true;
     }
 

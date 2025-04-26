@@ -40,6 +40,7 @@ import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
 import org.eclipse.daanse.jdbc.db.dialect.api.BestFitColumnType;
 import org.eclipse.daanse.jdbc.db.dialect.api.Datatype;
 import org.eclipse.daanse.jdbc.db.dialect.api.Dialect;
+import org.eclipse.daanse.jdbc.db.dialect.api.OrderedColumn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1145,6 +1146,16 @@ public abstract class JdbcDialectImpl implements Dialect {
 
     @Override
     public boolean supportsPercentileCont() {
+        return false;
+    }
+
+    @Override
+    public StringBuilder generateListAgg(CharSequence operand, boolean distinct, String separator, String coalesce, String onOverflowTruncate, List<OrderedColumn> columns) {
+        throw new RuntimeException("ListAgg Aggregation not supported");
+    }
+
+    @Override
+    public boolean supportsListAgg() {
         return false;
     }
 
