@@ -25,12 +25,14 @@ package org.eclipse.daanse.jdbc.db.dialect.db.postgresql;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
 import org.eclipse.daanse.jdbc.db.dialect.api.BestFitColumnType;
 import org.eclipse.daanse.jdbc.db.dialect.api.Dialect;
+import org.eclipse.daanse.jdbc.db.dialect.api.OrderedColumn;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.DialectUtil;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.JdbcDialectImpl;
 
@@ -212,6 +214,51 @@ public class PostgreSqlDialect extends JdbcDialectImpl {
             buf.append(" ").append(DESC);
         }
         buf.append(")");
+        return buf;
+    }
+
+    @Override
+    public StringBuilder generateNthValueAgg(CharSequence operand, boolean ignoreNulls, Integer n, List<OrderedColumn> columns) {
+        StringBuilder buf = new StringBuilder(64);
+        buf.append("NTH_VALUE");
+        buf.append("( ");
+        buf.append(operand);
+        buf.append(", ");
+        if (n == null || n < 1) {
+            buf.append(1);
+        } else {
+            buf.append(n);
+        }
+        buf.append(" )");
+        buf.append("OVER ( ");
+        if (columns != null && !columns.isEmpty()) {
+            buf.append("ORDER BY ");
+            buf.append(orderedColumns(columns));
+        }
+        buf.append(" )");
+        //NTH_VALUE(employee_name, 2) OVER ( ORDER BY salary DESC )
+        return buf;
+    }
+
+    private CharSequence orderedColumns(List<OrderedColumn> columns) {
+        StringBuilder buf = new StringBuilder(64);
+        boolean first = true;
+        if (columns != null) {
+            for(OrderedColumn c : columns) {
+                if (!first) {
+                    buf.append(", ");
+                }
+                if (c.getTableName() != null) {
+                    quoteIdentifier(buf, c.getTableName(), c.getColumnName());
+                } else {
+                    quoteIdentifier(buf, c.getColumnName());
+                }
+                if (!c.isAscend()) {
+                    buf.append(DESC);
+                }
+                first = false;
+            }
+        }
         return buf;
     }
 
