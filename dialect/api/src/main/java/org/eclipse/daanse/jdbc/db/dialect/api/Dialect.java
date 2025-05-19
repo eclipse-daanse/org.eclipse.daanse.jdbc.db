@@ -749,6 +749,8 @@ public interface Dialect {
 
     StringBuilder generateListAgg(CharSequence operand, boolean distinct, String separator, String coalesce, String onOverflowTruncate, List<OrderedColumn> columns);
 
+    StringBuilder generateNthValueAgg(CharSequence operand, boolean ignoreNulls, Integer n, List<OrderedColumn> columns);
+
     boolean supportsListAgg();
 
 }

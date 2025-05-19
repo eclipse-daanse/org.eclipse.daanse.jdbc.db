@@ -1155,6 +1155,11 @@ public abstract class JdbcDialectImpl implements Dialect {
     }
 
     @Override
+    public StringBuilder generateNthValueAgg(CharSequence operand, boolean ignoreNulls, Integer n, List<OrderedColumn> columns) {
+        throw new RuntimeException("NthValueAgg Aggregation not supported");
+    }
+
+    @Override
     public boolean supportsListAgg() {
         return false;
     }
