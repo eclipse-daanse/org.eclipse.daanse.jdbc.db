@@ -367,6 +367,21 @@ public interface Dialect {
     StringBuilder generateOrderItem(CharSequence expr, boolean nullable, boolean ascending, boolean collateNullsLast);
 
     /**
+     * Generates an item for an ORDER BY clause, sorting in the required direction,
+     * and ensuring that orderValue values collate either before or after all
+     * values, depending on the collateNullsLast parameter.
+     *
+     * @param expr             Expression
+     * @param orderValue       Order value
+     * @param datatype         Order value data type
+     * @param ascending        Whether to sort expression ascending
+     * @param collateNullsLast Whether the null values should be sorted first or
+     *                         last.
+     * @return Expression modified so that orderValue values collate
+     */
+    StringBuilder generateOrderItemForOrderValue(CharSequence expr, String orderValue, Datatype datatype, boolean ascending, boolean collateNullsLast);
+
+    /**
      * Returns whether this Dialect supports expressions in the GROUP BY clause.
      * Derby/Cloudscape and Infobright do not.
      *

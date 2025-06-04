@@ -741,6 +741,42 @@ public abstract class JdbcDialectImpl implements Dialect {
         }
     }
 
+    @Override
+    public StringBuilder generateOrderItemForOrderValue(
+        CharSequence expr,
+        String orderValue,
+        Datatype datatype,
+        boolean ascending,
+        boolean collateNullsLast) {
+        if (collateNullsLast) {
+            StringBuilder sb = new StringBuilder(CASE_WHEN)
+                .append(expr)
+                .append(" = ");
+                this.quote(sb, orderValue, datatype);
+                sb.append(" THEN 1 ELSE 0 END, ").append(expr);
+            if (ascending) {
+                return
+                    sb.append(" ASC");
+            } else {
+                return
+                    sb.append(DESC);
+            }
+        } else {
+            StringBuilder sb = new StringBuilder(CASE_WHEN_SPACE)
+                .append(expr)
+                .append(" = ");
+                this.quote(sb, orderValue, datatype);
+                sb.append(" THEN 0 ELSE 1 END, ").append(expr);
+            if (ascending) {
+                return
+                    sb.append(" ASC");
+            } else {
+                return
+                    sb.append(DESC);
+            }
+        }
+    }
+
     /**
      * Generates SQL to force null values to collate last.
      *
