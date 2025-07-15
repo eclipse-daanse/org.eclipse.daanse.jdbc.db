@@ -77,14 +77,10 @@ public class DatabaseServiceImpl implements DatabaseService {
     private static final int COLUMN_NAME = 9;
     private static final int CARDINALITY_COLUMN = 11;
 
-    private static final int[] RESULT_SET_TYPE_VALUES = {
-            ResultSet.TYPE_FORWARD_ONLY,
-            ResultSet.TYPE_SCROLL_INSENSITIVE,
-            ResultSet.TYPE_SCROLL_SENSITIVE};
+    private static final int[] RESULT_SET_TYPE_VALUES = { ResultSet.TYPE_FORWARD_ONLY,
+            ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.TYPE_SCROLL_SENSITIVE };
 
-        private static final int[] CONCURRENCY_VALUES = {
-            ResultSet.CONCUR_READ_ONLY,
-            ResultSet.CONCUR_UPDATABLE};
+    private static final int[] CONCURRENCY_VALUES = { ResultSet.CONCUR_READ_ONLY, ResultSet.CONCUR_UPDATABLE };
 
     @Override
     public MetaInfo createMetaInfo(DataSource dataSource) throws SQLException {
@@ -108,7 +104,7 @@ public class DatabaseServiceImpl implements DatabaseService {
         return new MetaInfoR(databaseInfo, structureInfo, identifierInfo, typeInfos, indexInfos);
     }
 
-    public List<IndexInfo> getIndexInfo(DatabaseMetaData databaseMetaData) throws SQLException{
+    public List<IndexInfo> getIndexInfo(DatabaseMetaData databaseMetaData) throws SQLException {
         List<TableDefinition> tables = getTableDefinitions(databaseMetaData);
         List<IndexInfo> indexInfos = new ArrayList<>();
         for (TableDefinition tableDefinition : tables) {
@@ -124,6 +120,7 @@ public class DatabaseServiceImpl implements DatabaseService {
                     catalog = sr.catalog().get().name();
                 }
             }
+            LOGGER.debug("Reading index info for table: {}.{}.{}", catalog, schema, table.name());
             try (ResultSet resultSet = databaseMetaData.getIndexInfo(catalog, schema, table.name(), false, true)) {
                 while (resultSet.next()) {
                     int type = resultSet.getInt(TYPE_COLUMN);
@@ -132,6 +129,11 @@ public class DatabaseServiceImpl implements DatabaseService {
                     boolean unique = !resultSet.getBoolean(NONUNIQUE_COLUMN);
                     indexInfoItems.add(new IndexInfoItemR(type, columnName, cardinalityColumn, unique));
                 }
+            } catch (SQLException e) {
+                LOGGER.warn("Error reading index info for table: {}.{}.{} - {}", catalog, schema, table.name(),
+                        e.getMessage());
+
+                continue;
             }
             indexInfos.add(new IndexInfoR(table, indexInfoItems));
         }
@@ -492,27 +494,25 @@ public class DatabaseServiceImpl implements DatabaseService {
                     oColumnSize = OptionalInt.empty();
                 }
 
-                OptionalInt oDecimalDigits =  OptionalInt.of(rs.getInt("DECIMAL_DIGITS"));
+                OptionalInt oDecimalDigits = OptionalInt.of(rs.getInt("DECIMAL_DIGITS"));
                 if (rs.wasNull()) {
                     oDecimalDigits = OptionalInt.empty();
                 }
 
                 OptionalInt oNumPrecRadix = OptionalInt.of(rs.getInt("NUM_PREC_RADIX"));
                 if (rs.wasNull()) {
-                    oNumPrecRadix=   OptionalInt.empty();
+                    oNumPrecRadix = OptionalInt.empty();
                 }
 
-                OptionalInt oNullable = OptionalInt.of( rs.getInt("NULLABLE"));
+                OptionalInt oNullable = OptionalInt.of(rs.getInt("NULLABLE"));
                 if (rs.wasNull()) {
                     oNullable = OptionalInt.empty();
                 }
 
-
-                OptionalInt oCharOctetLength = OptionalInt.of( rs.getInt("CHAR_OCTET_LENGTH"));
+                OptionalInt oCharOctetLength = OptionalInt.of(rs.getInt("CHAR_OCTET_LENGTH"));
                 if (rs.wasNull()) {
                     oCharOctetLength = OptionalInt.empty();
                 }
-
 
                 final int dataType = rs.getInt("DATA_TYPE");
 
@@ -521,12 +521,20 @@ public class DatabaseServiceImpl implements DatabaseService {
                 Optional<CatalogReference> oCatRef = oCatalogName.map(cn -> new CatalogReferenceR(cn));
                 Optional<SchemaReference> oSchemaRef = oSchemaName.map(sn -> new SchemaReferenceR(oCatRef, sn));
 
-                JDBCType jdbcType = JDBCType.valueOf(dataType);
+                JDBCType jdbcType;
+                try {
+                    jdbcType = JDBCType.valueOf(dataType);
+                } catch (IllegalArgumentException ex) {
+                    jdbcType = JDBCType.OTHER;
+                    LOGGER.info("Unknown JDBC-Typcode: " + dataType + " (" + typeName + ") in table: " + tableName
+                            + " column: " + columName);
+                }
+
                 TableReference tableReference = new TableReferenceR(oSchemaRef, tableName);
 
                 ColumnReference columnReference = new ColumnReferenceR(Optional.of(tableReference), columName);
-                ColumnDefinition columnDefinition = new ColumnDefinitionR(columnReference,
-                        new ColumnMetaDataR(jdbcType,typeName, oColumnSize, oDecimalDigits,oNumPrecRadix,oNullable,oCharOctetLength, remarks));
+                ColumnDefinition columnDefinition = new ColumnDefinitionR(columnReference, new ColumnMetaDataR(jdbcType,
+                        typeName, oColumnSize, oDecimalDigits, oNumPrecRadix, oNullable, oCharOctetLength, remarks));
 
                 columnDefinitions.add(columnDefinition);
             }
@@ -606,21 +614,13 @@ public class DatabaseServiceImpl implements DatabaseService {
         return List.copyOf(importedKeys);
     }
 
-    private static Set<List<Integer>> supportedResultSetStyles(
-        DatabaseMetaData databaseMetaData) throws SQLException
-    {
+    private static Set<List<Integer>> supportedResultSetStyles(DatabaseMetaData databaseMetaData) throws SQLException {
         Set<List<Integer>> supports = new HashSet<>();
         for (int type : RESULT_SET_TYPE_VALUES) {
             for (int concurrency : CONCURRENCY_VALUES) {
-                if (databaseMetaData.supportsResultSetConcurrency(
-                    type, concurrency))
-                {
-                    String driverName =
-                        databaseMetaData.getDriverName();
-                    if (type != ResultSet.TYPE_FORWARD_ONLY
-                        && driverName.equals(
-                        "JDBC-ODBC Bridge (odbcjt32.dll)"))
-                    {
+                if (databaseMetaData.supportsResultSetConcurrency(type, concurrency)) {
+                    String driverName = databaseMetaData.getDriverName();
+                    if (type != ResultSet.TYPE_FORWARD_ONLY && driverName.equals("JDBC-ODBC Bridge (odbcjt32.dll)")) {
                         // In JDK 1.6, the Jdbc-Odbc bridge announces
                         // that it can handle TYPE_SCROLL_INSENSITIVE
                         // but it does so by generating a 'COUNT(*)'
@@ -629,9 +629,7 @@ public class DatabaseServiceImpl implements DatabaseService {
                         // driver.
                         continue;
                     }
-                    supports.add(
-                        new ArrayList<>(
-                            Arrays.asList(type, concurrency)));
+                    supports.add(new ArrayList<>(Arrays.asList(type, concurrency)));
                 }
             }
         }
