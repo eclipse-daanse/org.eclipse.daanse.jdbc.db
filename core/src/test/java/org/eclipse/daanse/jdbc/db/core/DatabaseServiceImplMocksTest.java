@@ -19,6 +19,7 @@ import static org.mockito.Mockito.when;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
 import javax.sql.DataSource;
@@ -47,6 +48,9 @@ class DatabaseServiceImplMocksTest {
     @Mock
     ResultSet resultSet;
 
+    @Mock
+    ResultSetMetaData resultSetMetaData;
+
     @Test
     void createMetaDataTest() throws SQLException {
 
@@ -60,6 +64,16 @@ class DatabaseServiceImplMocksTest {
         when(databaseMetaData.getDatabaseProductVersion()).thenReturn("a");
         when(databaseMetaData.getTypeInfo()).thenReturn(resultSet);
         when(databaseMetaData.getCatalogs()).thenReturn(resultSet);
+
+        when(resultSet.getMetaData()).thenReturn(resultSetMetaData);
+        when(resultSetMetaData.getColumnCount()).thenReturn(6);
+
+        when(resultSetMetaData.getColumnName(1)).thenReturn("TABLE_CAT");
+        when(resultSetMetaData.getColumnName(2)).thenReturn("TABLE_SCHEM");
+        when(resultSetMetaData.getColumnName(3)).thenReturn("TABLE_NAME");
+        when(resultSetMetaData.getColumnName(4)).thenReturn("TABLE_TYPE");
+        when(resultSetMetaData.getColumnName(5)).thenReturn("REMARKS");
+        when(resultSetMetaData.getColumnName(6)).thenReturn("TYPE_CAT");
 //        when(databaseMetaData.getSchemas()).thenReturn(resultSet);
         when(databaseMetaData.getSchemas(Mockito.any(), Mockito.any())).thenReturn(resultSet);
         when(databaseMetaData.getTables(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
