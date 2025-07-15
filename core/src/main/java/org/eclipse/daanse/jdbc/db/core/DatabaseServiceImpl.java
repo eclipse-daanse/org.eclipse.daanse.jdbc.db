@@ -276,17 +276,25 @@ public class DatabaseServiceImpl implements DatabaseService {
 
         List<TableDefinition> tabeDefinitions = new ArrayList<>();
         try (ResultSet rs = databaseMetaData.getTables(catalog, schemaPattern, tableNamePattern, types)) {
+            int columnCount = rs.getMetaData().getColumnCount();
+            Set<String> columnNames = new HashSet<>();
+            for (int i = 1; i < columnCount; i++) {
+
+                String colName = rs.getMetaData().getColumnName(i);
+                columnNames.add(colName);
+            }
             while (rs.next()) {
                 final Optional<String> oCatalogName = Optional.ofNullable(rs.getString("TABLE_CAT"));
                 final Optional<String> oSchemaName = Optional.ofNullable(rs.getString("TABLE_SCHEM"));
                 final String tableName = rs.getString("TABLE_NAME");
                 final String tableType = rs.getString("TABLE_TYPE");
                 final Optional<String> oRemarks = Optional.ofNullable(rs.getString("REMARKS"));
-                final Optional<String> oTypeCat = Optional.ofNullable(rs.getString("TYPE_CAT"));
-                final Optional<String> oTypeSchema = Optional.ofNullable(rs.getString("TYPE_SCHEM"));
-                final Optional<String> oTypeName = Optional.ofNullable(rs.getString("TYPE_NAME"));
-                final Optional<String> oSelfRefColName = Optional.ofNullable(rs.getString("SELF_REFERENCING_COL_NAME"));
-                final Optional<String> oRefGen = Optional.ofNullable(rs.getString("REF_GENERATION"));
+
+                final Optional<String> oTypeCat = getColumnValue(rs, columnNames, "TYPE_CAT");
+                final Optional<String> oTypeSchema = getColumnValue(rs, columnNames, "TYPE_SCHEM");
+                final Optional<String> oTypeName = getColumnValue(rs, columnNames, "TYPE_NAME");
+                final Optional<String> oSelfRefColName = getColumnValue(rs, columnNames, "SELF_REFERENCING_COL_NAME");
+                final Optional<String> oRefGen = getColumnValue(rs, columnNames, "REF_GENERATION");
 
                 Optional<CatalogReference> oCatRef = oCatalogName.map(cn -> new CatalogReferenceR(cn));
                 Optional<SchemaReference> oSchemaRef = oSchemaName.map(sn -> new SchemaReferenceR(oCatRef, sn));
@@ -301,6 +309,19 @@ public class DatabaseServiceImpl implements DatabaseService {
         }
 
         return List.copyOf(tabeDefinitions);
+    }
+
+    private Optional<String> getColumnValue(ResultSet rs, Set<String> columnNames, String columnName)
+            throws SQLException {
+        if (!columnNames.contains(columnName)) {
+            return Optional.empty();
+        }
+        String value = rs.getString(columnName);
+        if (rs.wasNull()) {
+            return Optional.empty();
+        } else {
+            return Optional.of(value);
+        }
     }
 
     @Override
