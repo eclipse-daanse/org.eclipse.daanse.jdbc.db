@@ -346,7 +346,13 @@ public class DatabaseServiceImpl implements DatabaseService {
                 final short maximumScale = rs.getShort("MAXIMUM_SCALE");
                 final int numPrecRadix = rs.getInt("NUM_PREC_RADIX");
 
-                JDBCType jdbcType = JDBCType.valueOf(dataType);
+                JDBCType jdbcType;
+                try {
+                    jdbcType = JDBCType.valueOf(dataType);
+                } catch (IllegalArgumentException ex) {
+                    jdbcType = JDBCType.OTHER;
+                    LOGGER.info("Unknown JDBC-Typcode: " + dataType + " (" + typeName + ")");
+                }
                 TypeInfoR typeInfo = new TypeInfoR(typeName, jdbcType, percision, literatPrefix, literatSuffix,
                         createPragmas, nullable, caseSensitive, searchable, unsignesAttribute, fixedPrecScale,
                         autoIncrement, localTypeName, minimumScale, maximumScale, numPrecRadix);
