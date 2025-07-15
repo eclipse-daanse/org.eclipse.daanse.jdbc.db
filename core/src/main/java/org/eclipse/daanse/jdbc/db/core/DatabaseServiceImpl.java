@@ -278,7 +278,7 @@ public class DatabaseServiceImpl implements DatabaseService {
         try (ResultSet rs = databaseMetaData.getTables(catalog, schemaPattern, tableNamePattern, types)) {
             int columnCount = rs.getMetaData().getColumnCount();
             Set<String> columnNames = new HashSet<>();
-            for (int i = 1; i < columnCount; i++) {
+            for (int i = 1; i <= columnCount; i++) {
 
                 String colName = rs.getMetaData().getColumnName(i);
                 columnNames.add(colName);
