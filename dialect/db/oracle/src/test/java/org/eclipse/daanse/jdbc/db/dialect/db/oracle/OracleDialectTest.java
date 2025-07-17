@@ -27,25 +27,22 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.eclipse.daanse.jdbc.db.api.meta.DatabaseInfo;
-import org.eclipse.daanse.jdbc.db.api.meta.IdentifierInfo;
-import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
-import org.eclipse.daanse.jdbc.db.dialect.db.oracle.OracleDialect;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class OracleDialectTest {
-    private MetaInfo metaInfo = mock(MetaInfo.class);
-    private DatabaseInfo databaseInfo = mock(DatabaseInfo.class);
-    private IdentifierInfo identifierInfo = mock(IdentifierInfo.class);
+    private Connection connection = mock(Connection.class);
+    private DatabaseMetaData metaData = mock(DatabaseMetaData.class);
     private OracleDialect dialect;
 
     @BeforeEach
     public void setUp() throws Exception {
-        when(metaInfo.databaseInfo()).thenReturn(databaseInfo);
-        when(metaInfo.identifierInfo()).thenReturn(identifierInfo);
-        when(databaseInfo.databaseProductName()).thenReturn("ORACLE");
-        dialect = new OracleDialect(metaInfo);
+        when(connection.getMetaData()).thenReturn(metaData);
+        when(metaData.getDatabaseProductName()).thenReturn("ORACLE");
+        dialect = new OracleDialect(connection);
     }
 
     @Test

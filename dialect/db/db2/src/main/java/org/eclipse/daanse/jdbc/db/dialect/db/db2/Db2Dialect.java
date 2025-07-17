@@ -18,7 +18,8 @@
  */
 package org.eclipse.daanse.jdbc.db.dialect.db.db2;
 
-import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
+import java.sql.Connection;
+
 import org.eclipse.daanse.jdbc.db.dialect.api.Dialect;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.JdbcDialectImpl;
 
@@ -32,8 +33,8 @@ import org.eclipse.daanse.jdbc.db.dialect.db.common.JdbcDialectImpl;
  */
 public class Db2Dialect extends JdbcDialectImpl {
 
-    public Db2Dialect(MetaInfo metaInfo) {
-        super(metaInfo);
+    public Db2Dialect(Connection connection) {
+        super(connection);
     }
 
     @Override

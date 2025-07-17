@@ -48,19 +48,17 @@ class MySqlDialect3Test {
     private static final String BOOLEAN_LITERAL_FALSE = "False";
     private static final String BOOLEAN_LITERAL_ONE = "1";
     private static final String BOOLEAN_LITERAL_ZERO = "0";
-    private MetaInfo metaInfo = mock(MetaInfo.class);
-    private DatabaseInfo databaseInfo = mock(DatabaseInfo.class);
-    private IdentifierInfo identifierInfo = mock(IdentifierInfo.class);
+    private Connection connection = mock(Connection.class);
+    private DatabaseMetaData metaData = mock(DatabaseMetaData.class);
     private Dialect dialect;
     private StringBuilder buf;
 
     @BeforeEach
     protected void setUp() throws Exception {
-        when(metaInfo.databaseInfo()).thenReturn(databaseInfo);
-        when(metaInfo.identifierInfo()).thenReturn(identifierInfo);
-        when(databaseInfo.databaseProductName()).thenReturn("MYSQL");
-        when(databaseInfo.databaseProductVersion()).thenReturn("5.0");
-        dialect = new MySqlDialect(metaInfo);
+        when(connection.getMetaData()).thenReturn(metaData);
+        when(metaData.getDatabaseProductName()).thenReturn("MYSQL");
+        when(metaData.getDatabaseProductVersion()).thenReturn("5.0");
+        dialect = new MySqlDialect(connection);
         buf = new StringBuilder();
     }
 

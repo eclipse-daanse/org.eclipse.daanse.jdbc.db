@@ -24,24 +24,24 @@ package org.eclipse.daanse.jdbc.db.dialect.db.mariadb;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
 
-import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
 import org.eclipse.daanse.jdbc.db.dialect.db.mysql.MySqlDialect;
 
 public class MariaDBDialect extends MySqlDialect {
 
     private static final String SUPPORTED_PRODUCT_NAME = "MARIADB";
 
-    public MariaDBDialect(MetaInfo metaInfo) {
-        super(metaInfo);
+    public MariaDBDialect(Connection connection) {
+        super(connection);
     }
 
     @Override
-    protected String deduceProductName(MetaInfo metaInfo) {
+    protected String deduceProductName(DatabaseMetaData metaData) throws SQLException {
         // It is possible for someone to use the MariaDB JDBC driver with Infobright . .
         // .
-        final String productName = super.deduceProductName(metaInfo);
-        if (isInfobright(metaInfo)) {
+        final String productName = super.deduceProductName(metaData);
+        if (isInfobright(metaData)) {
             return "MySQL (Infobright)";
         }
         return productName;

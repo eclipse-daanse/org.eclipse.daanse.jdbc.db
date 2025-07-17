@@ -18,18 +18,6 @@
  */
 package org.eclipse.daanse.jdbc.db.dialect.resolver.basic;
 
-import org.eclipse.daanse.jdbc.db.api.DatabaseService;
-import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
-import org.eclipse.daanse.jdbc.db.dialect.api.Dialect;
-import org.eclipse.daanse.jdbc.db.dialect.api.DialectFactory;
-import org.eclipse.daanse.jdbc.db.dialect.api.DialectResolver;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferenceCardinality;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
@@ -40,6 +28,18 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
+
+import javax.sql.DataSource;
+
+import org.eclipse.daanse.jdbc.db.api.DatabaseService;
+import org.eclipse.daanse.jdbc.db.dialect.api.Dialect;
+import org.eclipse.daanse.jdbc.db.dialect.api.DialectFactory;
+import org.eclipse.daanse.jdbc.db.dialect.api.DialectResolver;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of {@link DialectResolver} that:<br>
@@ -86,13 +86,13 @@ public class UncachedBestCompatibleDialectResolver implements DialectResolver {
     @Override
     public Optional<Dialect> resolve(Connection connection) {
         try {
-            MetaInfo metaInfo = databaseService.createMetaInfo(connection);
+            //MetaInfo metaInfo = databaseService.createMetaInfo(connection);
             Optional<DialectFactory> dfOptional = dialectFactories.parallelStream()
-                .map(calcCompatibility(metaInfo.databaseInfo().databaseProductName(), metaInfo.databaseInfo().databaseProductVersion(), metaInfo))
+                .map(calcCompatibility(connection.getMetaData().getDatabaseProductName(), connection.getMetaData().getDatabaseProductVersion(), connection))
                 .filter(compatibleDialect())
                 .findFirst().map(Entry::getKey);
             if (dfOptional.isPresent()) {
-                return dfOptional.get().tryCreateDialect(metaInfo);
+                return dfOptional.get().tryCreateDialect(connection);
             }
         } catch (SQLException e) {
             LOGGER.info("resolve failed", e);
@@ -101,11 +101,11 @@ public class UncachedBestCompatibleDialectResolver implements DialectResolver {
     }
 
     private Function<? super DialectFactory, ? extends Entry<DialectFactory, Boolean>> calcCompatibility(
-        String productName, String productVersion, MetaInfo metaInfo) {
+        String productName, String productVersion, Connection connection) {
         return dialectFactory ->
             new AbstractMap.SimpleEntry<>(
                 dialectFactory,
-                dialectFactory.isSupportedProduct(productName, productVersion, metaInfo)
+                dialectFactory.isSupportedProduct(productName, productVersion, connection)
             );
     }
 

@@ -21,6 +21,8 @@
  */
 package org.eclipse.daanse.jdbc.db.dialect.db.firebird;
 
+import java.sql.Connection;
+
 import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
 import org.eclipse.daanse.jdbc.db.dialect.api.Dialect;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.JdbcDialectImpl;
@@ -35,8 +37,8 @@ public class FirebirdDialect extends JdbcDialectImpl {
 
     private static final String SUPPORTED_PRODUCT_NAME = "FIREBIRD";
 
-    public FirebirdDialect(MetaInfo metaInfo) {
-        super(metaInfo);
+    public FirebirdDialect(Connection connection) {
+        super(connection);
     }
 
     @Override

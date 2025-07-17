@@ -14,13 +14,13 @@
 
 package org.eclipse.daanse.jdbc.db.dialect.api;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Optional;
-
-import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
 
 public interface DialectFactory {
 
-    Optional<Dialect> tryCreateDialect(MetaInfo metaInfo);
+    Optional<Dialect> tryCreateDialect(Connection connection) throws SQLException;
 
-    boolean isSupportedProduct(String productName, String productVersion, MetaInfo metaInfo);
+    boolean isSupportedProduct(String productName, String productVersion, Connection connection);
 }

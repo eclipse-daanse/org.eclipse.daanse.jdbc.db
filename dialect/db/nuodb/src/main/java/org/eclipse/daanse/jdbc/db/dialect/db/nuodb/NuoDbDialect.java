@@ -24,12 +24,13 @@ package org.eclipse.daanse.jdbc.db.dialect.db.nuodb;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.Date;
+import java.sql.SQLException;
 import java.util.List;
 
-import org.eclipse.daanse.jdbc.db.dialect.db.common.JdbcDialectImpl;
-import org.eclipse.daanse.jdbc.db.dialect.db.common.Util;
 import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
 import org.eclipse.daanse.jdbc.db.dialect.api.Dialect;
+import org.eclipse.daanse.jdbc.db.dialect.db.common.JdbcDialectImpl;
+import org.eclipse.daanse.jdbc.db.dialect.db.common.Util;
 
 /**
  * Implementation of {@link Dialect} for the NuoDB database. In order to use
@@ -42,8 +43,8 @@ import org.eclipse.daanse.jdbc.db.dialect.api.Dialect;
 public class NuoDbDialect extends JdbcDialectImpl {
     private static final String SUPPORTED_PRODUCT_NAME = "NUODB";
 
-    public NuoDbDialect(MetaInfo metaInfo) {
-        super(metaInfo);
+    public NuoDbDialect(Connection connection) {
+        super(connection);
     }
 
     /**
@@ -82,12 +83,13 @@ public class NuoDbDialect extends JdbcDialectImpl {
      * double quote character. We ought to investigate why back-tick won't work. But
      * for now this makes all the tests work with Nuo (besides the tweaks above).
      *
-     * @param metaInfo metaInfo
+     * @param metaData DatabaseMetaData
      * @return the quotation character
+     * @throws SQLException
      */
     @Override
-    protected String deduceIdentifierQuoteString(MetaInfo metaInfo) {
-        String identifierQuoteString = super.deduceIdentifierQuoteString(metaInfo);
+    protected String deduceIdentifierQuoteString(DatabaseMetaData metaData) throws SQLException {
+        String identifierQuoteString = super.deduceIdentifierQuoteString(metaData);
         if (" ".equals(identifierQuoteString)) {
             identifierQuoteString = "\"";
         }

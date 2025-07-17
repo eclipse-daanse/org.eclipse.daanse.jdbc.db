@@ -13,11 +13,12 @@
  */
 package org.eclipse.daanse.jdbc.db.dialect.db.common;
 
+import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
 import java.util.Optional;
 import java.util.function.Function;
 
-import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
 import org.eclipse.daanse.jdbc.db.dialect.api.Dialect;
 import org.eclipse.daanse.jdbc.db.dialect.api.DialectFactory;
 import org.slf4j.Logger;
@@ -26,9 +27,9 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractDialectFactory<T extends Dialect> implements DialectFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractDialectFactory.class);
     @Override
-    public Optional<Dialect> tryCreateDialect(MetaInfo metaInfo) {
-        if (isSupportedProduct(metaInfo.databaseInfo().databaseProductName(), metaInfo.databaseInfo().databaseProductVersion(), metaInfo)) {
-            return Optional.of(getConstructorFunction().apply(metaInfo));
+    public Optional<Dialect> tryCreateDialect(Connection connection) throws SQLException {
+        if (isSupportedProduct(connection.getMetaData().getDatabaseProductName(), connection.getMetaData().getDatabaseProductVersion(), connection)) {
+            return Optional.of(getConstructorFunction().apply(connection));
         }
         return Optional.empty();
     }
@@ -46,21 +47,21 @@ public abstract class AbstractDialectFactory<T extends Dialect> implements Diale
      * and obtains some information directly from the server.
      *
      * @param databaseProduct Database product instance
-     * @param metaInfo metaInfo
+     * @param connection Connection
      * @return true if a match was found. false otherwise.
      */
     protected static boolean isDatabase(
         String databaseProduct,
-        MetaInfo metaInfo)
+        Connection connection)
     {
         //Statement statement = null;
         //ResultSet resultSet = null;
 
         String dbProduct = databaseProduct.toLowerCase();
 
-        //try {
+        try {
             // Quick and dirty check first.
-            if (metaInfo.databaseInfo().databaseProductName()
+            if (connection.getMetaData().getDatabaseProductName()
                 .toLowerCase().contains(dbProduct))
             {
                 LOGGER.debug("Using {} dialect", databaseProduct);
@@ -82,17 +83,18 @@ public abstract class AbstractDialectFactory<T extends Dialect> implements Diale
             LOGGER.debug("NOT Using {} dialect",  databaseProduct);
             */
             return false;
-        //} catch (SQLException e) {
+        } catch (SQLException e) {
             // this exception can be hit by any db types that don't support
             // 'select version()'
             // no need to log exception, this is an "expected" error as we
             // loop through all dialects looking for one that matches.
-            //LOGGER.debug("NOT Using {} dialect.", databaseProduct);
-            //return false;
+            LOGGER.debug("NOT Using {} dialect.", databaseProduct);
+            return false;
+        }
         //} finally {
         //    Util.close(resultSet, statement, null);
         //}
     }
 
-    public abstract Function<MetaInfo, T> getConstructorFunction();
+    public abstract Function<Connection, T> getConstructorFunction();
 }

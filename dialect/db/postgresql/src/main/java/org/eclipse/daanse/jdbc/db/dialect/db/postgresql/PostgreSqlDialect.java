@@ -22,6 +22,7 @@
 
 package org.eclipse.daanse.jdbc.db.dialect.db.postgresql;
 
+import java.sql.Connection;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
@@ -29,7 +30,6 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
 import org.eclipse.daanse.jdbc.db.dialect.api.BestFitColumnType;
 import org.eclipse.daanse.jdbc.db.dialect.api.Dialect;
 import org.eclipse.daanse.jdbc.db.dialect.api.OrderedColumn;
@@ -44,8 +44,8 @@ import org.eclipse.daanse.jdbc.db.dialect.db.common.JdbcDialectImpl;
  */
 public class PostgreSqlDialect extends JdbcDialectImpl {
 
-    public PostgreSqlDialect(MetaInfo metaInfo) {
-        super(metaInfo);
+    public PostgreSqlDialect(Connection connection) {
+        super(connection);
     }
 
     @Override

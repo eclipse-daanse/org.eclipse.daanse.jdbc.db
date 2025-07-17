@@ -22,15 +22,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
 
-import org.eclipse.daanse.jdbc.db.api.meta.DatabaseInfo;
-import org.eclipse.daanse.jdbc.db.api.meta.IdentifierInfo;
-import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
 import org.eclipse.daanse.jdbc.db.dialect.api.BestFitColumnType;
-import org.eclipse.daanse.jdbc.db.dialect.db.monetdb.MonetDbDialect;
 import org.junit.jupiter.api.Test;
 
 class AdditionalTest {
@@ -38,13 +36,11 @@ class AdditionalTest {
     @Test
     void testMonetBooleanColumn() throws SQLException {
         ResultSetMetaData resultSet = mock(ResultSetMetaData.class);
-        MetaInfo metaInfo = mock(MetaInfo.class);
-        IdentifierInfo identifierInfo = mock(IdentifierInfo.class);
-        DatabaseInfo databaseInfo = mock(DatabaseInfo.class);
-        when(metaInfo.identifierInfo()).thenReturn(identifierInfo);
-        when(metaInfo.databaseInfo()).thenReturn(databaseInfo);
+        Connection connection = mock(Connection.class);;
+        DatabaseMetaData metaData = mock(DatabaseMetaData.class);
+        when(connection.getMetaData()).thenReturn(metaData);
         when(resultSet.getColumnType(1)).thenReturn(Types.BOOLEAN);
-        MonetDbDialect monetDbDialect = new MonetDbDialect(metaInfo);
+        MonetDbDialect monetDbDialect = new MonetDbDialect(connection);
         BestFitColumnType type = monetDbDialect.getType(resultSet, 0);
         assertEquals(BestFitColumnType.OBJECT, type);
     }

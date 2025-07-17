@@ -21,7 +21,8 @@
  */
 package org.eclipse.daanse.jdbc.db.dialect.db.infobright;
 
-import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
+import java.sql.Connection;
+
 import org.eclipse.daanse.jdbc.db.dialect.api.Dialect;
 import org.eclipse.daanse.jdbc.db.dialect.db.mysql.MySqlDialect;
 import org.slf4j.Logger;
@@ -38,8 +39,8 @@ public class InfobrightDialect extends MySqlDialect {
     private static final Logger LOGGER = LoggerFactory.getLogger(InfobrightDialect.class);
     private static final String SUPPORTED_PRODUCT_NAME = "INFOBRIGHT";
 
-    public InfobrightDialect(MetaInfo metaInfo) {
-        super(metaInfo);
+    public InfobrightDialect(Connection connection) {
+        super(connection);
     }
 
     @Override

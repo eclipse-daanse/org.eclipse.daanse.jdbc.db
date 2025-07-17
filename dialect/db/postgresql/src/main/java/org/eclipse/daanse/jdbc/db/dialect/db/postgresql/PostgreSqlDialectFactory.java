@@ -16,7 +16,6 @@ package org.eclipse.daanse.jdbc.db.dialect.db.postgresql;
 import java.sql.Connection;
 import java.util.function.Function;
 
-import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
 import org.eclipse.daanse.jdbc.db.dialect.api.DialectFactory;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.AbstractDialectFactory;
 import org.osgi.service.component.annotations.Component;
@@ -31,14 +30,14 @@ public class PostgreSqlDialectFactory extends AbstractDialectFactory<PostgreSqlD
     private static final String SUPPORTED_PRODUCT_NAME = "POSTGRESQL";
 
     @Override
-    public boolean isSupportedProduct(String productName, String productVersion, MetaInfo metaInfo) {
-        return SUPPORTED_PRODUCT_NAME.equalsIgnoreCase(productVersion) && !isDatabase("GREENPLUM", metaInfo)
-            && !isDatabase("NETEZZA", metaInfo)
-            && !isDatabase("REDSHIFT", metaInfo);
+    public boolean isSupportedProduct(String productName, String productVersion, Connection connection) {
+        return SUPPORTED_PRODUCT_NAME.equalsIgnoreCase(productVersion) && !isDatabase("GREENPLUM", connection)
+            && !isDatabase("NETEZZA", connection)
+            && !isDatabase("REDSHIFT", connection);
     }
 
     @Override
-    public Function<MetaInfo, PostgreSqlDialect> getConstructorFunction() {
+    public Function<Connection, PostgreSqlDialect> getConstructorFunction() {
         return PostgreSqlDialect::new;
     }
 

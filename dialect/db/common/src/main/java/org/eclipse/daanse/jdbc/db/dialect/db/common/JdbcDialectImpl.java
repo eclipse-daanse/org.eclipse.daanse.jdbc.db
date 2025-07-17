@@ -21,22 +21,26 @@
  */
 package org.eclipse.daanse.jdbc.db.dialect.db.common;
 
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.Date;
+import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
 import org.eclipse.daanse.jdbc.db.dialect.api.BestFitColumnType;
 import org.eclipse.daanse.jdbc.db.dialect.api.Datatype;
 import org.eclipse.daanse.jdbc.db.dialect.api.Dialect;
@@ -68,6 +72,14 @@ public abstract class JdbcDialectImpl implements Dialect {
     public static final String CASE_WHEN_SPACE = "CASE WHEN ";
     private static final Logger LOGGER = LoggerFactory.getLogger(JdbcDialectImpl.class);
 
+    private static final int[] RESULT_SET_TYPE_VALUES = {
+            ResultSet.TYPE_FORWARD_ONLY,
+            ResultSet.TYPE_SCROLL_INSENSITIVE,
+            ResultSet.TYPE_SCROLL_SENSITIVE};
+
+    private static final int[] CONCURRENCY_VALUES = {
+            ResultSet.CONCUR_READ_ONLY,
+            ResultSet.CONCUR_UPDATABLE};
     /**
      * String used to quote identifiers.
      */
@@ -138,20 +150,20 @@ public abstract class JdbcDialectImpl implements Dialect {
 
     }
 
-    public JdbcDialectImpl(MetaInfo metaInfo) {
+    public JdbcDialectImpl(Connection connection) {
 
-        //DatabaseMetaData metaData;
+        DatabaseMetaData metaData;
         try {
-            //metaData = connection.getMetaData();
+            metaData = connection.getMetaData();
 
             //init
-            this.quoteIdentifierString = deduceIdentifierQuoteString(metaInfo);
-            this.productName = deduceProductName(metaInfo);
-            this.productVersion = deduceProductVersion(metaInfo);
-            this.supportedResultSetTypes = deduceSupportedResultSetStyles(metaInfo);
-            this.readOnly = deduceReadOnly(metaInfo);
-            this.maxColumnNameLength = deduceMaxColumnNameLength(metaInfo);
-            this.permitsSelectNotInGroupBy = deduceSupportsSelectNotInGroupBy(metaInfo);
+            this.quoteIdentifierString = deduceIdentifierQuoteString(metaData);
+            this.productName = deduceProductName(metaData);
+            this.productVersion = deduceProductVersion(metaData);
+            this.supportedResultSetTypes = deduceSupportedResultSetStyles(metaData);
+            this.readOnly = deduceReadOnly(metaData);
+            this.maxColumnNameLength = deduceMaxColumnNameLength(metaData);
+            this.permitsSelectNotInGroupBy = deduceSupportsSelectNotInGroupBy(metaData);
 
         } catch (SQLException e) {
             LOGGER.info("initialize failed", e);
@@ -170,30 +182,30 @@ public abstract class JdbcDialectImpl implements Dialect {
         return true;
     }
 
-    protected int deduceMaxColumnNameLength(MetaInfo metaInfo) {
-        return metaInfo.identifierInfo().maxColumnNameLength();
+    protected int deduceMaxColumnNameLength(DatabaseMetaData metaData) throws SQLException {
+        return metaData.getMaxColumnNameLength();
     }
 
-    protected boolean deduceReadOnly(MetaInfo metaInfo) {
-        return metaInfo.identifierInfo().readOnly();
+    protected boolean deduceReadOnly(DatabaseMetaData metaData) throws SQLException {
+        return metaData.isReadOnly();
     }
 
-    protected String deduceProductName(MetaInfo metaInfo) {
-        return metaInfo.databaseInfo().databaseProductName();
+    protected String deduceProductName(DatabaseMetaData metaData) throws SQLException {
+        return metaData.getDatabaseProductName();
     }
 
     protected String deduceIdentifierQuoteString(
-        MetaInfo metaInfo) {
+            DatabaseMetaData metaData) throws SQLException {
         final String identifierString =
-            metaInfo.identifierInfo().quoteString();
+                metaData.getIdentifierQuoteString();
         return "".equals(identifierString)
             // quoting not supported
             ? null
             : identifierString;
     }
 
-    protected String deduceProductVersion(MetaInfo metaInfo) {
-        return metaInfo.databaseInfo().databaseProductVersion();
+    protected String deduceProductVersion(DatabaseMetaData metaData) throws SQLException {
+        return metaData.getDatabaseProductVersion();
     }
 
     /**
@@ -204,10 +216,10 @@ public abstract class JdbcDialectImpl implements Dialect {
      * <p>The expectation is that this will not change while Mondrian is
      * running, though some databases (MySQL) allow changing it on the fly.</p>
      *
-     * @param metaInfo metaInfo
+     * @param metaData DatabaseMetaData
      * @throws SQLException on error
      */
-    protected boolean deduceSupportsSelectNotInGroupBy(MetaInfo metaInfo)
+    protected boolean deduceSupportsSelectNotInGroupBy(DatabaseMetaData metaData)
         throws SQLException {
         // Most simply don't support it
         return false;
@@ -916,8 +928,7 @@ public abstract class JdbcDialectImpl implements Dialect {
     public boolean supportsResultSetConcurrency(
         int type,
         int concurrency) {
-        return supportedResultSetTypes.contains(
-            Arrays.asList(type, concurrency));
+        return supportedResultSetTypes.contains( Arrays.asList(type, concurrency) );
     }
 
     @Override
@@ -1091,10 +1102,6 @@ public abstract class JdbcDialectImpl implements Dialect {
         return true;
     }
 
-    protected Set<List<Integer>> deduceSupportedResultSetStyles(MetaInfo metaInfo) {
-        return metaInfo.identifierInfo().supportedResultSetStyles();
-    }
-
     @Override
     public StringBuilder generateAndBitAggregation(CharSequence operand) {
         throw new RuntimeException("AND Bit Aggregation not supported");
@@ -1199,5 +1206,46 @@ public abstract class JdbcDialectImpl implements Dialect {
     public boolean supportsListAgg() {
         return false;
     }
+
+    protected Set<List<Integer>> deduceSupportedResultSetStyles(
+            DatabaseMetaData databaseMetaData)
+        {
+            Set<List<Integer>> supports = new HashSet<List<Integer>>();
+            for (int type : RESULT_SET_TYPE_VALUES) {
+                for (int concurrency : CONCURRENCY_VALUES) {
+                    try {
+                        if (databaseMetaData.supportsResultSetConcurrency(
+                                type, concurrency))
+                        {
+                            String driverName =
+                                databaseMetaData.getDriverName();
+                            if (type != ResultSet.TYPE_FORWARD_ONLY
+                                && driverName.equals(
+                                    "JDBC-ODBC Bridge (odbcjt32.dll)"))
+                            {
+                                // In JDK 1.6, the Jdbc-Odbc bridge announces
+                                // that it can handle TYPE_SCROLL_INSENSITIVE
+                                // but it does so by generating a 'COUNT(*)'
+                                // query, and this query is invalid if the query
+                                // contains a single-quote. So, override the
+                                // driver.
+                                continue;
+                            }
+                            supports.add(
+                                new ArrayList<Integer>(
+                                    Arrays.asList(type, concurrency)));
+                        }
+                    } catch (SQLException e) {
+                        // DB2 throws "com.ibm.db2.jcc.b.SqlException: Unknown type
+                        // or Concurrency" for certain values of type/concurrency.
+                        // No harm in interpreting all such exceptions as 'this
+                        // database does not support this type/concurrency
+                        // combination'.
+                        //Util.discard(e);
+                    }
+                }
+            }
+            return supports;
+        }
 
 }
