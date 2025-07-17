@@ -17,13 +17,11 @@ import java.sql.Connection;
 import java.util.function.Function;
 
 import org.eclipse.daanse.jdbc.db.dialect.api.DialectFactory;
+import org.eclipse.daanse.jdbc.db.dialect.api.DialectName;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.AbstractDialectFactory;
 import org.osgi.service.component.annotations.Component;
 
-import aQute.bnd.annotation.spi.ServiceProvider;
-
-@ServiceProvider(value = DialectFactory.class, attribute = { "database.dialect.type:String='DERBY'",
-    "database.product:String='DERBY'" })
+@DialectName("DERBY")
 @Component(service = DialectFactory.class)
 public class DerbyDialectFactory extends AbstractDialectFactory<DerbyDialect> {
     private static final String SUPPORTED_PRODUCT_NAME = "DERBY";

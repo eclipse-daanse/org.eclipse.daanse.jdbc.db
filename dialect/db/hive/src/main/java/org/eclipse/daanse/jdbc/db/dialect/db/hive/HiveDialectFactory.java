@@ -17,14 +17,12 @@ import java.sql.Connection;
 import java.util.function.Function;
 
 import org.eclipse.daanse.jdbc.db.dialect.api.DialectFactory;
+import org.eclipse.daanse.jdbc.db.dialect.api.DialectName;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.AbstractDialectFactory;
 import org.osgi.service.component.annotations.Component;
 
-import aQute.bnd.annotation.spi.ServiceProvider;
-
-@ServiceProvider(value = DialectFactory.class, attribute = { "database.dialect.type:String='HIVE'",
-    "database.product:String='HIVE'" })
 @Component(service = DialectFactory.class)
+@DialectName("HIVE")
 public class HiveDialectFactory extends AbstractDialectFactory<HiveDialect>{
 
     private static final String SUPPORTED_PRODUCT_NAME = "HIVE";
