@@ -22,11 +22,11 @@
 
 package org.eclipse.daanse.jdbc.db.dialect.db.redshift;
 
+import java.sql.Connection;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.DialectUtil;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.Util;
 import org.eclipse.daanse.jdbc.db.dialect.db.postgresql.PostgreSqlDialect;
@@ -37,8 +37,8 @@ import org.eclipse.daanse.jdbc.db.dialect.db.postgresql.PostgreSqlDialect;
 public class RedshiftDialect extends PostgreSqlDialect {
     private static final String SUPPORTED_PRODUCT_NAME = "REDSHIFT";
 
-    public RedshiftDialect(MetaInfo metaInfo) {
-        super(metaInfo);
+    public RedshiftDialect(Connection connection) {
+        super(connection);
     }
 
     @Override

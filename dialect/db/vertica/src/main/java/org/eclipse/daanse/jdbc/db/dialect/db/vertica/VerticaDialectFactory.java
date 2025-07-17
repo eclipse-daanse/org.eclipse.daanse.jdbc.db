@@ -13,13 +13,13 @@
  */
 package org.eclipse.daanse.jdbc.db.dialect.db.vertica;
 
+import java.sql.Connection;
 import java.util.Optional;
 import java.util.function.Function;
 
-import org.eclipse.daanse.jdbc.db.dialect.db.common.AbstractDialectFactory;
-import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
 import org.eclipse.daanse.jdbc.db.dialect.api.Dialect;
 import org.eclipse.daanse.jdbc.db.dialect.api.DialectFactory;
+import org.eclipse.daanse.jdbc.db.dialect.db.common.AbstractDialectFactory;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ServiceScope;
 
@@ -31,17 +31,17 @@ import aQute.bnd.annotation.spi.ServiceProvider;
 public class VerticaDialectFactory extends AbstractDialectFactory<VerticaDialect> {
     private static final String SUPPORTED_PRODUCT_NAME = "VERTICA";
     @Override
-    public Optional<Dialect> tryCreateDialect(MetaInfo metaInfo) {
-        return Optional.of(new VerticaDialect(metaInfo));
+    public Optional<Dialect> tryCreateDialect(Connection connection) {
+        return Optional.of(new VerticaDialect(connection));
     }
 
     @Override
-    public boolean isSupportedProduct(String productName, String productVersion, MetaInfo metaInfo) {
+    public boolean isSupportedProduct(String productName, String productVersion, Connection connection) {
         return SUPPORTED_PRODUCT_NAME.equalsIgnoreCase(productVersion);
     }
 
     @Override
-    public Function<MetaInfo, VerticaDialect> getConstructorFunction() {
+    public Function<Connection, VerticaDialect> getConstructorFunction() {
         return VerticaDialect::new;
     }
 }

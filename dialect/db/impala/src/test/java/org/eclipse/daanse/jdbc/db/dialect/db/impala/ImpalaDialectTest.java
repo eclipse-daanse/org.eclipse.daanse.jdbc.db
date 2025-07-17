@@ -31,10 +31,6 @@ import static org.mockito.Mockito.when;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 
-import org.eclipse.daanse.jdbc.db.api.meta.DatabaseInfo;
-import org.eclipse.daanse.jdbc.db.api.meta.IdentifierInfo;
-import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
-import org.eclipse.daanse.jdbc.db.dialect.db.impala.ImpalaDialect;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -42,17 +38,15 @@ import org.junit.jupiter.api.Test;
  * @author Andrey Khayrutdinov
  */
 class ImpalaDialectTest {
-    private MetaInfo metaInfo = mock(MetaInfo.class);
-    private DatabaseInfo databaseInfo = mock(DatabaseInfo.class);
-    private IdentifierInfo identifierInfo = mock(IdentifierInfo.class);
+    private Connection connection = mock(Connection.class);
+    private DatabaseMetaData metaData = mock(DatabaseMetaData.class);
     private static ImpalaDialect impalaDialect;
 
     @BeforeEach
     protected void setUp() throws Exception {
-        when(metaInfo.databaseInfo()).thenReturn(databaseInfo);
-        when(metaInfo.identifierInfo()).thenReturn(identifierInfo);
-        when(databaseInfo.databaseProductName()).thenReturn("IMPALA");
-        impalaDialect = new ImpalaDialect(metaInfo);
+        when(connection.getMetaData()).thenReturn(metaData);
+        when(metaData.getDatabaseProductName()).thenReturn("IMPALA");
+        impalaDialect = new ImpalaDialect(connection);
     }
 
     @Test

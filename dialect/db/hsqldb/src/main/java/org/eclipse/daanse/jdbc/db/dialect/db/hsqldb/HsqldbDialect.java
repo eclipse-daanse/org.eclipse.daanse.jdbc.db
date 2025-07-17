@@ -22,10 +22,10 @@
 
 package org.eclipse.daanse.jdbc.db.dialect.db.hsqldb;
 
+import java.sql.Connection;
 import java.sql.Date;
 import java.util.List;
 
-import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
 import org.eclipse.daanse.jdbc.db.dialect.api.Dialect;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.JdbcDialectImpl;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.Util;
@@ -40,8 +40,8 @@ public class HsqldbDialect extends JdbcDialectImpl {
 
     private static final String SUPPORTED_PRODUCT_NAME = "HSQLDB";
 
-    public HsqldbDialect(MetaInfo metaInfo) {
-        super(metaInfo);
+    public HsqldbDialect(Connection connection) {
+        super(connection);
     }
 
     @Override

@@ -28,9 +28,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import org.eclipse.daanse.jdbc.db.dialect.db.hive.HiveDialect;
 import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.DialectUtil;
+import org.eclipse.daanse.jdbc.db.dialect.db.hive.HiveDialect;
 
 /**
  * Dialect for Cloudera's Impala DB.
@@ -47,12 +47,12 @@ public class ImpalaDialect extends HiveDialect {
     public static final String CAST = "cast(";
     public static final String AS_STRING = " as string)";
 
-    public ImpalaDialect(MetaInfo metaInfo) {
-        super(metaInfo);
+    public ImpalaDialect(Connection connection) {
+        super(connection);
     }
 
     @Override
-    protected String deduceIdentifierQuoteString(MetaInfo metaInfo) {
+    protected String deduceIdentifierQuoteString(DatabaseMetaData metaData) {
         return "`";
     }
 

@@ -47,18 +47,16 @@ class MicrosoftSqlServerDialectTest {
     private static final String BOOLEAN_LITERAL_FALSE = "False";
     private static final String BOOLEAN_LITERAL_ONE = "1";
     private static final String BOOLEAN_LITERAL_ZERO = "0";
-    private MetaInfo metaInfo = mock(MetaInfo.class);
-    private DatabaseInfo databaseInfo = mock(DatabaseInfo.class);
-    private IdentifierInfo identifierInfo = mock(IdentifierInfo.class);
+    private Connection connection = mock(Connection.class);
+    private DatabaseMetaData metaData = mock(DatabaseMetaData.class);
     private MicrosoftSqlServerDialect dialect;
     private StringBuilder buf;
 
     @BeforeEach
     protected void setUp() throws Exception {
-        when(metaInfo.databaseInfo()).thenReturn(databaseInfo);
-        when(metaInfo.identifierInfo()).thenReturn(identifierInfo);
-        when(databaseInfo.databaseProductName()).thenReturn("MSSQL");
-        dialect = new MicrosoftSqlServerDialect(metaInfo);
+        when(connection.getMetaData()).thenReturn(metaData);
+        when(metaData.getDatabaseProductName()).thenReturn("MSSQL");
+        dialect = new MicrosoftSqlServerDialect(connection);
         buf = new StringBuilder();
     }
 

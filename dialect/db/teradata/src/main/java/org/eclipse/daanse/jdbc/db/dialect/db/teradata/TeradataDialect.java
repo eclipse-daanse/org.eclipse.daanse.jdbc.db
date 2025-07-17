@@ -25,7 +25,6 @@ package org.eclipse.daanse.jdbc.db.dialect.db.teradata;
 import java.sql.Connection;
 import java.util.List;
 
-import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
 import org.eclipse.daanse.jdbc.db.dialect.api.Dialect;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.JdbcDialectImpl;
 
@@ -39,8 +38,8 @@ public class TeradataDialect extends JdbcDialectImpl {
 
     private static final String SUPPORTED_PRODUCT_NAME = "TERADATA";
 
-    public TeradataDialect(MetaInfo metaInfo) {
-        super(metaInfo);
+    public TeradataDialect(Connection connection) {
+        super(connection);
     }
 
     @Override

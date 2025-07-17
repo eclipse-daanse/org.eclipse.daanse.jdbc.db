@@ -22,11 +22,11 @@
 
 package org.eclipse.daanse.jdbc.db.dialect.db.netezza;
 
+import java.sql.Connection;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
 
-import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
 import org.eclipse.daanse.jdbc.db.dialect.api.BestFitColumnType;
 import org.eclipse.daanse.jdbc.db.dialect.api.Dialect;
 import org.eclipse.daanse.jdbc.db.dialect.db.postgresql.PostgreSqlDialect;
@@ -41,8 +41,8 @@ public class NetezzaDialect extends PostgreSqlDialect {
 
     private static final String SUPPORTED_PRODUCT_NAME = "NETEZZA";
 
-    public NetezzaDialect(MetaInfo metaInfo) {
-        super(metaInfo);
+    public NetezzaDialect(Connection connection) {
+        super(connection);
     }
 
     @Override

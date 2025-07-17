@@ -30,7 +30,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
 import org.eclipse.daanse.jdbc.db.dialect.api.BestFitColumnType;
 import org.eclipse.daanse.jdbc.db.dialect.api.Dialect;
 import org.eclipse.daanse.jdbc.db.dialect.api.OrderedColumn;
@@ -49,8 +48,8 @@ public class OracleDialect extends JdbcDialectImpl {
     private static final Pattern escapePattern = Pattern.compile(ESCAPE_REGEXP);
     private static final String SUPPORTED_PRODUCT_NAME = "ORACLE";
 
-    public OracleDialect(MetaInfo metaInfo) {
-        super(metaInfo);
+    public OracleDialect(Connection connection) {
+        super(connection);
     }
 
     @Override

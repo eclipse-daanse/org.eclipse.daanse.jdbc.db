@@ -21,11 +21,11 @@
  */
 package org.eclipse.daanse.jdbc.db.dialect.db.pdidataservice;
 
+import java.sql.Connection;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
 
-import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
 import org.eclipse.daanse.jdbc.db.dialect.api.BestFitColumnType;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.JdbcDialectImpl;
 
@@ -33,8 +33,8 @@ public class PdiDataServiceDialect extends JdbcDialectImpl {
 
     private static final String SUPPORTED_PRODUCT_NAME = "PDI";
 
-    public PdiDataServiceDialect(MetaInfo metaInfo) {
-        super(metaInfo);
+    public PdiDataServiceDialect(Connection connection) {
+        super(connection);
     }
 
     @Override

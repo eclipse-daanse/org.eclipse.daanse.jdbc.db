@@ -21,6 +21,8 @@
  */
 package org.eclipse.daanse.jdbc.db.dialect.db.mysql;
 
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +30,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
 import org.eclipse.daanse.jdbc.db.dialect.api.OrderedColumn;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.DialectUtil;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.JdbcDialectImpl;
@@ -50,10 +51,10 @@ public class MySqlDialect extends JdbcDialectImpl {
 
     private static final String SUPPORTED_PRODUCT_NAME = "MYSQL";
 
-    public MySqlDialect(MetaInfo metaInfo) {
-        super(metaInfo);
+    public MySqlDialect(Connection connection) {
+        super(connection);
         try {
-            if (isInfobright(metaInfo)) {
+            if (isInfobright(connection.getMetaData())) {
                 throw new RuntimeException();
             }
         } catch (Exception e) {
@@ -68,26 +69,26 @@ public class MySqlDialect extends JdbcDialectImpl {
      * Infobright uses the MySQL driver and appears to be a MySQL instance. The only
      * difference is the presence of the BRIGHTHOUSE engine.
      *
-     * @param metaInfo metaInfo
+     * @param metaData DatabaseMetaData
      * @return Whether this is Infobright
      */
-    public static boolean isInfobright(MetaInfo metaInfo) {
+    public static boolean isInfobright(DatabaseMetaData metaData) {
         //TODO add Infobright to dialect configuration
         return false;
     }
 
     @Override
-    protected String deduceProductName(MetaInfo metaInfo) {
-        final String productName = super.deduceProductName(metaInfo);
-        if (isInfobright(metaInfo)) {
+    protected String deduceProductName(DatabaseMetaData metaData) throws SQLException {
+        final String productName = super.deduceProductName(metaData);
+        if (isInfobright(metaData)) {
             return "MySQL (Infobright)";
         }
         return productName;
     }
 
     @Override
-    protected String deduceIdentifierQuoteString(MetaInfo metaInfo) {
-        String quoteIdentifierString = super.deduceIdentifierQuoteString(metaInfo);
+    protected String deduceIdentifierQuoteString(DatabaseMetaData metaData) throws SQLException {
+        String quoteIdentifierString = super.deduceIdentifierQuoteString(metaData);
 
         if (quoteIdentifierString == null) {
             // mm.mysql.2.0.4 driver lies. We know better.
@@ -97,7 +98,7 @@ public class MySqlDialect extends JdbcDialectImpl {
     }
 
     @Override
-    protected boolean deduceSupportsSelectNotInGroupBy(MetaInfo metaInfo) throws SQLException {
+    protected boolean deduceSupportsSelectNotInGroupBy(DatabaseMetaData metaData) throws SQLException {
         //TODO SupportsSelectNotInGroupBy to configuration
         return false;
     }

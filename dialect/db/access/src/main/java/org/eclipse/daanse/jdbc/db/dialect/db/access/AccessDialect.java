@@ -21,6 +21,7 @@
 */
 package org.eclipse.daanse.jdbc.db.dialect.db.access;
 
+import java.sql.Connection;
 import java.sql.Date;
 import java.util.Calendar;
 import java.util.List;
@@ -40,8 +41,8 @@ public class AccessDialect extends JdbcDialectImpl {
 
     private static final String SUPPORTED_PRODUCT_NAME = "ACCESS";
 
-    public AccessDialect(MetaInfo metaInfo) {
-        super(metaInfo);
+    public AccessDialect(Connection connection) {
+        super(connection);
     }
 
     @Override

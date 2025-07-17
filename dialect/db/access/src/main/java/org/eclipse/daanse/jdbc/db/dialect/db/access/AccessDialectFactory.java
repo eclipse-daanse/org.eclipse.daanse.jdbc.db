@@ -13,6 +13,7 @@
  */
 package org.eclipse.daanse.jdbc.db.dialect.db.access;
 
+import java.sql.Connection;
 import java.util.function.Function;
 
 import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
@@ -29,12 +30,12 @@ public class AccessDialectFactory extends AbstractDialectFactory<AccessDialect> 
     private static final String SUPPORTED_PRODUCT_NAME = "ACCESS";
 
     @Override
-    public boolean isSupportedProduct(String productName, String productVersion, MetaInfo metaInfo) {
+    public boolean isSupportedProduct(String productName, String productVersion, Connection connection) {
         return SUPPORTED_PRODUCT_NAME.equalsIgnoreCase(productVersion);
     }
 
     @Override
-    public Function<MetaInfo, AccessDialect> getConstructorFunction() {
+    public Function<Connection, AccessDialect> getConstructorFunction() {
         return AccessDialect::new;
     }
 }

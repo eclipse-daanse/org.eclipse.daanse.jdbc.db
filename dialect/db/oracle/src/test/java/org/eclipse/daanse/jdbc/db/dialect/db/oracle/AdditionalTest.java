@@ -43,19 +43,16 @@ class AdditionalTest {
     void testOracleTypeMapQuirks() throws SQLException {
 
         ResultSetMetaData resultSet = mock(ResultSetMetaData.class);
-        //DatabaseMetaData databaseMetaData = mock(DatabaseMetaData.class);
-        MetaInfo metaInfo = mock(MetaInfo.class);
-        IdentifierInfo identifierInfo = mock(IdentifierInfo.class);
-        DatabaseInfo databaseInfo = mock(DatabaseInfo.class);
-        when(metaInfo.identifierInfo()).thenReturn(identifierInfo);
-        when(metaInfo.databaseInfo()).thenReturn(databaseInfo);
+        DatabaseMetaData databaseMetaData = mock(DatabaseMetaData.class);
+        Connection connection = mock(Connection.class);
+        when(connection.getMetaData()).thenReturn(databaseMetaData);
         when(resultSet.getColumnName(1)).thenReturn("c0");
         when(resultSet.getColumnType(1)).thenReturn(Types.NUMERIC);
         when(resultSet.getPrecision(1)).thenReturn(0);
         when(resultSet.getScale(1)).thenReturn(0);
 
 
-        Dialect oracleDialect = new OracleDialect(metaInfo);
+        Dialect oracleDialect = new OracleDialect(connection);
 
         assertSame(BestFitColumnType.INT,
             oracleDialect.getType(

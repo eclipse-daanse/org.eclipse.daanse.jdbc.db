@@ -16,7 +16,6 @@ package org.eclipse.daanse.jdbc.db.dialect.db.redshift;
 import java.sql.Connection;
 import java.util.function.Function;
 
-import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
 import org.eclipse.daanse.jdbc.db.dialect.api.DialectFactory;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.AbstractDialectFactory;
 import org.osgi.service.component.annotations.Component;
@@ -30,12 +29,12 @@ public class RedshiftDialectFactory extends AbstractDialectFactory<RedshiftDiale
     private static final String SUPPORTED_PRODUCT_NAME = "REDSHIFT";
 
     @Override
-    public boolean isSupportedProduct(String productName, String productVersion, MetaInfo metaInfo) {
-        return SUPPORTED_PRODUCT_NAME.equalsIgnoreCase(productVersion) && isDatabase(SUPPORTED_PRODUCT_NAME, metaInfo);
+    public boolean isSupportedProduct(String productName, String productVersion, Connection connection) {
+        return SUPPORTED_PRODUCT_NAME.equalsIgnoreCase(productVersion) && isDatabase(SUPPORTED_PRODUCT_NAME, connection);
     }
 
     @Override
-    public Function<MetaInfo, RedshiftDialect> getConstructorFunction() {
+    public Function<Connection, RedshiftDialect> getConstructorFunction() {
         return RedshiftDialect::new;
     }
 

@@ -21,6 +21,7 @@
  */
 package org.eclipse.daanse.jdbc.db.dialect.db.vertica;
 
+import java.sql.Connection;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
@@ -31,11 +32,10 @@ import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import org.eclipse.daanse.jdbc.db.dialect.db.common.DialectUtil;
-import org.eclipse.daanse.jdbc.db.dialect.db.common.JdbcDialectImpl;
-import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
 import org.eclipse.daanse.jdbc.db.dialect.api.BestFitColumnType;
 import org.eclipse.daanse.jdbc.db.dialect.api.Dialect;
+import org.eclipse.daanse.jdbc.db.dialect.db.common.DialectUtil;
+import org.eclipse.daanse.jdbc.db.dialect.db.common.JdbcDialectImpl;
 
 /**
  * Implementation of {@link Dialect} for the Vertica database.
@@ -47,8 +47,8 @@ public class VerticaDialect extends JdbcDialectImpl {
 
     private static final String SUPPORTED_PRODUCT_NAME = "VERTICA";
 
-    public VerticaDialect(MetaInfo metaInfo) {
-        super(metaInfo);
+    public VerticaDialect(Connection connection) {
+        super(connection);
     }
 
     @Override

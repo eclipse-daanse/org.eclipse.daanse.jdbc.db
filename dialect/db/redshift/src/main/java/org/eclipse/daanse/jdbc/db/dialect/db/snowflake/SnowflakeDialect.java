@@ -21,6 +21,7 @@
  */
 package org.eclipse.daanse.jdbc.db.dialect.db.snowflake;
 
+import java.sql.Connection;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
@@ -28,7 +29,6 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
 import org.eclipse.daanse.jdbc.db.dialect.api.BestFitColumnType;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.DialectUtil;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.JdbcDialectImpl;
@@ -38,8 +38,8 @@ public class SnowflakeDialect extends JdbcDialectImpl {
 
     private static final String SUPPORTED_PRODUCT_NAME = "SNOWFLAKE";
 
-    public SnowflakeDialect(MetaInfo metaInfo) {
-        super(metaInfo);
+    public SnowflakeDialect(Connection connection) {
+        super(connection);
     }
 
     @Override

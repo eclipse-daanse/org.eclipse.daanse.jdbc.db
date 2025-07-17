@@ -29,27 +29,20 @@ import static org.mockito.Mockito.when;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.sql.Statement;
 
-import org.eclipse.daanse.jdbc.db.api.meta.DatabaseInfo;
-import org.eclipse.daanse.jdbc.db.api.meta.IdentifierInfo;
-import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
-import org.eclipse.daanse.jdbc.db.dialect.db.redshift.RedshiftDialect;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class RedshiftDialectTest {
-    private MetaInfo metaInfo = mock(MetaInfo.class);
-    private DatabaseInfo databaseInfo = mock(DatabaseInfo.class);
-    private IdentifierInfo identifierInfo = mock(IdentifierInfo.class);
+    private Connection connection = mock(Connection.class);
+    private DatabaseMetaData metaData = mock(DatabaseMetaData.class);
     private RedshiftDialect dialect;
 
     @BeforeEach
     protected void setUp() throws Exception {
-        when(metaInfo.databaseInfo()).thenReturn(databaseInfo);
-        when(metaInfo.identifierInfo()).thenReturn(identifierInfo);
-        when(databaseInfo.databaseProductName()).thenReturn("REDSHIFT");
-        dialect = new RedshiftDialect(metaInfo);
+        when(connection.getMetaData()).thenReturn(metaData);
+        when(metaData.getDatabaseProductName()).thenReturn("REDSHIFT");
+        dialect = new RedshiftDialect(connection);
     }
 
     @Test

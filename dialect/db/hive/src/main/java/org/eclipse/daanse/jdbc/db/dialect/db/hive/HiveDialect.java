@@ -26,11 +26,8 @@ import java.sql.DatabaseMetaData;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
-import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
 import org.eclipse.daanse.jdbc.db.dialect.api.Dialect;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.JdbcDialectImpl;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.Util;
@@ -46,29 +43,30 @@ public class HiveDialect extends JdbcDialectImpl {
 
     private static final String SUPPORTED_PRODUCT_NAME = "HIVE";
 
-    public HiveDialect(MetaInfo metaInfo) {
-        super(metaInfo);
+    public HiveDialect(Connection connection) {
+        super(connection);
     }
 
     @Override
-    protected String deduceIdentifierQuoteString(MetaInfo metaInfo) {
+    protected String deduceIdentifierQuoteString(DatabaseMetaData metaData) {
         return null;
     }
 
     @Override
-    protected Set<List<Integer>> deduceSupportedResultSetStyles(MetaInfo metaInfo) {
-        // Hive don't support this, so just return an empty set.
-        return Collections.emptySet();
+    public boolean supportsResultSetConcurrency(
+        int type,
+        int concurrency) {
+            return false;
     }
 
     @Override
-    protected boolean deduceReadOnly(MetaInfo metaInfo) {
-        return metaInfo.identifierInfo().readOnly();
+    protected boolean deduceReadOnly(DatabaseMetaData metaData) throws SQLException {
+        return metaData.isReadOnly();
     }
 
     @Override
-    protected int deduceMaxColumnNameLength(MetaInfo metaInfo) {
-        return metaInfo.identifierInfo().maxColumnNameLength();
+    protected int deduceMaxColumnNameLength(DatabaseMetaData metaData) throws SQLException {
+        return metaData.getMaxCatalogNameLength();
     }
 
     @Override

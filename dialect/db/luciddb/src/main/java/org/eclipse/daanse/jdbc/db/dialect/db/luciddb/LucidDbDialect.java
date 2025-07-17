@@ -21,7 +21,8 @@
  */
 package org.eclipse.daanse.jdbc.db.dialect.db.luciddb;
 
-import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
+import java.sql.Connection;
+
 import org.eclipse.daanse.jdbc.db.dialect.api.Dialect;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.JdbcDialectImpl;
 
@@ -35,8 +36,8 @@ public class LucidDbDialect extends JdbcDialectImpl {
 
     private static final String SUPPORTED_PRODUCT_NAME = "LUCIDDB";
 
-    public LucidDbDialect(MetaInfo metaInfo) {
-        super(metaInfo);
+    public LucidDbDialect(Connection connection) {
+        super(connection);
     }
 
     @Override

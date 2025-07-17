@@ -23,9 +23,8 @@ package org.eclipse.daanse.jdbc.db.dialect.db.greenplum;
 
 import java.sql.Connection;
 
-import org.eclipse.daanse.jdbc.db.dialect.db.postgresql.PostgreSqlDialect;
-import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
 import org.eclipse.daanse.jdbc.db.dialect.api.Dialect;
+import org.eclipse.daanse.jdbc.db.dialect.db.postgresql.PostgreSqlDialect;
 
 /**
  * Implementation of {@link Dialect} for the GreenplumSQL database.
@@ -37,8 +36,8 @@ public class GreenplumDialect extends PostgreSqlDialect {
 
     private static final String SUPPORTED_PRODUCT_NAME = "GREENPLUM";
 
-    public GreenplumDialect(MetaInfo metaInfo) {
-        super(metaInfo);
+    public GreenplumDialect(Connection connection) {
+        super(connection);
     }
 
     @Override

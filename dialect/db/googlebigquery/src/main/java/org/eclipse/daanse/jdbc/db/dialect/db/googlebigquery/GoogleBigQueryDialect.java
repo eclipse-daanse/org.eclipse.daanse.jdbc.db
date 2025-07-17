@@ -21,11 +21,11 @@
  */
 package org.eclipse.daanse.jdbc.db.dialect.db.googlebigquery;
 
+import java.sql.Connection;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.DialectUtil;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.JdbcDialectImpl;
 
@@ -38,8 +38,8 @@ import org.eclipse.daanse.jdbc.db.dialect.db.common.JdbcDialectImpl;
 public class GoogleBigQueryDialect extends JdbcDialectImpl {
     private static final String SUPPORTED_PRODUCT_NAME = "GOOGLEBIGQUERY";
 
-    public GoogleBigQueryDialect(MetaInfo metaInfo) {
-        super(metaInfo);
+    public GoogleBigQueryDialect(Connection connection) {
+        super(connection);
     }
 
     @Override

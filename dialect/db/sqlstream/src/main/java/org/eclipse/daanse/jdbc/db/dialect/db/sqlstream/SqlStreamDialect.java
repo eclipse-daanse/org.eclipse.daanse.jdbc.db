@@ -23,7 +23,6 @@ package org.eclipse.daanse.jdbc.db.dialect.db.sqlstream;
 
 import java.sql.Connection;
 
-import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
 import org.eclipse.daanse.jdbc.db.dialect.api.Dialect;
 import org.eclipse.daanse.jdbc.db.dialect.db.luciddb.LucidDbDialect;
 
@@ -37,8 +36,8 @@ public class SqlStreamDialect extends LucidDbDialect {
 
     private static final String SUPPORTED_PRODUCT_NAME = "SQLSTREAM";
 
-    public SqlStreamDialect(MetaInfo metaInfo) {
-        super(metaInfo);
+    public SqlStreamDialect(Connection connection) {
+        super(connection);
     }
 
     @Override

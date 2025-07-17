@@ -38,10 +38,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class MonetDbDialectTest {
-    private MetaInfo metaInfo = mock(MetaInfo.class);
-    private DatabaseInfo databaseInfo = mock(DatabaseInfo.class);
-    private IdentifierInfo identifierInfo = mock(IdentifierInfo.class);
-
+    private Connection connection = mock(Connection.class);
+    private DatabaseMetaData metaData = mock(DatabaseMetaData.class);
 
     private MonetDbDialect dialect;
     private static final String JUL_2017_SP1_DB_VERSION = "11.27.5";
@@ -51,26 +49,25 @@ class MonetDbDialectTest {
 
     @BeforeEach
     protected void setUp() throws Exception {
-        when(metaInfo.databaseInfo()).thenReturn(databaseInfo);
-        when(metaInfo.identifierInfo()).thenReturn(identifierInfo);
-        when(databaseInfo.databaseProductName()).thenReturn("MONETDB");
-        when(databaseInfo.databaseProductVersion()).thenReturn(CURRENT_DB_VERSION);
-        dialect = new MonetDbDialect(metaInfo);
+        when(connection.getMetaData()).thenReturn(metaData);
+        when(metaData.getDatabaseProductName()).thenReturn("MONETDB");
+        when(metaData.getDatabaseProductVersion()).thenReturn(CURRENT_DB_VERSION);
+        dialect = new MonetDbDialect(connection);
     }
 
     @Test
     void testAllowsCountDistinctFalse_BeforeAug2011SP2() throws Exception {
         // set up the version before Aug2011 SP2
-        when(databaseInfo.databaseProductVersion()).thenReturn(AUG_2011_SP1_DB_VERSION);
-        dialect = new MonetDbDialect(metaInfo);
+        when(metaData.getDatabaseProductVersion()).thenReturn(AUG_2011_SP1_DB_VERSION);
+        dialect = new MonetDbDialect(connection);
         assertFalse(dialect.allowsCountDistinct());
     }
 
     @Test
     void testAllowsCountDistinctTrue_StartingFromAug2011SP2() throws Exception {
         // set up the version starting from Aug2011 SP2
-        when(databaseInfo.databaseProductVersion()).thenReturn(AUG_2011_SP2_DB_VERSION);
-        dialect = new MonetDbDialect(metaInfo);
+        when(metaData.getDatabaseProductVersion()).thenReturn(AUG_2011_SP2_DB_VERSION);
+        dialect = new MonetDbDialect(connection);
         assertTrue(dialect.allowsCountDistinct());
     }
 

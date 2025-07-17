@@ -21,14 +21,14 @@
  */
 package org.eclipse.daanse.jdbc.db.dialect.db.monetdb;
 
+import java.sql.Connection;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
 
-import org.eclipse.daanse.jdbc.db.dialect.db.common.JdbcDialectImpl;
-import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
 import org.eclipse.daanse.jdbc.db.dialect.api.BestFitColumnType;
 import org.eclipse.daanse.jdbc.db.dialect.api.Dialect;
+import org.eclipse.daanse.jdbc.db.dialect.db.common.JdbcDialectImpl;
 
 /**
  * Implementation of {@link Dialect} for the MonetDB database.
@@ -41,8 +41,8 @@ public class MonetDbDialect extends JdbcDialectImpl {
 
     private static final String SUPPORTED_PRODUCT_NAME = "MONETDB";
 
-    public MonetDbDialect(MetaInfo metaInfo) {
-        super(metaInfo);
+    public MonetDbDialect(Connection connection) {
+        super(connection);
     }
 
     @Override

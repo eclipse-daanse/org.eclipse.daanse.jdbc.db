@@ -13,6 +13,7 @@
  */
 package org.eclipse.daanse.jdbc.db.dialect.db.db2;
 
+import java.sql.Connection;
 import java.util.function.Function;
 
 import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
@@ -29,12 +30,12 @@ public class Db2DialectFactory extends AbstractDialectFactory<Db2Dialect> {
     private static final String SUPPORTED_PRODUCT_NAME = "DB2";
 
     @Override
-    public boolean isSupportedProduct(String productName, String productVersion, MetaInfo metaInfo) {
+    public boolean isSupportedProduct(String productName, String productVersion, Connection connection) {
         return SUPPORTED_PRODUCT_NAME.equalsIgnoreCase(productVersion);
     }
 
     @Override
-    public Function<MetaInfo, Db2Dialect> getConstructorFunction() {
+    public Function<Connection, Db2Dialect> getConstructorFunction() {
         return Db2Dialect::new;
     }
 }

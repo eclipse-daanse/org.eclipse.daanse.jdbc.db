@@ -13,9 +13,9 @@
  */
 package org.eclipse.daanse.jdbc.db.dialect.db.infobright;
 
+import java.sql.Connection;
 import java.util.function.Function;
 
-import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
 import org.eclipse.daanse.jdbc.db.dialect.api.DialectFactory;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.AbstractDialectFactory;
 import org.osgi.service.component.annotations.Component;
@@ -30,12 +30,12 @@ public class InfobrightDialectFactory extends AbstractDialectFactory<InfobrightD
     private static final String SUPPORTED_PRODUCT_NAME = "INFOBRIGHT";
 
     @Override
-    public boolean isSupportedProduct(String productName, String productVersion, MetaInfo metaInfo) {
+    public boolean isSupportedProduct(String productName, String productVersion, Connection connection) {
         return SUPPORTED_PRODUCT_NAME.equalsIgnoreCase(productVersion);
     }
 
     @Override
-    public Function<MetaInfo, InfobrightDialect> getConstructorFunction() {
+    public Function<Connection, InfobrightDialect> getConstructorFunction() {
         return InfobrightDialect::new;
     }
 

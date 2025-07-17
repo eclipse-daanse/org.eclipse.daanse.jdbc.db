@@ -13,9 +13,9 @@
  */
 package org.eclipse.daanse.jdbc.db.dialect.db.oracle;
 
+import java.sql.Connection;
 import java.util.function.Function;
 
-import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
 import org.eclipse.daanse.jdbc.db.dialect.api.DialectFactory;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.AbstractDialectFactory;
 import org.osgi.service.component.annotations.Component;
@@ -29,12 +29,12 @@ public class OracleDialectFactory extends AbstractDialectFactory<OracleDialect> 
     private static final String SUPPORTED_PRODUCT_NAME = "ORACLE";
 
     @Override
-    public boolean isSupportedProduct(String productName, String productVersion, MetaInfo metaInfo) {
+    public boolean isSupportedProduct(String productName, String productVersion, Connection connection) {
         return SUPPORTED_PRODUCT_NAME.equalsIgnoreCase(productVersion);
     }
 
     @Override
-    public Function<MetaInfo, OracleDialect> getConstructorFunction() {
+    public Function<Connection, OracleDialect> getConstructorFunction() {
         return OracleDialect::new;
     }
 
