@@ -16,15 +16,12 @@ package org.eclipse.daanse.jdbc.db.dialect.db.db2;
 import java.sql.Connection;
 import java.util.function.Function;
 
-import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
 import org.eclipse.daanse.jdbc.db.dialect.api.DialectFactory;
+import org.eclipse.daanse.jdbc.db.dialect.api.DialectName;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.AbstractDialectFactory;
 import org.osgi.service.component.annotations.Component;
 
-import aQute.bnd.annotation.spi.ServiceProvider;
-
-@ServiceProvider(value = DialectFactory.class, attribute = { "database.dialect.type:String='DB2_OLD_AS400'",
-    "database.product:String='DB2_OLD_AS400'" })
+@DialectName("DB2_OLD_AS400")
 @Component(service = DialectFactory.class)
 public class Db2OldAs400DialectFactory extends AbstractDialectFactory<Db2OldAs400Dialect> {
     private static final String SUPPORTED_PRODUCT_NAME = "DB2_OLD_AS400";

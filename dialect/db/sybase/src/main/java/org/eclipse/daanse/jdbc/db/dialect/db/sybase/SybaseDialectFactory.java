@@ -17,15 +17,13 @@ import java.sql.Connection;
 import java.util.function.Function;
 
 import org.eclipse.daanse.jdbc.db.dialect.api.DialectFactory;
+import org.eclipse.daanse.jdbc.db.dialect.api.DialectName;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.AbstractDialectFactory;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ServiceScope;
 
-import aQute.bnd.annotation.spi.ServiceProvider;
-
-@ServiceProvider(value = DialectFactory.class, attribute = { "database.dialect.type:String='SYBASE'",
-    "database.product:String='SYBASE'" })
 @Component(service = DialectFactory.class, scope = ServiceScope.PROTOTYPE)
+@DialectName("SQLSTREAM")
 public class SybaseDialectFactory extends AbstractDialectFactory<SybaseDialect>{
     private static final String SUPPORTED_PRODUCT_NAME = "SQLSTREAM";
 
