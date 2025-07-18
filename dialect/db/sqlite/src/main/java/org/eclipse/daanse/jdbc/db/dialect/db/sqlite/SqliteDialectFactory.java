@@ -26,12 +26,6 @@ import org.osgi.service.component.annotations.ServiceScope;
 @Component(service = DialectFactory.class, scope = ServiceScope.PROTOTYPE)
 @DialectName("SQLITE")
 public class SqliteDialectFactory extends AbstractDialectFactory<SqliteDialect> {
-    private static final String SUPPORTED_PRODUCT_NAME = "SQLITE";
-
-    @Override
-    public boolean isSupportedProduct(String productName, String productVersion, Connection connection) {
-        return SUPPORTED_PRODUCT_NAME.equalsIgnoreCase(productName);
-    }
 
     @Override
     public Function<Connection, SqliteDialect> getConstructorFunction() {

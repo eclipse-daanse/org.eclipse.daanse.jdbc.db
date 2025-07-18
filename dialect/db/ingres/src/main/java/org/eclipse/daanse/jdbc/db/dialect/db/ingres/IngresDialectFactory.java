@@ -25,13 +25,6 @@ import org.osgi.service.component.annotations.Component;
 @DialectName("INGRES")
 public class IngresDialectFactory extends AbstractDialectFactory<IngresDialect> {
 
-    private static final String SUPPORTED_PRODUCT_NAME = "INGRES";
-
-    @Override
-    public boolean isSupportedProduct(String productName, String productVersion, Connection connection) {
-        return SUPPORTED_PRODUCT_NAME.equalsIgnoreCase(productVersion);
-    }
-
     @Override
     public Function<Connection, IngresDialect> getConstructorFunction() {
         return IngresDialect::new;

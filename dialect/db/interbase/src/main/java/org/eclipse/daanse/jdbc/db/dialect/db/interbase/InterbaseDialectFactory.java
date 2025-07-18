@@ -25,13 +25,6 @@ import org.osgi.service.component.annotations.Component;
 @DialectName("INTERBASE")
 public class InterbaseDialectFactory extends AbstractDialectFactory<InterbaseDialect> {
 
-    private static final String SUPPORTED_PRODUCT_NAME = "INTERBASE";
-
-    @Override
-    public boolean isSupportedProduct(String productName, String productVersion, Connection connection) {
-        return SUPPORTED_PRODUCT_NAME.equalsIgnoreCase(productVersion);
-    }
-
     @Override
     public Function<Connection, InterbaseDialect> getConstructorFunction() {
         return InterbaseDialect::new;

@@ -21,17 +21,9 @@ import org.eclipse.daanse.jdbc.db.dialect.api.DialectName;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.AbstractDialectFactory;
 import org.osgi.service.component.annotations.Component;
 
-import aQute.bnd.annotation.spi.ServiceProvider;
-
 @Component(service = DialectFactory.class)
 @DialectName("MSSQL")
 public class MicrosoftSqlServerDialectFactory extends AbstractDialectFactory<MicrosoftSqlServerDialect> {
-    private static final String SUPPORTED_PRODUCT_NAME = "MSSQL";
-
-    @Override
-    public boolean isSupportedProduct(String productName, String productVersion, Connection connection) {
-        return SUPPORTED_PRODUCT_NAME.equalsIgnoreCase(productVersion);
-    }
 
     @Override
     public Function<Connection, MicrosoftSqlServerDialect> getConstructorFunction() {

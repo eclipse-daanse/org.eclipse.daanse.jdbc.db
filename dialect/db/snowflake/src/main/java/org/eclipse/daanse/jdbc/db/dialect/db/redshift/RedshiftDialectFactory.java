@@ -24,12 +24,6 @@ import org.osgi.service.component.annotations.Component;
 @Component(service = DialectFactory.class)
 @DialectName("REDSHIFT")
 public class RedshiftDialectFactory extends AbstractDialectFactory<RedshiftDialect> {
-    private static final String SUPPORTED_PRODUCT_NAME = "REDSHIFT";
-
-    @Override
-    public boolean isSupportedProduct(String productName, String productVersion, Connection connection) {
-        return SUPPORTED_PRODUCT_NAME.equalsIgnoreCase(productVersion) && isDatabase(SUPPORTED_PRODUCT_NAME, connection);
-    }
 
     @Override
     public Function<Connection, RedshiftDialect> getConstructorFunction() {

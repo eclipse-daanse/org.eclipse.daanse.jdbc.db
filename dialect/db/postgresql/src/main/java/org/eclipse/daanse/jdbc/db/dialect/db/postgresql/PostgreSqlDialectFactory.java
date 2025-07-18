@@ -25,12 +25,6 @@ import org.osgi.service.component.annotations.ServiceScope;
 @Component(service = DialectFactory.class, scope = ServiceScope.PROTOTYPE)
 @DialectName("POSTGRESQL")
 public class PostgreSqlDialectFactory extends AbstractDialectFactory<PostgreSqlDialect> {
-    private static final String SUPPORTED_PRODUCT_NAME = "POSTGRESQL";
-
-    @Override
-    public boolean isSupportedProduct(String productName, String productVersion, Connection connection) {
-        return true;
-    }
 
     @Override
     public Function<Connection, PostgreSqlDialect> getConstructorFunction() {

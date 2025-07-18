@@ -22,7 +22,6 @@
   <packaging>pom</packaging>
   <modules>
     <module>api</module>
-    <module>resolver</module>
     <module>db</module>
   </modules>
 </project>
