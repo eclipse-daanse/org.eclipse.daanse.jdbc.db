@@ -20,9 +20,10 @@ import org.eclipse.daanse.jdbc.db.dialect.api.DialectFactory;
 import org.eclipse.daanse.jdbc.db.dialect.api.DialectName;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.AbstractDialectFactory;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ServiceScope;
 
 @DialectName("DB2_OLD_AS400")
-@Component(service = DialectFactory.class)
+@Component(service = DialectFactory.class, scope = ServiceScope.SINGLETON)
 public class Db2OldAs400DialectFactory extends AbstractDialectFactory<Db2OldAs400Dialect> {
 
     @Override

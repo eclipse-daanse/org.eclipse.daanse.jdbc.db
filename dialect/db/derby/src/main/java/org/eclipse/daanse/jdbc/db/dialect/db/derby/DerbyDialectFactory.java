@@ -20,9 +20,10 @@ import org.eclipse.daanse.jdbc.db.dialect.api.DialectFactory;
 import org.eclipse.daanse.jdbc.db.dialect.api.DialectName;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.AbstractDialectFactory;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ServiceScope;
 
 @DialectName("DERBY")
-@Component(service = DialectFactory.class)
+@Component(service = DialectFactory.class, scope = ServiceScope.SINGLETON)
 public class DerbyDialectFactory extends AbstractDialectFactory<DerbyDialect> {
 
     @Override

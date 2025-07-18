@@ -23,8 +23,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 
 import org.eclipse.daanse.jdbc.db.dialect.api.DialectFactory;
-import org.eclipse.daanse.jdbc.db.dialect.db.db2.Db2DialectFactory;
-import org.eclipse.daanse.jdbc.db.dialect.db.db2.Db2OldAs400DialectFactory;
 import org.junit.jupiter.api.Test;
 import org.osgi.test.common.annotation.InjectService;
 
