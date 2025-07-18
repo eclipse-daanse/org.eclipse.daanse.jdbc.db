@@ -24,12 +24,6 @@ import org.osgi.service.component.annotations.Component;
 @DialectName("DERBY")
 @Component(service = DialectFactory.class)
 public class DerbyDialectFactory extends AbstractDialectFactory<DerbyDialect> {
-    private static final String SUPPORTED_PRODUCT_NAME = "DERBY";
-
-    @Override
-    public boolean isSupportedProduct(String productName, String productVersion, Connection connection) {
-        return SUPPORTED_PRODUCT_NAME.equalsIgnoreCase(productVersion);
-    }
 
     @Override
     public Function<Connection, DerbyDialect> getConstructorFunction() {

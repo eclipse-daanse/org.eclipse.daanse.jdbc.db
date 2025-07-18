@@ -14,31 +14,17 @@
 package org.eclipse.daanse.jdbc.db.dialect.db.vertica;
 
 import java.sql.Connection;
-import java.util.Optional;
 import java.util.function.Function;
 
-import org.eclipse.daanse.jdbc.db.dialect.api.Dialect;
 import org.eclipse.daanse.jdbc.db.dialect.api.DialectFactory;
+import org.eclipse.daanse.jdbc.db.dialect.api.DialectName;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.AbstractDialectFactory;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ServiceScope;
 
-import aQute.bnd.annotation.spi.ServiceProvider;
-
-@ServiceProvider(value = DialectFactory.class, attribute = { "database.dialect.type:String='VERTICA'",
-    "database.product:String='VERTICA'" })
+@DialectName("VERTICA")
 @Component(service = DialectFactory.class, scope = ServiceScope.PROTOTYPE)
 public class VerticaDialectFactory extends AbstractDialectFactory<VerticaDialect> {
-    private static final String SUPPORTED_PRODUCT_NAME = "VERTICA";
-    @Override
-    public Optional<Dialect> tryCreateDialect(Connection connection) {
-        return Optional.of(new VerticaDialect(connection));
-    }
-
-    @Override
-    public boolean isSupportedProduct(String productName, String productVersion, Connection connection) {
-        return SUPPORTED_PRODUCT_NAME.equalsIgnoreCase(productVersion);
-    }
 
     @Override
     public Function<Connection, VerticaDialect> getConstructorFunction() {

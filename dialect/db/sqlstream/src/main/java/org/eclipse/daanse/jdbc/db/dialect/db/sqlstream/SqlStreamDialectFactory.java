@@ -22,17 +22,9 @@ import org.eclipse.daanse.jdbc.db.dialect.db.common.AbstractDialectFactory;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ServiceScope;
 
-import aQute.bnd.annotation.spi.ServiceProvider;
-
 @Component(service = DialectFactory.class, scope = ServiceScope.PROTOTYPE)
 @DialectName("SQLSTREAM")
-public class SqlStreamDialectFactory extends AbstractDialectFactory<SqlStreamDialect>{
-    private static final String SUPPORTED_PRODUCT_NAME = "SQLSTREAM";
-
-    @Override
-    public boolean isSupportedProduct(String productName, String productVersion, Connection connection) {
-        return SUPPORTED_PRODUCT_NAME.equalsIgnoreCase(productVersion);
-    }
+public class SqlStreamDialectFactory extends AbstractDialectFactory<SqlStreamDialect> {
 
     @Override
     public Function<Connection, SqlStreamDialect> getConstructorFunction() {

@@ -21,17 +21,9 @@ import org.eclipse.daanse.jdbc.db.dialect.api.DialectName;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.AbstractDialectFactory;
 import org.osgi.service.component.annotations.Component;
 
-import aQute.bnd.annotation.spi.ServiceProvider;
-
 @Component(service = DialectFactory.class)
 @DialectName("MONETDB")
 public class MonetDbDialectFactory extends AbstractDialectFactory<MonetDbDialect> {
-    private static final String SUPPORTED_PRODUCT_NAME = "MONETDB";
-
-    @Override
-    public boolean isSupportedProduct(String productName, String productVersion, Connection connection) {
-        return SUPPORTED_PRODUCT_NAME.equalsIgnoreCase(productVersion);
-    }
 
     @Override
     public Function<Connection, MonetDbDialect> getConstructorFunction() {

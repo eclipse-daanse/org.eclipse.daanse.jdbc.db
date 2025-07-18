@@ -23,13 +23,7 @@ import org.osgi.service.component.annotations.Component;
 
 @Component(service = DialectFactory.class)
 @DialectName("SNOWFLAKE")
-public class SnowflakeDialectFactory extends AbstractDialectFactory<SnowflakeDialect>{
-    private static final String SUPPORTED_PRODUCT_NAME = "SNOWFLAKE";
-
-    @Override
-    public boolean isSupportedProduct(String productName, String productVersion, Connection connection) {
-        return SUPPORTED_PRODUCT_NAME.equalsIgnoreCase(productVersion);
-    }
+public class SnowflakeDialectFactory extends AbstractDialectFactory<SnowflakeDialect> {
 
     @Override
     public Function<Connection, SnowflakeDialect> getConstructorFunction() {

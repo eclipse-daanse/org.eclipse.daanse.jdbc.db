@@ -22,17 +22,9 @@ import org.eclipse.daanse.jdbc.db.dialect.db.common.AbstractDialectFactory;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ServiceScope;
 
-import aQute.bnd.annotation.spi.ServiceProvider;
-
 @Component(service = DialectFactory.class, scope = ServiceScope.PROTOTYPE)
 @DialectName("MARIADB")
 public class MariaDBDialectFactory extends AbstractDialectFactory<MariaDBDialect> {
-    private static final String SUPPORTED_PRODUCT_NAME = "MARIADB";
-
-    @Override
-    public boolean isSupportedProduct(String productName, String productVersion, Connection connection) {
-        return SUPPORTED_PRODUCT_NAME.equalsIgnoreCase(productVersion);
-    }
 
     @Override
     public Function<Connection, MariaDBDialect> getConstructorFunction() {

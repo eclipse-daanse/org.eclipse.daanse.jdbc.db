@@ -20,7 +20,6 @@ package org.eclipse.daanse.jdbc.db.dialect.db.db2;
 
 import java.sql.Connection;
 
-import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
 import org.eclipse.daanse.jdbc.db.dialect.api.Dialect;
 
 /**

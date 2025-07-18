@@ -23,13 +23,7 @@ import org.osgi.service.component.annotations.Component;
 
 @Component(service = DialectFactory.class)
 @DialectName("HSQLDB")
-public class HsqldbDialectFactory extends AbstractDialectFactory<HsqldbDialect>{
-    private static final String SUPPORTED_PRODUCT_NAME = "HSQLDB";
-
-    @Override
-    public boolean isSupportedProduct(String productName, String productVersion, Connection connection) {
-        return SUPPORTED_PRODUCT_NAME.equalsIgnoreCase(productVersion);
-    }
+public class HsqldbDialectFactory extends AbstractDialectFactory<HsqldbDialect> {
 
     @Override
     public Function<Connection, HsqldbDialect> getConstructorFunction() {

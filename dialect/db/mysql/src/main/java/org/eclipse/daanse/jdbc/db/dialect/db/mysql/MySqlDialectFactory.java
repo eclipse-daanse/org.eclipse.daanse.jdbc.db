@@ -24,12 +24,6 @@ import org.osgi.service.component.annotations.Component;
 @Component(service = DialectFactory.class)
 @DialectName("MYSQL")
 public class MySqlDialectFactory extends AbstractDialectFactory<MySqlDialect> {
-    private static final String SUPPORTED_PRODUCT_NAME = "MYSQL";
-
-    @Override
-    public boolean isSupportedProduct(String productName, String productVersion, Connection connection) {
-        return SUPPORTED_PRODUCT_NAME.equalsIgnoreCase(productVersion);
-    }
 
     @Override
     public Function<Connection, MySqlDialect> getConstructorFunction() {

@@ -26,13 +26,6 @@ import org.osgi.service.component.annotations.ServiceScope;
 @DialectName("IMPALA")
 public class ImpalaDialectFactory extends AbstractDialectFactory<ImpalaDialect> {
 
-    private static final String SUPPORTED_PRODUCT_NAME = "IMPALA";
-
-    @Override
-    public boolean isSupportedProduct(String productName, String productVersion, Connection connection) {
-        return SUPPORTED_PRODUCT_NAME.equalsIgnoreCase(productVersion) && isDatabase(SUPPORTED_PRODUCT_NAME, connection);
-    }
-
     @Override
     public Function<Connection, ImpalaDialect> getConstructorFunction() {
         return ImpalaDialect::new;

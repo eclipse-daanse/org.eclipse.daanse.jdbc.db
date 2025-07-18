@@ -24,13 +24,7 @@ import org.osgi.service.component.annotations.ServiceScope;
 
 @Component(service = DialectFactory.class, scope = ServiceScope.PROTOTYPE)
 @DialectName("SQLSTREAM")
-public class SybaseDialectFactory extends AbstractDialectFactory<SybaseDialect>{
-    private static final String SUPPORTED_PRODUCT_NAME = "SQLSTREAM";
-
-    @Override
-    public boolean isSupportedProduct(String productName, String productVersion, Connection connection) {
-        return SUPPORTED_PRODUCT_NAME.equalsIgnoreCase(productVersion);
-    }
+public class SybaseDialectFactory extends AbstractDialectFactory<SybaseDialect> {
 
     @Override
     public Function<Connection, SybaseDialect> getConstructorFunction() {

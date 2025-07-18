@@ -24,12 +24,6 @@ import org.osgi.service.component.annotations.Component;
 @Component(service = DialectFactory.class)
 @DialectName("DB2")
 public class Db2DialectFactory extends AbstractDialectFactory<Db2Dialect> {
-    private static final String SUPPORTED_PRODUCT_NAME = "DB2";
-
-    @Override
-    public boolean isSupportedProduct(String productName, String productVersion, Connection connection) {
-        return SUPPORTED_PRODUCT_NAME.equalsIgnoreCase(productVersion);
-    }
 
     @Override
     public Function<Connection, Db2Dialect> getConstructorFunction() {

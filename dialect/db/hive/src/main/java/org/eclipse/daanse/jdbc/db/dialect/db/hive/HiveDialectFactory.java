@@ -23,14 +23,7 @@ import org.osgi.service.component.annotations.Component;
 
 @Component(service = DialectFactory.class)
 @DialectName("HIVE")
-public class HiveDialectFactory extends AbstractDialectFactory<HiveDialect>{
-
-    private static final String SUPPORTED_PRODUCT_NAME = "HIVE";
-
-    @Override
-    public boolean isSupportedProduct(String productName, String productVersion, Connection connection) {
-        return SUPPORTED_PRODUCT_NAME.equalsIgnoreCase(productVersion) && isDatabase(productName, connection);
-    }
+public class HiveDialectFactory extends AbstractDialectFactory<HiveDialect> {
 
     @Override
     public Function<Connection, HiveDialect> getConstructorFunction() {

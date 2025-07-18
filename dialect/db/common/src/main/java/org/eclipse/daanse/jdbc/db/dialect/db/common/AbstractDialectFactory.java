@@ -16,7 +16,6 @@ package org.eclipse.daanse.jdbc.db.dialect.db.common;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
-import java.util.Optional;
 import java.util.function.Function;
 
 import org.eclipse.daanse.jdbc.db.dialect.api.Dialect;
@@ -26,13 +25,11 @@ import org.slf4j.LoggerFactory;
 
 public abstract class AbstractDialectFactory<T extends Dialect> implements DialectFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractDialectFactory.class);
+
     @Override
-    public Optional<Dialect> tryCreateDialect(Connection connection) throws SQLException {
-        if (isSupportedProduct(connection.getMetaData().getDatabaseProductName(), connection.getMetaData().getDatabaseProductVersion(), connection)) {
-            return Optional.of(getConstructorFunction().apply(connection));
+    public Dialect createDialect(Connection connection) throws SQLException {
+            return getConstructorFunction().apply(connection);
         }
-        return Optional.empty();
-    }
 
     /**
      * Helper method to determine if a connection would work with

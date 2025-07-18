@@ -26,11 +26,6 @@ import org.osgi.service.component.annotations.Component;
 public class OracleDialectFactory extends AbstractDialectFactory<OracleDialect> {
 
     @Override
-    public boolean isSupportedProduct(String productName, String productVersion, Connection connection) {
-        return true;
-    }
-
-    @Override
     public Function<Connection, OracleDialect> getConstructorFunction() {
         return OracleDialect::new;
     }

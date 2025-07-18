@@ -25,12 +25,6 @@ import org.osgi.service.component.annotations.ServiceScope;
 @Component(service = DialectFactory.class, scope = ServiceScope.PROTOTYPE)
 @DialectName("NEOVIEW")
 public class NeoviewDialectFactory extends AbstractDialectFactory<NeoviewDialect> {
-    private static final String SUPPORTED_PRODUCT_NAME = "NEOVIEW";
-
-    @Override
-    public boolean isSupportedProduct(String productName, String productVersion, Connection connection) {
-        return SUPPORTED_PRODUCT_NAME.equalsIgnoreCase(productVersion);
-    }
 
     @Override
     public Function<Connection, NeoviewDialect> getConstructorFunction() {
