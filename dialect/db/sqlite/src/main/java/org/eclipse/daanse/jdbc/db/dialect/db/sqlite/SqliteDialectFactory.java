@@ -23,7 +23,7 @@ import org.eclipse.daanse.jdbc.db.dialect.db.common.AbstractDialectFactory;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ServiceScope;
 
-@Component(service = DialectFactory.class, scope = ServiceScope.PROTOTYPE)
+@Component(service = DialectFactory.class, scope = ServiceScope.SINGLETON)
 @DialectName("SQLITE")
 public class SqliteDialectFactory extends AbstractDialectFactory<SqliteDialect> {
 

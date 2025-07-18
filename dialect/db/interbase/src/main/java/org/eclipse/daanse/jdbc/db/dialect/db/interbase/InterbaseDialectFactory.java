@@ -20,8 +20,9 @@ import org.eclipse.daanse.jdbc.db.dialect.api.DialectFactory;
 import org.eclipse.daanse.jdbc.db.dialect.api.DialectName;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.AbstractDialectFactory;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ServiceScope;
 
-@Component(service = DialectFactory.class)
+@Component(service = DialectFactory.class, scope = ServiceScope.SINGLETON)
 @DialectName("INTERBASE")
 public class InterbaseDialectFactory extends AbstractDialectFactory<InterbaseDialect> {
 

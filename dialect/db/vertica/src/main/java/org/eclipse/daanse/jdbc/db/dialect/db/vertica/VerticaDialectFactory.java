@@ -23,7 +23,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ServiceScope;
 
 @DialectName("VERTICA")
-@Component(service = DialectFactory.class, scope = ServiceScope.PROTOTYPE)
+@Component(service = DialectFactory.class, scope = ServiceScope.SINGLETON)
 public class VerticaDialectFactory extends AbstractDialectFactory<VerticaDialect> {
 
     @Override
