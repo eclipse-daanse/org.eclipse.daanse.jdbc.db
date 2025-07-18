@@ -29,9 +29,7 @@ public class PostgreSqlDialectFactory extends AbstractDialectFactory<PostgreSqlD
 
     @Override
     public boolean isSupportedProduct(String productName, String productVersion, Connection connection) {
-        return SUPPORTED_PRODUCT_NAME.equalsIgnoreCase(productVersion) && !isDatabase("GREENPLUM", connection)
-            && !isDatabase("NETEZZA", connection)
-            && !isDatabase("REDSHIFT", connection);
+        return true;
     }
 
     @Override
