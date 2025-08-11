@@ -21,6 +21,8 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>org.eclipse.daanse.jdbc.db.dialect.db.postgresql</artifactId>
+  <name>Eclipse Daanse JDBC DB Dialect PostgreSQL</name>
+  <description>PostgreSQL database dialect implementation providing PostgreSQL-specific SQL generation, query optimization, and advanced database feature handling. Supports PostgreSQL-specific data types, functions, and analytical capabilities for enterprise OLAP operations.</description>
   <dependencies>
     <dependency>
       <groupId>org.slf4j</groupId>

@@ -13,13 +13,15 @@
  */
 package org.eclipse.daanse.jdbc.db.dialect.api;
 
-import static java.lang.annotation.ElementType.*;
-
-import org.osgi.service.component.annotations.ComponentPropertyType;
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.TYPE;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+
+import org.osgi.service.component.annotations.ComponentPropertyType;
 
 /**
  * OSGi Component Property Type for defining a dialect name.

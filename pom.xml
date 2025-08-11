@@ -24,6 +24,8 @@
   <artifactId>org.eclipse.daanse.jdbc.db</artifactId>
   <version>${revision}</version>
   <packaging>pom</packaging>
+  <name>Eclipse Daanse JDBC Database Utilities</name>
+  <description>Comprehensive JDBC database abstraction framework providing cross-database compatibility through extensive dialect support for 25+ database systems. Includes advanced database introspection, SQL statement generation, metadata extraction, and data import utilities with specialized handling for database-specific features and optimizations.</description>
 
   <properties>
     <revision>0.0.1-SNAPSHOT</revision>

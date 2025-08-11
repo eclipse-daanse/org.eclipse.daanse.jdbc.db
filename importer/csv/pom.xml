@@ -18,6 +18,8 @@
     <version>${revision}</version>
   </parent>
   <artifactId>org.eclipse.daanse.jdbc.db.importer.csv</artifactId>
+  <name>Daanse JDBC DB Importer CSV</name>
+  <description>CSV file import utility for Daanse JDBC database operations. Provides functionality to import data from CSV files into database tables with configurable parsing, validation, and transformation options.</description>
 
   <dependencies>
     <dependency>
