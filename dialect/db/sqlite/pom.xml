@@ -21,6 +21,8 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>org.eclipse.daanse.jdbc.db.dialect.db.sqlite</artifactId>
+  <name>Eclipse Daanse JDBC DB Dialect SQLite</name>
+  <description>SQLite database dialect implementation providing SQLite-specific SQL generation, query optimization, and embedded database feature handling. Supports SQLite lightweight database operations with proper handling of SQLite data types and SQL syntax variations.</description>
   <dependencies>
     <dependency>
       <groupId>org.slf4j</groupId>

@@ -21,6 +21,8 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>org.eclipse.daanse.jdbc.db.dialect.db.impala</artifactId>
+  <name>Eclipse Daanse JDBC DB Dialect Impala</name>
+  <description>Apache Impala database dialect implementation providing Impala-specific SQL generation, query optimization, and real-time analytical database feature handling. Supports Impala distributed queries and high-performance analytical operations for OLAP workloads on Hadoop.</description>
   <dependencies>
     <dependency>
       <groupId>org.slf4j</groupId>

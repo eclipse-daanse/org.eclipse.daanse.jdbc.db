@@ -20,7 +20,9 @@
     <version>${revision}</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
-  <artifactId>org.eclipse.daanse.jdbc.db.dialect.db.redshift</artifactId>
+  <artifactId>org.eclipse.daanse.jdbc.db.dialect.db.snowflake</artifactId>
+  <name>Eclipse Daanse JDBC DB Dialect Snowflake</name>
+  <description>Snowflake database dialect implementation providing Snowflake-specific SQL generation, query optimization, and cloud data warehouse feature handling. Supports Snowflake semi-structured data, analytical functions, and cloud-native capabilities for OLAP operations.</description>
   <dependencies>
     <dependency>
       <groupId>org.slf4j</groupId>

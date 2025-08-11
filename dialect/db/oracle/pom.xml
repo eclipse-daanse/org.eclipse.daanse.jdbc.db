@@ -21,6 +21,8 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>org.eclipse.daanse.jdbc.db.dialect.db.oracle</artifactId>
+  <name>Eclipse Daanse JDBC DB Dialect Oracle</name>
+  <description>Oracle database dialect implementation providing Oracle-specific SQL generation, query optimization, and advanced database feature handling. Supports Oracle-specific data types, functions, PL/SQL constructs, and enterprise-grade analytical capabilities for OLAP operations.</description>
   <dependencies>
     <dependency>
       <groupId>org.slf4j</groupId>

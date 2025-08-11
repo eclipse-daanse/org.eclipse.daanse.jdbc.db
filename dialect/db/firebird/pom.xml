@@ -21,6 +21,8 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>org.eclipse.daanse.jdbc.db.dialect.db.firebird</artifactId>
+  <name>Eclipse Daanse JDBC DB Dialect Firebird</name>
+  <description>Firebird database dialect implementation providing Firebird-specific SQL generation, query optimization, and database feature handling. Supports Firebird stored procedures, triggers, and analytical capabilities for OLAP operations.</description>
   <dependencies>
     <dependency>
       <groupId>org.slf4j</groupId>

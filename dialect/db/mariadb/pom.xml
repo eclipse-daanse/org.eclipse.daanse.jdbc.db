@@ -21,6 +21,8 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>org.eclipse.daanse.jdbc.db.dialect.db.mariadb</artifactId>
+  <name>Eclipse Daanse JDBC DB Dialect MariaDB</name>
+  <description>MariaDB database dialect implementation providing MariaDB-specific SQL generation, query optimization, and database feature handling. Supports MariaDB advanced features, stored procedures, and analytical functions with MySQL compatibility for OLAP operations.</description>
   <dependencies>
     <dependency>
       <groupId>org.slf4j</groupId>

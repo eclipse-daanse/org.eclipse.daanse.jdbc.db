@@ -22,6 +22,8 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>org.eclipse.daanse.jdbc.db.dialect.db.clickhouse</artifactId>
+  <name>Eclipse Daanse JDBC DB Dialect ClickHouse</name>
+  <description>ClickHouse database dialect implementation providing ClickHouse-specific SQL generation, query optimization, and analytical database feature handling. Supports ClickHouse columnar storage, distributed queries, and high-performance analytical operations for OLAP workloads.</description>
   <dependencies>
     <dependency>
       <groupId>org.slf4j</groupId>

@@ -21,6 +21,8 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>org.eclipse.daanse.jdbc.db.dialect.db.monetdb</artifactId>
+  <name>Eclipse Daanse JDBC DB Dialect MonetDB</name>
+  <description>MonetDB database dialect implementation providing MonetDB-specific SQL generation, query optimization, and columnar analytical database feature handling. Supports MonetDB high-performance analytical operations and scientific computing capabilities for OLAP workloads.</description>
   <dependencies>
     <dependency>
       <groupId>org.slf4j</groupId>

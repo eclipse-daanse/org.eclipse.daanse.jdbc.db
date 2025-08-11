@@ -20,7 +20,7 @@
     <version>${revision}</version>
   </parent>
   <artifactId>org.eclipse.daanse.jdbc.db.core</artifactId>
-  <name>Daanse JDBC DB Core</name>
+  <name>Eclipse Daanse JDBC DB Core</name>
   <description>Core implementation of JDBC database operations for Daanse. Provides concrete implementations of database connectivity, SQL execution, and database metadata services with support for multiple database dialects.</description>
 
   <dependencies>

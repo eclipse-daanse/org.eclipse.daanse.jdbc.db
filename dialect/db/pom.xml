@@ -22,6 +22,8 @@
   </parent>
   <artifactId>org.eclipse.daanse.jdbc.db.dialect.db</artifactId>
   <packaging>pom</packaging>
+  <name>Eclipse Daanse JDBC DB Dialect Database Implementations</name>
+  <description>Collection of database-specific dialect implementations providing comprehensive support for 25+ database systems. Each dialect handles database-specific SQL generation, query optimization, data types, and feature support for enterprise OLAP operations.</description>
   <modules>
     <module>common</module>
     <module>mysql</module>
