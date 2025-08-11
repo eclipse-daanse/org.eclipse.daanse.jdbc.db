@@ -21,6 +21,8 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>org.eclipse.daanse.jdbc.db.dialect.db.mysql</artifactId>
+  <name>Daanse JDBC DB Dialect MySQL</name>
+  <description>MySQL database dialect implementation for Daanse JDBC. Provides MySQL-specific SQL generation, query optimization, and database feature handling including MySQL data types, functions, and syntax variations.</description>
   <dependencies>
     <dependency>
       <groupId>org.slf4j</groupId>

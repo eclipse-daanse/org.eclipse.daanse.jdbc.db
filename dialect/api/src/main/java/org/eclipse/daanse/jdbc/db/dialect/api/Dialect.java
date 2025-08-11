@@ -26,7 +26,6 @@
 
 package org.eclipse.daanse.jdbc.db.dialect.api;
 
-import java.sql.DatabaseMetaData;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.List;
