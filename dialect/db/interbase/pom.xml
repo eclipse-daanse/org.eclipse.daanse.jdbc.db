@@ -21,6 +21,8 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>org.eclipse.daanse.jdbc.db.dialect.db.interbase</artifactId>
+  <name>Eclipse Daanse JDBC DB Dialect InterBase</name>
+  <description>InterBase database dialect implementation providing InterBase-specific SQL generation, query optimization, and database feature handling. Supports InterBase stored procedures, triggers, and database connectivity for analytical operations.</description>
   <dependencies>
     <dependency>
       <groupId>org.slf4j</groupId>

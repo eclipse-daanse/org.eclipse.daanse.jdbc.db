@@ -21,6 +21,8 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>org.eclipse.daanse.jdbc.db.dialect.db.derby</artifactId>
+  <name>Eclipse Daanse JDBC DB Dialect Derby</name>
+  <description>Apache Derby database dialect implementation providing Derby-specific SQL generation, query optimization, and embedded database feature handling. Supports Derby embedded and server modes with comprehensive SQL support for analytical operations.</description>
   <dependencies>
     <dependency>
       <groupId>org.slf4j</groupId>

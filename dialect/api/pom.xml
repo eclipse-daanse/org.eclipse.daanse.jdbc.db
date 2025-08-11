@@ -18,7 +18,7 @@
     <version>${revision}</version>
   </parent>
   <artifactId>org.eclipse.daanse.jdbc.db.dialect.api</artifactId>
-  <name>Daanse JDBC DB Dialect API</name>
+  <name>Eclipse Daanse JDBC DB Dialect API</name>
   <description>API definitions for database dialect support in Daanse JDBC. Provides interfaces and contracts for implementing database-specific SQL dialects, query optimization, and database feature handling across different database systems.</description>
 
   <dependencies>

@@ -21,6 +21,8 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>org.eclipse.daanse.jdbc.db.dialect.db.pdidataservice</artifactId>
+  <name>Eclipse Daanse JDBC DB Dialect PDI Data Service</name>
+  <description>Pentaho Data Integration (PDI) Data Service dialect implementation providing PDI-specific SQL generation, query optimization, and data integration service feature handling. Supports PDI transformations and data service capabilities for analytical operations.</description>
   <dependencies>
     <dependency>
       <groupId>org.slf4j</groupId>

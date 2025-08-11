@@ -21,6 +21,8 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>org.eclipse.daanse.jdbc.db.dialect.db.luciddb</artifactId>
+  <name>Eclipse Daanse JDBC DB Dialect LucidDB</name>
+  <description>LucidDB database dialect implementation providing LucidDB-specific SQL generation, query optimization, and columnar analytical database feature handling. Supports LucidDB data warehousing capabilities and optimized analytical operations for OLAP workloads.</description>
   <dependencies>
     <dependency>
       <groupId>org.slf4j</groupId>

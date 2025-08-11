@@ -21,6 +21,8 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>org.eclipse.daanse.jdbc.db.dialect.db.sqlstream</artifactId>
+  <name>Eclipse Daanse JDBC DB Dialect SQLstream</name>
+  <description>SQLstream database dialect implementation providing SQLstream-specific SQL generation, query optimization, and stream processing database feature handling. Supports SQLstream real-time data processing and streaming analytical capabilities for OLAP operations.</description>
   <dependencies>
     <dependency>
       <groupId>org.slf4j</groupId>
