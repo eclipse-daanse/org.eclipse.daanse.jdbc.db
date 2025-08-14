@@ -17,11 +17,11 @@ import java.sql.Connection;
 
 import org.eclipse.daanse.jdbc.db.dialect.db.common.JdbcDialectImpl;
 
-public class OpenSearchDialectFactoryDialect extends JdbcDialectImpl {
+public class OpenSearchDialect extends JdbcDialectImpl {
 
     private static final String SUPPORTED_PRODUCT_NAME = "OPENSEARCH";
 
-    public OpenSearchDialectFactoryDialect(Connection connection) {
+    public OpenSearchDialect(Connection connection) {
         super(connection);
     }
 
