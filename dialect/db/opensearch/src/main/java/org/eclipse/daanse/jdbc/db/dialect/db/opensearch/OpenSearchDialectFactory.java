@@ -24,11 +24,11 @@ import org.osgi.service.component.annotations.ServiceScope;
 
 @Component(service = DialectFactory.class, scope = ServiceScope.SINGLETON)
 @DialectName("OPENSEARCH")
-public class OpenSearchDialectFactory extends AbstractDialectFactory<OpenSearchDialectFactoryDialect> {
+public class OpenSearchDialectFactory extends AbstractDialectFactory<OpenSearchDialect> {
 
     @Override
-    public Function<Connection, OpenSearchDialectFactoryDialect> getConstructorFunction() {
-        return OpenSearchDialectFactoryDialect::new;
+    public Function<Connection, OpenSearchDialect> getConstructorFunction() {
+        return OpenSearchDialect::new;
     }
 
 }
