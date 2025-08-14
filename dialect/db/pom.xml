@@ -49,6 +49,7 @@
     <module>neoview</module>
     <module>netezza</module>
     <module>nuodb</module>
+    <module>opensearch</module>
     <module>oracle</module>
     <module>pdidataservice</module>
     <module>postgresql</module>
