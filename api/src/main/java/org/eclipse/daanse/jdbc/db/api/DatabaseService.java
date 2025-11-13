@@ -21,7 +21,6 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.eclipse.daanse.jdbc.db.api.meta.IndexInfo;
 import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
 import org.eclipse.daanse.jdbc.db.api.meta.TypeInfo;
 import org.eclipse.daanse.jdbc.db.api.schema.CatalogReference;
