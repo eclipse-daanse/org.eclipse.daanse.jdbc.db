@@ -11,7 +11,7 @@
 *   SmartCity Jena - initial
 *   Stefan Bischof (bipolis.org) - initial
 */
-package org.eclipse.daanse.jdbc.db.dialect.db.mysql;
+package org.eclipse.daanse.jdbc.db.dialect.db.mysql.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
