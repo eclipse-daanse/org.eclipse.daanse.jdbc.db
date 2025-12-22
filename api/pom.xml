@@ -21,6 +21,8 @@
   </parent>
   <artifactId>org.eclipse.daanse.jdbc.db.api</artifactId>
   <name>Eclipse Daanse JDBC DB API</name>
-  <description>Core API definitions for JDBC database operations in Daanse. Provides interfaces and contracts for database connectivity, SQL execution, and database metadata access across different database systems and dialects.</description>
+  <description>Core API definitions for JDBC database operations in Daanse.
+    Provides interfaces and contracts for database connectivity, SQL execution,
+    and database metadata access across different database systems and dialects.</description>
 
 </project>

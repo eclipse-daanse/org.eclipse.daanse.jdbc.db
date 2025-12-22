@@ -22,7 +22,10 @@
   </parent>
   <artifactId>org.eclipse.daanse.jdbc.db.dialect.db.vectorwise</artifactId>
   <name>Eclipse Daanse JDBC DB Dialect Vectorwise</name>
-  <description>Vectorwise database dialect implementation providing Vectorwise-specific SQL generation, query optimization, and columnar analytical database feature handling. Supports Vectorwise high-performance analytics and vectorized query processing for OLAP workloads.</description>
+  <description>Vectorwise database dialect implementation providing
+    Vectorwise-specific SQL generation, query optimization, and columnar
+    analytical database feature handling. Supports Vectorwise high-performance
+    analytics and vectorized query processing for OLAP workloads.</description>
   <dependencies>
     <dependency>
       <groupId>org.slf4j</groupId>

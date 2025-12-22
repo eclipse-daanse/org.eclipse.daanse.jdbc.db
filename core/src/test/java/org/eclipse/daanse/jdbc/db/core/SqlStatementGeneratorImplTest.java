@@ -25,6 +25,9 @@ import java.util.Set;
 import org.eclipse.daanse.jdbc.db.api.SqlStatementGenerator;
 import org.eclipse.daanse.jdbc.db.api.meta.IndexInfo;
 import org.eclipse.daanse.jdbc.db.api.meta.TypeInfo;
+import org.eclipse.daanse.jdbc.db.api.schema.ColumnMetaData.AutoIncrement;
+import org.eclipse.daanse.jdbc.db.api.schema.ColumnMetaData.GeneratedColumn;
+import org.eclipse.daanse.jdbc.db.api.schema.ColumnMetaData.Nullability;
 import org.eclipse.daanse.jdbc.db.record.meta.DatabaseInfoR;
 import org.eclipse.daanse.jdbc.db.record.meta.IdentifierInfoR;
 import org.eclipse.daanse.jdbc.db.record.meta.MetaInfoR;
@@ -175,7 +178,8 @@ class SqlStatementGeneratorImplTest {
                         "theTableName", "TABLE")),
                 List.of(new ColumnDefinitionR(new ColumnReferenceR("Col1"),
                         new ColumnMetaDataR(JDBCType.INTEGER, "fooType", OptionalInt.empty(), OptionalInt.empty(),
-                                OptionalInt.empty(), OptionalInt.empty(), OptionalInt.empty(), Optional.empty()))),
+                                OptionalInt.empty(), OptionalInt.empty(), Nullability.UNKNOWN, OptionalInt.empty(),
+                                Optional.empty(), Optional.empty(), AutoIncrement.UNKNOWN, GeneratedColumn.UNKNOWN))),
                 true));
 
         assertThat(sql).isEqualTo("CREATE TABLE IF NOT EXISTS #theSchemaName#.#theTableName#( #Col1# int)");
@@ -188,8 +192,9 @@ class SqlStatementGeneratorImplTest {
                 new TableDefinitionR(new TableReferenceR(Optional.of(new SchemaReferenceR("theSchemaName")),
                         "theTableName", "TABLE")),
                 List.of(new ColumnDefinitionR(new ColumnReferenceR("Col1"),
-                        new ColumnMetaDataR(JDBCType.VARCHAR, "fooType", OptionalInt.of(200), OptionalInt.empty(),OptionalInt.empty(),
-                                OptionalInt.empty(), OptionalInt.empty(), Optional.empty()))),
+                        new ColumnMetaDataR(JDBCType.VARCHAR, "fooType", OptionalInt.of(200), OptionalInt.empty(),
+                                OptionalInt.empty(), OptionalInt.empty(), Nullability.UNKNOWN, OptionalInt.empty(),
+                                Optional.empty(), Optional.empty(), AutoIncrement.UNKNOWN, GeneratedColumn.UNKNOWN))),
                 true));
         assertThat(sql).isEqualTo("CREATE TABLE IF NOT EXISTS #theSchemaName#.#theTableName#( #Col1# varchar(200))");
 
@@ -201,12 +206,14 @@ class SqlStatementGeneratorImplTest {
                 new TableDefinitionR(new TableReferenceR(Optional.of(new SchemaReferenceR("theSchemaName")),
                         "theTableName", "TABLE")),
                 List.of(new ColumnDefinitionR(new ColumnReferenceR("Col1"),
-                        new ColumnMetaDataR(JDBCType.INTEGER, "fooType", OptionalInt.empty(), OptionalInt.empty(),OptionalInt.empty(),
-                                OptionalInt.empty(), OptionalInt.empty(), Optional.empty())),
+                        new ColumnMetaDataR(JDBCType.INTEGER, "fooType", OptionalInt.empty(), OptionalInt.empty(),
+                                OptionalInt.empty(), OptionalInt.empty(), Nullability.UNKNOWN, OptionalInt.empty(),
+                                Optional.empty(), Optional.empty(), AutoIncrement.UNKNOWN, GeneratedColumn.UNKNOWN)),
                         new ColumnDefinitionR(new ColumnReferenceR("Col2"),
                                 new ColumnMetaDataR(JDBCType.INTEGER, "footype", OptionalInt.empty(),
-                                        OptionalInt.empty(), OptionalInt.empty(), OptionalInt.empty(),OptionalInt.empty(),
-                                        Optional.empty()))),
+                                        OptionalInt.empty(), OptionalInt.empty(), OptionalInt.empty(), Nullability.UNKNOWN,
+                                        OptionalInt.empty(), Optional.empty(), Optional.empty(), AutoIncrement.UNKNOWN,
+                                        GeneratedColumn.UNKNOWN))),
                 true));
         assertThat(sql).isEqualTo("CREATE TABLE IF NOT EXISTS #theSchemaName#.#theTableName#( #Col1# int, #Col2# int)");
     }

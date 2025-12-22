@@ -14,10 +14,13 @@
 package org.eclipse.daanse.jdbc.db.dialect.db.h2;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
 import java.util.List;
 
+import org.eclipse.daanse.jdbc.db.dialect.api.generator.BitOperation;
 import org.eclipse.daanse.jdbc.db.dialect.api.Dialect;
-import org.eclipse.daanse.jdbc.db.dialect.api.OrderedColumn;
+import org.eclipse.daanse.jdbc.db.dialect.api.order.OrderedColumn;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.JdbcDialectImpl;
 
 /**
@@ -38,108 +41,38 @@ public class H2Dialect extends JdbcDialectImpl {
     }
 
     @Override
-    public StringBuilder generateAndBitAggregation(CharSequence operand) {
+    protected boolean deduceSupportsNullsOrdering(DatabaseMetaData metaData) throws SQLException {
+        return true; // H2 supports NULLS FIRST/LAST
+    }
+
+    // Unified BitOperation methods
+
+    @Override
+    public StringBuilder generateBitAggregation(BitOperation operation, CharSequence operand) {
         StringBuilder buf = new StringBuilder(64);
-        buf.append("BIT_AND_AGG(").append(operand).append(")");
-        return buf;
-
+        return switch (operation) {
+            case AND -> buf.append("BIT_AND_AGG(").append(operand).append(")");
+            case OR -> buf.append("BIT_OR_AGG(").append(operand).append(")");
+            case XOR -> buf.append("BIT_XOR_AGG(").append(operand).append(")");
+            case NAND -> buf.append("BIT_NAND_AGG(").append(operand).append(")");
+            case NOR -> buf.append("BIT_NOR_AGG(").append(operand).append(")");
+            case NXOR -> buf.append("BIT_XNOR_AGG(").append(operand).append(")");
+        };
     }
 
     @Override
-    public StringBuilder generateOrBitAggregation(CharSequence operand) {
-        StringBuilder buf = new StringBuilder(64);
-        buf.append("BIT_OR_AGG(").append(operand).append(")");
-        return buf;
-    }
-
-    @Override
-    public StringBuilder generateXorBitAggregation(CharSequence operand) {
-        StringBuilder buf = new StringBuilder(64);
-        buf.append("BIT_XOR_AGG(").append(operand).append(")");
-        return buf;
-    }
-
-    @Override
-    public StringBuilder generateNAndBitAggregation(CharSequence operand) {
-        StringBuilder buf = new StringBuilder(64);
-        buf.append("BIT_NAND_AGG(").append(operand).append(")");
-        return buf;
-    }
-
-    @Override
-    public StringBuilder generateNOrBitAggregation(CharSequence operand) {
-        StringBuilder buf = new StringBuilder(64);
-        buf.append("BIT_NOR_AGG(").append(operand).append(")");
-        return buf;
-    }
-
-    @Override
-    public StringBuilder generateNXorBitAggregation(CharSequence operand) {
-        StringBuilder buf = new StringBuilder(64);
-        buf.append("BIT_XNOR_AGG(").append(operand).append(")");
-        return buf;
-    }
-
-    @Override
-    public boolean supportsBitAndAgg() {
-        return true;
-    }
-
-    @Override
-    public boolean supportsBitOrAgg() {
-        return true;
-    }
-
-    @Override
-    public boolean supportsBitXorAgg() {
-        return true;
-    }
-
-    @Override
-    public boolean supportsBitNAndAgg() {
-        return true;
-    }
-
-    @Override
-    public boolean supportsBitNOrAgg() {
-        return true;
-    }
-
-    @Override
-    public boolean supportsBitNXorAgg() {
-        return true;
+    public boolean supportsBitAggregation(BitOperation operation) {
+        return true; // H2 supports all bit operations
     }
 
     @Override
     public StringBuilder generatePercentileDisc(double percentile, boolean desc, String tableName, String columnName) {
-        StringBuilder buf = new StringBuilder(64);
-        buf.append("PERCENTILE_DISC(").append(percentile).append(")").append(" WITHIN GROUP (ORDER BY ");
-        if (tableName != null) {
-            quoteIdentifier(buf, tableName, columnName);
-        } else {
-            quoteIdentifier(buf, columnName);
-        }
-        if (desc) {
-            buf.append(" ").append(DESC);
-        }
-        buf.append(")");
-        return buf;
+        return buildPercentileFunction("PERCENTILE_DISC", percentile, desc, tableName, columnName);
     }
 
     @Override
     public StringBuilder generatePercentileCont(double percentile, boolean desc, String tableName, String columnName) {
-        StringBuilder buf = new StringBuilder(64);
-        buf.append("PERCENTILE_CONT(").append(percentile).append(")").append(" WITHIN GROUP (ORDER BY ");
-        if (tableName != null) {
-            quoteIdentifier(buf, tableName, columnName);
-        } else {
-            quoteIdentifier(buf, columnName);
-        }
-        if (desc) {
-            buf.append(" ").append(DESC);
-        }
-        buf.append(")");
-        return buf;
+        return buildPercentileFunction("PERCENTILE_CONT", percentile, desc, tableName, columnName);
     }
 
     @Override
@@ -169,9 +102,7 @@ public class H2Dialect extends JdbcDialectImpl {
         }
         if (columns != null && !columns.isEmpty()) {
             buf.append(" WITHIN GROUP (ORDER BY ");
-            if (columns != null) {
-                buf.append(orderedColumns(columns));
-            }
+            buf.append(buildOrderedColumnsClause(columns));
             buf.append(")");
         }
         //LISTAGG(NAME, ', ') WITHIN GROUP (ORDER BY ID)
@@ -183,53 +114,7 @@ public class H2Dialect extends JdbcDialectImpl {
 
     @Override
     public StringBuilder generateNthValueAgg(CharSequence operand, boolean ignoreNulls, Integer n, List<OrderedColumn> columns) {
-        StringBuilder buf = new StringBuilder(64);
-        buf.append("NTH_VALUE");
-        buf.append("( ");
-        buf.append(operand);
-        buf.append(", ");
-        if (n == null || n < 1) {
-            buf.append(1);
-        } else {
-            buf.append(n);
-        }
-        buf.append(" )");
-        if (ignoreNulls) {
-            buf.append(" IGNORE NULLS ");
-        } else {
-            buf.append(" RESPECT NULLS ");
-        }
-        buf.append("OVER ( ");
-        if (columns != null && !columns.isEmpty()) {
-            buf.append("ORDER BY ");
-            buf.append(orderedColumns(columns));
-        }
-        buf.append(" )");
-        //NTH_VALUE(price,2) IGNORE NULLS OVER (ORDER BY id)
-        //NTH_VALUE(price,2) IGNORE NULLS OVER ()
-        return buf;
-    }
-
-    private CharSequence orderedColumns(List<OrderedColumn> columns) {
-        StringBuilder buf = new StringBuilder(64);
-        boolean first = true;
-        if (columns != null) {
-            for(OrderedColumn c : columns) {
-                if (!first) {
-                    buf.append(", ");
-                }
-                if (c.getTableName() != null) {
-                    quoteIdentifier(buf, c.getTableName(), c.getColumnName());
-                } else {
-                    quoteIdentifier(buf, c.getColumnName());
-                }
-                if (!c.isAscend()) {
-                    buf.append(DESC);
-                }
-                first = false;
-            }
-        }
-        return buf;
+        return buildNthValueFunction("NTH_VALUE", operand, ignoreNulls, n, columns, true);
     }
 
 
@@ -240,6 +125,16 @@ public class H2Dialect extends JdbcDialectImpl {
 
     @Override
     public boolean supportsPercentileCont() {
+        return true;
+    }
+
+    @Override
+    public boolean supportsNthValue() {
+        return true;
+    }
+
+    @Override
+    public boolean supportsNthValueIgnoreNulls() {
         return true;
     }
 

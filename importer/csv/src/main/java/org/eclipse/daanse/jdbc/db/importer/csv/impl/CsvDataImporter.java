@@ -387,7 +387,9 @@ public class CsvDataImporter implements FileSystemWatcherListener {
         }
 
         return new ColumnMetaDataR(jdbcType, jdbcType.getName(), columnSize, decimalDigits, OptionalInt.empty(),
-                OptionalInt.empty(), OptionalInt.empty(), java.util.Optional.empty());
+                OptionalInt.empty(), ColumnMetaData.Nullability.NULLABLE, OptionalInt.empty(),
+                java.util.Optional.empty(), java.util.Optional.empty(),
+                ColumnMetaData.AutoIncrement.NO, ColumnMetaData.GeneratedColumn.NO);
     }
 
     private String getFileNameWithoutExtension(String fileName) {

@@ -10,7 +10,9 @@
 * SPDX-License-Identifier: EPL-2.0
 **********************************************************************/
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.eclipse.daanse</groupId>
@@ -19,7 +21,10 @@
   </parent>
   <artifactId>org.eclipse.daanse.jdbc.db.dialect.api</artifactId>
   <name>Eclipse Daanse JDBC DB Dialect API</name>
-  <description>API definitions for database dialect support in Daanse JDBC. Provides interfaces and contracts for implementing database-specific SQL dialects, query optimization, and database feature handling across different database systems.</description>
+  <description>API definitions for database dialect support in Daanse JDBC.
+    Provides interfaces and contracts for implementing database-specific SQL
+    dialects, query optimization, and database feature handling across different
+    database systems.</description>
 
   <dependencies>
     <dependency>

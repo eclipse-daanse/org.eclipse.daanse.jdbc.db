@@ -26,7 +26,9 @@ import org.eclipse.daanse.jdbc.db.api.meta.TypeInfo;
 import org.eclipse.daanse.jdbc.db.api.schema.CatalogReference;
 import org.eclipse.daanse.jdbc.db.api.schema.ColumnDefinition;
 import org.eclipse.daanse.jdbc.db.api.schema.ColumnReference;
+import org.eclipse.daanse.jdbc.db.api.schema.Function;
 import org.eclipse.daanse.jdbc.db.api.schema.ImportedKey;
+import org.eclipse.daanse.jdbc.db.api.schema.Procedure;
 import org.eclipse.daanse.jdbc.db.api.schema.SchemaReference;
 import org.eclipse.daanse.jdbc.db.api.schema.TableDefinition;
 import org.eclipse.daanse.jdbc.db.api.schema.TableReference;
@@ -332,5 +334,112 @@ public interface DatabaseService {
      * @throws SQLException
      */
     List<ImportedKey> getImportedKeys(DatabaseMetaData databaseMetaData, TableReference table) throws SQLException;
+
+    /**
+     * returns a {@link List} of {@link Procedure}s according
+     * {@link DatabaseMetaData#getProcedures(String, String, String)}
+     *
+     * @param databaseMetaData
+     * @return
+     * @throws SQLException
+     */
+    List<Procedure> getProcedures(DatabaseMetaData databaseMetaData) throws SQLException;
+
+    /**
+     * returns a {@link List} of {@link Procedure}s according
+     * {@link DatabaseMetaData#getProcedures(String, String, String)}
+     *
+     * @param databaseMetaData
+     * @param catalog
+     * @param schemaPattern
+     * @param procedureNamePattern
+     * @return
+     * @throws SQLException
+     */
+    List<Procedure> getProcedures(DatabaseMetaData databaseMetaData, String catalog, String schemaPattern,
+            String procedureNamePattern) throws SQLException;
+
+    /**
+     * returns a {@link List} of {@link Function}s according
+     * {@link DatabaseMetaData#getFunctions(String, String, String)}
+     *
+     * @param databaseMetaData
+     * @return
+     * @throws SQLException
+     */
+    List<Function> getFunctions(DatabaseMetaData databaseMetaData) throws SQLException;
+
+    /**
+     * returns a {@link List} of {@link Function}s according
+     * {@link DatabaseMetaData#getFunctions(String, String, String)}
+     *
+     * @param databaseMetaData
+     * @param catalog
+     * @param schemaPattern
+     * @param functionNamePattern
+     * @return
+     * @throws SQLException
+     */
+    List<Function> getFunctions(DatabaseMetaData databaseMetaData, String catalog, String schemaPattern,
+            String functionNamePattern) throws SQLException;
+
+    /**
+     * Returns a {@link List} of {@link ImportedKey}s representing foreign keys that
+     * reference the given table's primary key. This is the opposite of getImportedKeys.
+     * According to {@link DatabaseMetaData#getExportedKeys(String, String, String)}
+     *
+     * @param databaseMetaData
+     * @param table the table whose exported keys are requested
+     * @return list of foreign key constraints referencing this table
+     * @throws SQLException
+     */
+    List<ImportedKey> getExportedKeys(DatabaseMetaData databaseMetaData, TableReference table) throws SQLException;
+
+    /**
+     * Returns a {@link List} of {@link ImportedKey}s representing foreign keys that
+     * reference the given table's primary key. This is the opposite of getImportedKeys.
+     * According to {@link DatabaseMetaData#getExportedKeys(String, String, String)}
+     *
+     * @param databaseMetaData
+     * @param catalog
+     * @param schema
+     * @param tableName
+     * @return list of foreign key constraints referencing this table
+     * @throws SQLException
+     */
+    List<ImportedKey> getExportedKeys(DatabaseMetaData databaseMetaData, String catalog, String schema,
+            String tableName) throws SQLException;
+
+    /**
+     * Returns a {@link List} of {@link ImportedKey}s representing the foreign key relationship
+     * between two specific tables. According to
+     * {@link DatabaseMetaData#getCrossReference(String, String, String, String, String, String)}
+     *
+     * @param databaseMetaData
+     * @param parentTable the table containing the primary key
+     * @param foreignTable the table containing the foreign key
+     * @return list of foreign key constraints between the tables
+     * @throws SQLException
+     */
+    List<ImportedKey> getCrossReference(DatabaseMetaData databaseMetaData, TableReference parentTable,
+            TableReference foreignTable) throws SQLException;
+
+    /**
+     * Returns a {@link List} of {@link ImportedKey}s representing the foreign key relationship
+     * between two specific tables. According to
+     * {@link DatabaseMetaData#getCrossReference(String, String, String, String, String, String)}
+     *
+     * @param databaseMetaData
+     * @param parentCatalog catalog of the parent table
+     * @param parentSchema schema of the parent table
+     * @param parentTable name of the parent table (contains primary key)
+     * @param foreignCatalog catalog of the foreign table
+     * @param foreignSchema schema of the foreign table
+     * @param foreignTable name of the foreign table (contains foreign key)
+     * @return list of foreign key constraints between the tables
+     * @throws SQLException
+     */
+    List<ImportedKey> getCrossReference(DatabaseMetaData databaseMetaData, String parentCatalog, String parentSchema,
+            String parentTable, String foreignCatalog, String foreignSchema, String foreignTable) throws SQLException;
 
 }

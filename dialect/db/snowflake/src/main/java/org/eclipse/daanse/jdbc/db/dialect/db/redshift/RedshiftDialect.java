@@ -28,7 +28,6 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import org.eclipse.daanse.jdbc.db.dialect.db.common.DialectUtil;
-import org.eclipse.daanse.jdbc.db.dialect.db.common.Util;
 import org.eclipse.daanse.jdbc.db.dialect.db.postgresql.PostgreSqlDialect;
 
 /**
@@ -49,7 +48,7 @@ public class RedshiftDialect extends PostgreSqlDialect {
     @Override
     public void quoteStringLiteral(StringBuilder buf, String value) {
         // '\' to '\\'
-        Util.singleQuoteString(value.replace("\\\\", "\\\\\\\\"), buf);
+        DialectUtil.singleQuoteString(value.replace("\\\\", "\\\\\\\\"), buf);
     }
 
     @Override

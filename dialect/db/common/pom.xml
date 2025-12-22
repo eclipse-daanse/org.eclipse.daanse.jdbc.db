@@ -22,7 +22,10 @@
   </parent>
   <artifactId>org.eclipse.daanse.jdbc.db.dialect.db.common</artifactId>
   <name>Daanse JDBC DB Dialect Common</name>
-  <description>Common functionality and base classes for database dialect implementations. Provides shared utilities, base dialect classes, and common SQL generation patterns used across different database-specific dialect implementations.</description>
+  <description>Common functionality and base classes for database dialect
+    implementations. Provides shared utilities, base dialect classes, and common
+    SQL generation patterns used across different database-specific dialect
+    implementations.</description>
 
 
   <dependencies>

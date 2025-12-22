@@ -22,7 +22,10 @@
   </parent>
   <artifactId>org.eclipse.daanse.jdbc.db.dialect.db.sybase</artifactId>
   <name>Eclipse Daanse JDBC DB Dialect Sybase</name>
-  <description>Sybase database dialect implementation providing Sybase-specific SQL generation, query optimization, and enterprise database feature handling. Supports Sybase ASE features, stored procedures, and analytical functions for enterprise OLAP operations.</description>
+  <description>Sybase database dialect implementation providing Sybase-specific
+    SQL generation, query optimization, and enterprise database feature
+    handling. Supports Sybase ASE features, stored procedures, and analytical
+    functions for enterprise OLAP operations.</description>
   <dependencies>
     <dependency>
       <groupId>org.slf4j</groupId>

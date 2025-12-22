@@ -22,7 +22,10 @@
   </parent>
   <artifactId>org.eclipse.daanse.jdbc.db.dialect.db.h2</artifactId>
   <name>Eclipse Daanse JDBC DB Dialect H2</name>
-  <description>H2 database dialect implementation providing H2-specific SQL generation, query optimization, and database feature handling. Supports H2 embedded and server modes with comprehensive SQL dialect support for analytical and transactional operations.</description>
+  <description>H2 database dialect implementation providing H2-specific SQL
+    generation, query optimization, and database feature handling. Supports H2
+    embedded and server modes with comprehensive SQL dialect support for
+    analytical and transactional operations.</description>
   <dependencies>
     <dependency>
       <groupId>org.slf4j</groupId>

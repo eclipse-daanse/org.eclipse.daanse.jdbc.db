@@ -34,7 +34,7 @@ import java.sql.Statement;
 import org.eclipse.daanse.jdbc.db.api.meta.DatabaseInfo;
 import org.eclipse.daanse.jdbc.db.api.meta.IdentifierInfo;
 import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
-import org.eclipse.daanse.jdbc.db.dialect.db.common.Util;
+import org.eclipse.daanse.jdbc.db.dialect.db.common.DialectUtil;
 import org.eclipse.daanse.jdbc.db.dialect.db.mssqlserver.MicrosoftSqlServerDialect;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -64,28 +64,28 @@ class MicrosoftSqlServerDialectTest {
     void testQuoteBooleanLiteral_True() throws Exception {
         assertEquals(0, buf.length());
         dialect.quoteBooleanLiteral(buf, BOOLEAN_LITERAL_TRUE);
-        assertEquals(Util.singleQuoteString(BOOLEAN_LITERAL_TRUE), buf.toString());
+        assertEquals(DialectUtil.singleQuoteString(BOOLEAN_LITERAL_TRUE), buf.toString());
     }
 
     @Test
     void testQuoteBooleanLiteral_False() throws Exception {
         assertEquals(0, buf.length());
         dialect.quoteBooleanLiteral(buf, BOOLEAN_LITERAL_FALSE);
-        assertEquals(Util.singleQuoteString(BOOLEAN_LITERAL_FALSE), buf.toString());
+        assertEquals(DialectUtil.singleQuoteString(BOOLEAN_LITERAL_FALSE), buf.toString());
     }
 
     @Test
     void testQuoteBooleanLiteral_One() throws Exception {
         assertEquals(0, buf.length());
         dialect.quoteBooleanLiteral(buf, BOOLEAN_LITERAL_ONE);
-        assertEquals(Util.singleQuoteString(BOOLEAN_LITERAL_ONE), buf.toString());
+        assertEquals(DialectUtil.singleQuoteString(BOOLEAN_LITERAL_ONE), buf.toString());
     }
 
     @Test
     void testQuoteBooleanLiteral_Zero() throws Exception {
         assertEquals(0, buf.length());
         dialect.quoteBooleanLiteral(buf, BOOLEAN_LITERAL_ZERO);
-        assertEquals(Util.singleQuoteString(BOOLEAN_LITERAL_ZERO), buf.toString());
+        assertEquals(DialectUtil.singleQuoteString(BOOLEAN_LITERAL_ZERO), buf.toString());
     }
 
     @Test

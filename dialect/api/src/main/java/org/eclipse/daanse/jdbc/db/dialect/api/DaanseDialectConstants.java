@@ -29,7 +29,6 @@ public final class DaanseDialectConstants {
 
     /**
      * The property key for the dialect name.
-     * Equivalent to "org.eclipse.daanse.dialect.name".
      */
     public static final String DIALECT_NAME_PROPERTY = PREFIX + ".dialect.name";
 }

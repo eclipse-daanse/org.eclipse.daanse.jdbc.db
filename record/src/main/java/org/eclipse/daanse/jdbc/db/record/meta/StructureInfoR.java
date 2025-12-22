@@ -19,10 +19,16 @@ import org.eclipse.daanse.jdbc.db.api.meta.StructureInfo;
 import org.eclipse.daanse.jdbc.db.api.schema.CatalogReference;
 import org.eclipse.daanse.jdbc.db.api.schema.ColumnDefinition;
 import org.eclipse.daanse.jdbc.db.api.schema.ImportedKey;
+import org.eclipse.daanse.jdbc.db.api.schema.PrimaryKey;
 import org.eclipse.daanse.jdbc.db.api.schema.SchemaReference;
 import org.eclipse.daanse.jdbc.db.api.schema.TableDefinition;
 
-public record StructureInfoR(List<CatalogReference> catalogs, List<SchemaReference> schemas,
-        List<TableDefinition> tables, List<ColumnDefinition> columns, List<ImportedKey> importedKeys) implements StructureInfo {
+public record StructureInfoR(
+        List<CatalogReference> catalogs,
+        List<SchemaReference> schemas,
+        List<TableDefinition> tables,
+        List<ColumnDefinition> columns,
+        List<ImportedKey> importedKeys,
+        List<PrimaryKey> primaryKeys) implements StructureInfo {
 
 }

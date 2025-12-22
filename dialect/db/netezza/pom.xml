@@ -22,7 +22,10 @@
   </parent>
   <artifactId>org.eclipse.daanse.jdbc.db.dialect.db.netezza</artifactId>
   <name>Eclipse Daanse JDBC DB Dialect Netezza</name>
-  <description>IBM Netezza database dialect implementation providing Netezza-specific SQL generation, query optimization, and data warehouse appliance feature handling. Supports Netezza massively parallel processing and high-performance analytical operations for OLAP workloads.</description>
+  <description>IBM Netezza database dialect implementation providing
+    Netezza-specific SQL generation, query optimization, and data warehouse
+    appliance feature handling. Supports Netezza massively parallel processing
+    and high-performance analytical operations for OLAP workloads.</description>
   <dependencies>
     <dependency>
       <groupId>org.slf4j</groupId>

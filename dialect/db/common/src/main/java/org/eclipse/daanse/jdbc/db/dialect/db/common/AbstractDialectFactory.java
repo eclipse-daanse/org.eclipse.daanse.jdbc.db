@@ -51,46 +51,20 @@ public abstract class AbstractDialectFactory<T extends Dialect> implements Diale
         String databaseProduct,
         Connection connection)
     {
-        //Statement statement = null;
-        //ResultSet resultSet = null;
-
         String dbProduct = databaseProduct.toLowerCase();
 
         try {
-            // Quick and dirty check first.
             if (connection.getMetaData().getDatabaseProductName()
                 .toLowerCase().contains(dbProduct))
             {
                 LOGGER.debug("Using {} dialect", databaseProduct);
                 return true;
             }
-
-            // Let's try using version().
-            /*
-            statement = connection.createStatement();
-            resultSet = statement.executeQuery("select version()");
-            if (resultSet.next()) {
-                String version = resultSet.getString(1);
-                LOGGER.debug("Version={}", version);
-                if (version != null && version.toLowerCase().contains(dbProduct)) {
-                    LOGGER.info("Using {} dialect", databaseProduct);
-                    return true;
-                }
-            }
-            LOGGER.debug("NOT Using {} dialect",  databaseProduct);
-            */
             return false;
         } catch (SQLException e) {
-            // this exception can be hit by any db types that don't support
-            // 'select version()'
-            // no need to log exception, this is an "expected" error as we
-            // loop through all dialects looking for one that matches.
             LOGGER.debug("NOT Using {} dialect.", databaseProduct);
             return false;
         }
-        //} finally {
-        //    Util.close(resultSet, statement, null);
-        //}
     }
 
     public abstract Function<Connection, T> getConstructorFunction();

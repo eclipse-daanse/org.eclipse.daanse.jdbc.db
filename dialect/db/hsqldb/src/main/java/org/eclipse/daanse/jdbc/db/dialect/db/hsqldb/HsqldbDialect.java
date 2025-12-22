@@ -28,7 +28,7 @@ import java.util.List;
 
 import org.eclipse.daanse.jdbc.db.dialect.api.Dialect;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.JdbcDialectImpl;
-import org.eclipse.daanse.jdbc.db.dialect.db.common.Util;
+import org.eclipse.daanse.jdbc.db.dialect.db.common.DialectUtil;
 
 /**
  * Implementation of {@link Dialect} for the Hsqldb database.
@@ -50,7 +50,7 @@ public class HsqldbDialect extends JdbcDialectImpl {
         Date date)
     {
         // Hsqldb accepts '2008-01-23' but not SQL:2003 format.
-        Util.singleQuoteString(date.toString(), buf);
+        DialectUtil.singleQuoteString(date.toString(), buf);
     }
 
     @Override

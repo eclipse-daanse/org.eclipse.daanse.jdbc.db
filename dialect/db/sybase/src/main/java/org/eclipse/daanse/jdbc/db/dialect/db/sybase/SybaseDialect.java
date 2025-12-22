@@ -26,7 +26,7 @@ import java.sql.Date;
 
 import org.eclipse.daanse.jdbc.db.dialect.api.Dialect;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.JdbcDialectImpl;
-import org.eclipse.daanse.jdbc.db.dialect.db.common.Util;
+import org.eclipse.daanse.jdbc.db.dialect.db.common.DialectUtil;
 
 /**
  * Implementation of {@link Dialect} for the Sybase database.
@@ -60,7 +60,7 @@ public class SybaseDialect extends JdbcDialectImpl {
     @Override
     protected void quoteDateLiteral(StringBuilder buf, Date date)
     {
-        Util.singleQuoteString(date.toString(), buf);
+        DialectUtil.singleQuoteString(date.toString(), buf);
     }
 
     @Override

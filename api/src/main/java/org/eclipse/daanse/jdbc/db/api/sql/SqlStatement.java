@@ -14,6 +14,9 @@
 package org.eclipse.daanse.jdbc.db.api.sql;
 
 public sealed interface SqlStatement permits DropContainerSqlStatement, CreateSqlStatement, CreateSchemaSqlStatement,
-        TruncateTableSqlStatement, DropSchemaSqlStatement, InsertSqlStatement, CreateConstraintStatement, DropConstraintStatement {
+        TruncateTableSqlStatement, DropSchemaSqlStatement, InsertSqlStatement, CreateConstraintStatement,
+        DropConstraintStatement, CreateIndexStatement, DropIndexStatement, CreatePrimaryKeyStatement,
+        DropPrimaryKeyStatement, AddColumnStatement, DropColumnStatement, ModifyColumnStatement,
+        RenameColumnStatement, RenameTableStatement, UpdateSqlStatement, DeleteSqlStatement {
 
 }

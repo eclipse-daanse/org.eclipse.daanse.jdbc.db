@@ -25,20 +25,16 @@
   <version>${revision}</version>
   <packaging>pom</packaging>
   <name>Eclipse Daanse JDBC Database Utilities</name>
-  <description>Comprehensive JDBC database abstraction framework providing cross-database compatibility through extensive dialect support for 25+ database systems. Includes advanced database introspection, SQL statement generation, metadata extraction, and data import utilities with specialized handling for database-specific features and optimizations.</description>
+  <description>Comprehensive JDBC database abstraction framework providing
+    cross-database compatibility through extensive dialect support for 25+
+    database systems. Includes advanced database introspection, SQL statement
+    generation, metadata extraction, and data import utilities with specialized
+    handling for database-specific features and optimizations.</description>
 
   <properties>
     <revision>0.0.1-SNAPSHOT</revision>
     <scm.repo.detail>org.eclipse.daanse.jdbc.db</scm.repo.detail>
     <slf4j.version>2.0.9</slf4j.version>
-    <mockito.version>4.9.0</mockito.version>
-    <assertj.version>3.24.2</assertj.version>
-
-    <java.version>17</java.version>
-    <java.release>17</java.release>
-
-    <maven.compiler.source>${java.version}</maven.compiler.source>
-    <maven.compiler.target>${java.version}</maven.compiler.target>
   </properties>
 
   <repositories>
@@ -62,18 +58,6 @@
         <artifactId>slf4j-api</artifactId>
         <version>${slf4j.version}</version>
         <scope>compile</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.mockito</groupId>
-        <artifactId>mockito-core</artifactId>
-        <version>${mockito.version}</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.assertj</groupId>
-        <artifactId>assertj-core</artifactId>
-        <version>${assertj.version}</version>
-        <scope>test</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>

@@ -22,7 +22,10 @@
   </parent>
   <artifactId>org.eclipse.daanse.jdbc.db.dialect.db.redshift</artifactId>
   <name>Eclipse Daanse JDBC DB Dialect Redshift</name>
-  <description>Amazon Redshift database dialect implementation providing Redshift-specific SQL generation, query optimization, and cloud data warehouse feature handling. Supports Redshift columnar storage, distributed queries, and analytical functions for OLAP operations.</description>
+  <description>Amazon Redshift database dialect implementation providing
+    Redshift-specific SQL generation, query optimization, and cloud data
+    warehouse feature handling. Supports Redshift columnar storage, distributed
+    queries, and analytical functions for OLAP operations.</description>
   <dependencies>
     <dependency>
       <groupId>org.slf4j</groupId>

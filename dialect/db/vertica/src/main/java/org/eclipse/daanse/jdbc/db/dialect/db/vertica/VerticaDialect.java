@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import org.eclipse.daanse.jdbc.db.dialect.api.BestFitColumnType;
+import org.eclipse.daanse.jdbc.db.dialect.api.type.BestFitColumnType;
 import org.eclipse.daanse.jdbc.db.dialect.api.Dialect;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.DialectUtil;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.JdbcDialectImpl;

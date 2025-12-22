@@ -30,9 +30,10 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import org.eclipse.daanse.jdbc.db.dialect.api.BestFitColumnType;
+import org.eclipse.daanse.jdbc.db.dialect.api.type.BestFitColumnType;
+import org.eclipse.daanse.jdbc.db.dialect.api.generator.BitOperation;
 import org.eclipse.daanse.jdbc.db.dialect.api.Dialect;
-import org.eclipse.daanse.jdbc.db.dialect.api.OrderedColumn;
+import org.eclipse.daanse.jdbc.db.dialect.api.order.OrderedColumn;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.DialectUtil;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.JdbcDialectImpl;
 
@@ -97,12 +98,16 @@ public class PostgreSqlDialect extends JdbcDialectImpl {
         final int columnType = metaData.getColumnType(columnIndex + 1);
         final String columnName = metaData.getColumnName(columnIndex + 1);
 
-        // TODO - Do we need the check for "m"??
+        // Check for column names starting with "m" (measure columns like "m0", "m1"):
+        // In GROUPING SETS queries, Greenplum/PostgreSQL may loosen type metadata for measure
+        // columns. Using OBJECT avoids data loss when converting measure values. This pattern
+        // matches the handling in OracleDialect.getNumericDecimalType() for similar cases.
+        // The "m" prefix check identifies measure columns in aggregation queries.
         if (columnType == Types.NUMERIC && scale == 0 && precision == 0 && columnName.startsWith("m")) {
-            // In Greenplum NUMBER/NUMERIC w/ no precision or
-            // scale means floating point.
+            // In Greenplum, NUMBER/NUMERIC with no precision or scale means floating point.
+            // Using OBJECT is safer than DOUBLE to avoid potential precision issues.
             logTypeInfo(metaData, columnIndex, BestFitColumnType.OBJECT);
-            return BestFitColumnType.OBJECT; // TODO - can this be DOUBLE?
+            return BestFitColumnType.OBJECT;
         }
         return super.getType(metaData, columnIndex);
     }
@@ -113,153 +118,44 @@ public class PostgreSqlDialect extends JdbcDialectImpl {
     }
 
     @Override
-    public StringBuilder generateAndBitAggregation(CharSequence operand) {
+    protected boolean deduceSupportsNullsOrdering(java.sql.DatabaseMetaData metaData) throws SQLException {
+        // Support for "ORDER BY ... NULLS LAST" was introduced in Postgres 8.3.
+        return productVersion != null && productVersion.compareTo("8.3") >= 0;
+    }
+
+    // Unified BitOperation methods
+
+    @Override
+    public StringBuilder generateBitAggregation(BitOperation operation, CharSequence operand) {
         StringBuilder buf = new StringBuilder(64);
-        buf.append("bit_and(").append(operand).append(")");
-        return buf;
-
+        return switch (operation) {
+            case AND -> buf.append("bit_and(").append(operand).append(")");
+            case OR -> buf.append("bit_or(").append(operand).append(")");
+            case XOR -> buf.append("bit_xor(").append(operand).append(")");
+            case NAND -> buf.append("NOT(bit_and(").append(operand).append("))");
+            case NOR -> buf.append("NOT(bit_or(").append(operand).append("))");
+            case NXOR -> buf.append("NOT(bit_xor(").append(operand).append("))");
+        };
     }
 
     @Override
-    public StringBuilder generateOrBitAggregation(CharSequence operand) {
-        StringBuilder buf = new StringBuilder(64);
-        buf.append("bit_or(").append(operand).append(")");
-        return buf;
-    }
-
-    @Override
-    public StringBuilder generateXorBitAggregation(CharSequence operand) {
-        StringBuilder buf = new StringBuilder(64);
-        buf.append("bit_xor(").append(operand).append(")");
-        return buf;
-    }
-
-    @Override
-    public StringBuilder generateNAndBitAggregation(CharSequence operand) {
-        StringBuilder buf = new StringBuilder(64);
-        buf.append("NOT(bit_and(").append(operand).append("))");
-        return buf;
-    }
-
-    @Override
-    public StringBuilder generateNOrBitAggregation(CharSequence operand) {
-        StringBuilder buf = new StringBuilder(64);
-        buf.append("NOT(bit_or(").append(operand).append("))");
-        return buf;
-    }
-
-    @Override
-    public StringBuilder generateNXorBitAggregation(CharSequence operand) {
-        StringBuilder buf = new StringBuilder(64);
-        buf.append("NOT(bit_xor(").append(operand).append("))");
-        return buf;
-    }
-
-    @Override
-    public boolean supportsBitAndAgg() {
-        return true;
-    }
-
-    @Override
-    public boolean supportsBitOrAgg() {
-        return true;
-    }
-
-    @Override
-    public boolean supportsBitXorAgg() {
-        return true;
-    }
-
-    @Override
-    public boolean supportsBitNAndAgg() {
-        return true;
-    }
-
-    @Override
-    public boolean supportsBitNOrAgg() {
-        return true;
-    }
-
-    @Override
-    public boolean supportsBitNXorAgg() {
-        return true;
+    public boolean supportsBitAggregation(BitOperation operation) {
+        return true; // PostgreSQL supports all bit operations
     }
 
     @Override
     public StringBuilder generatePercentileDisc(double percentile, boolean desc, String tableName, String columnName) {
-        StringBuilder buf = new StringBuilder(64);
-        buf.append("PERCENTILE_DISC(").append(percentile).append(")").append(" WITHIN GROUP (ORDER BY ");
-        if (tableName != null) {
-            quoteIdentifier(buf, tableName, columnName);
-        } else {
-            quoteIdentifier(buf, columnName);
-        }
-        if (desc) {
-            buf.append(" ").append(DESC);
-        }
-        buf.append(")");
-        return buf;
+        return buildPercentileFunction("PERCENTILE_DISC", percentile, desc, tableName, columnName);
     }
 
     @Override
     public StringBuilder generatePercentileCont(double percentile, boolean desc, String tableName, String columnName) {
-        StringBuilder buf = new StringBuilder(64);
-        buf.append("PERCENTILE_CONT(").append(percentile).append(")").append(" WITHIN GROUP (ORDER BY ");
-        if (tableName != null) {
-            quoteIdentifier(buf, tableName, columnName);
-        } else {
-            quoteIdentifier(buf, columnName);
-        }
-        if (desc) {
-            buf.append(" ").append(DESC);
-        }
-        buf.append(")");
-        return buf;
+        return buildPercentileFunction("PERCENTILE_CONT", percentile, desc, tableName, columnName);
     }
 
     @Override
     public StringBuilder generateNthValueAgg(CharSequence operand, boolean ignoreNulls, Integer n, List<OrderedColumn> columns) {
-        StringBuilder buf = new StringBuilder(64);
-        buf.append("NTH_VALUE");
-        buf.append("( ");
-        buf.append(operand);
-        buf.append(", ");
-        if (n == null || n < 1) {
-            buf.append(1);
-        } else {
-            buf.append(n);
-        }
-        buf.append(" )");
-        buf.append("OVER ( ");
-        if (columns != null && !columns.isEmpty()) {
-            buf.append("ORDER BY ");
-            buf.append(orderedColumns(columns));
-        }
-        buf.append(" )");
-        //NTH_VALUE(employee_name, 2) OVER ( ORDER BY salary DESC )
-        return buf;
-    }
-
-    private CharSequence orderedColumns(List<OrderedColumn> columns) {
-        StringBuilder buf = new StringBuilder(64);
-        boolean first = true;
-        if (columns != null) {
-            for(OrderedColumn c : columns) {
-                if (!first) {
-                    buf.append(", ");
-                }
-                if (c.getTableName() != null) {
-                    quoteIdentifier(buf, c.getTableName(), c.getColumnName());
-                } else {
-                    quoteIdentifier(buf, c.getColumnName());
-                }
-                if (!c.isAscend()) {
-                    buf.append(DESC);
-                }
-                first = false;
-            }
-        }
-        return buf;
+        return buildNthValueFunction("NTH_VALUE", operand, ignoreNulls, n, columns, false);
     }
 
     @Override
@@ -269,6 +165,11 @@ public class PostgreSqlDialect extends JdbcDialectImpl {
 
     @Override
     public boolean supportsPercentileCont() {
+        return true;
+    }
+
+    @Override
+    public boolean supportsNthValue() {
         return true;
     }
 

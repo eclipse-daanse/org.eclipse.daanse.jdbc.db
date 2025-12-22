@@ -41,8 +41,14 @@ import org.eclipse.daanse.jdbc.db.api.meta.TypeInfo.Nullable;
 import org.eclipse.daanse.jdbc.db.api.meta.TypeInfo.Searchable;
 import org.eclipse.daanse.jdbc.db.api.schema.CatalogReference;
 import org.eclipse.daanse.jdbc.db.api.schema.ColumnDefinition;
+import org.eclipse.daanse.jdbc.db.api.schema.ColumnMetaData;
 import org.eclipse.daanse.jdbc.db.api.schema.ColumnReference;
+import org.eclipse.daanse.jdbc.db.api.schema.Function;
+import org.eclipse.daanse.jdbc.db.api.schema.FunctionColumn;
 import org.eclipse.daanse.jdbc.db.api.schema.ImportedKey;
+import org.eclipse.daanse.jdbc.db.api.schema.PrimaryKey;
+import org.eclipse.daanse.jdbc.db.api.schema.Procedure;
+import org.eclipse.daanse.jdbc.db.api.schema.ProcedureColumn;
 import org.eclipse.daanse.jdbc.db.api.schema.SchemaReference;
 import org.eclipse.daanse.jdbc.db.api.schema.TableDefinition;
 import org.eclipse.daanse.jdbc.db.api.schema.TableMetaData;
@@ -56,9 +62,16 @@ import org.eclipse.daanse.jdbc.db.record.schema.CatalogReferenceR;
 import org.eclipse.daanse.jdbc.db.record.schema.ColumnDefinitionR;
 import org.eclipse.daanse.jdbc.db.record.schema.ColumnMetaDataR;
 import org.eclipse.daanse.jdbc.db.record.schema.ColumnReferenceR;
+import org.eclipse.daanse.jdbc.db.record.schema.FunctionColumnR;
+import org.eclipse.daanse.jdbc.db.record.schema.FunctionR;
+import org.eclipse.daanse.jdbc.db.record.schema.FunctionReferenceR;
 import org.eclipse.daanse.jdbc.db.record.schema.ImportedKeyR;
 import org.eclipse.daanse.jdbc.db.record.schema.IndexInfoItemR;
 import org.eclipse.daanse.jdbc.db.record.schema.IndexInfoR;
+import org.eclipse.daanse.jdbc.db.record.schema.PrimaryKeyR;
+import org.eclipse.daanse.jdbc.db.record.schema.ProcedureColumnR;
+import org.eclipse.daanse.jdbc.db.record.schema.ProcedureR;
+import org.eclipse.daanse.jdbc.db.record.schema.ProcedureReferenceR;
 import org.eclipse.daanse.jdbc.db.record.schema.SchemaReferenceR;
 import org.eclipse.daanse.jdbc.db.record.schema.TableDefinitionR;
 import org.eclipse.daanse.jdbc.db.record.schema.TableMetaDataR;
@@ -72,10 +85,17 @@ import org.slf4j.LoggerFactory;
 public class DatabaseServiceImpl implements DatabaseService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseServiceImpl.class);
-    private static final int NONUNIQUE_COLUMN = 4;
-    private static final int TYPE_COLUMN = 7;
-    private static final int COLUMN_NAME = 9;
-    private static final int CARDINALITY_COLUMN = 11;
+
+    // Index info column positions (from JDBC spec)
+    private static final int INDEX_NON_UNIQUE = 4;
+    private static final int INDEX_NAME = 6;
+    private static final int INDEX_TYPE = 7;
+    private static final int INDEX_ORDINAL_POSITION = 8;
+    private static final int INDEX_COLUMN_NAME = 9;
+    private static final int INDEX_ASC_OR_DESC = 10;
+    private static final int INDEX_CARDINALITY = 11;
+    private static final int INDEX_PAGES = 12;
+    private static final int INDEX_FILTER_CONDITION = 13;
 
     private static final int[] RESULT_SET_TYPE_VALUES = { ResultSet.TYPE_FORWARD_ONLY,
             ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.TYPE_SCROLL_SENSITIVE };
@@ -123,11 +143,21 @@ public class DatabaseServiceImpl implements DatabaseService {
             LOGGER.debug("Reading index info for table: {}.{}.{}", catalog, schema, table.name());
             try (ResultSet resultSet = databaseMetaData.getIndexInfo(catalog, schema, table.name(), false, true)) {
                 while (resultSet.next()) {
-                    int type = resultSet.getInt(TYPE_COLUMN);
-                    String columnName = resultSet.getString(COLUMN_NAME);
-                    int cardinalityColumn = resultSet.getInt(CARDINALITY_COLUMN);
-                    boolean unique = !resultSet.getBoolean(NONUNIQUE_COLUMN);
-                    indexInfoItems.add(new IndexInfoItemR(type, columnName, cardinalityColumn, unique));
+                    boolean nonUnique = resultSet.getBoolean(INDEX_NON_UNIQUE);
+                    Optional<String> indexName = Optional.ofNullable(resultSet.getString(INDEX_NAME));
+                    int type = resultSet.getInt(INDEX_TYPE);
+                    int ordinalPosition = resultSet.getInt(INDEX_ORDINAL_POSITION);
+                    Optional<String> columnName = Optional.ofNullable(resultSet.getString(INDEX_COLUMN_NAME));
+                    String ascOrDesc = resultSet.getString(INDEX_ASC_OR_DESC);
+                    Optional<Boolean> ascending = ascOrDesc == null ? Optional.empty() :
+                            Optional.of("A".equalsIgnoreCase(ascOrDesc));
+                    long cardinality = resultSet.getLong(INDEX_CARDINALITY);
+                    long pages = resultSet.getLong(INDEX_PAGES);
+                    Optional<String> filterCondition = Optional.ofNullable(resultSet.getString(INDEX_FILTER_CONDITION));
+
+                    IndexInfoItem.IndexType indexType = IndexInfoItem.IndexType.of(type);
+                    indexInfoItems.add(new IndexInfoItemR(indexName, indexType, columnName, ordinalPosition,
+                            ascending, cardinality, pages, filterCondition, !nonUnique));
                 }
             } catch (SQLException e) {
                 LOGGER.warn("Error reading index info for table: {}.{}.{} - {}", catalog, schema, table.name(),
@@ -147,12 +177,18 @@ public class DatabaseServiceImpl implements DatabaseService {
         List<ColumnDefinition> columns = getColumnDefinitions(databaseMetaData);
 
         List<ImportedKey> importedKeys = new ArrayList<ImportedKey>();
+        List<PrimaryKey> primaryKeys = new ArrayList<PrimaryKey>();
         for (TableDefinition tableDefinition : tables) {
             List<ImportedKey> iks = getImportedKeys(databaseMetaData, tableDefinition.table());
             importedKeys.addAll(iks);
+
+            PrimaryKey pk = getPrimaryKey(databaseMetaData, tableDefinition.table());
+            if (pk != null) {
+                primaryKeys.add(pk);
+            }
         }
 
-        StructureInfo structureInfo = new StructureInfoR(catalogs, schemas, tables, columns, importedKeys);
+        StructureInfo structureInfo = new StructureInfoR(catalogs, schemas, tables, columns, importedKeys, primaryKeys);
         return structureInfo;
     }
 
@@ -354,14 +390,14 @@ public class DatabaseServiceImpl implements DatabaseService {
             while (rs.next()) {
                 final String typeName = rs.getString("TYPE_NAME");
                 final int dataType = rs.getInt("DATA_TYPE");
-                final int percision = rs.getInt("PRECISION");
-                final Optional<String> literatPrefix = Optional.ofNullable(rs.getString("LITERAL_PREFIX"));
-                final Optional<String> literatSuffix = Optional.ofNullable(rs.getString("LITERAL_SUFFIX"));
-                final Optional<String> createPragmas = Optional.ofNullable(rs.getString("CREATE_PARAMS"));
+                final int precision = rs.getInt("PRECISION");
+                final Optional<String> literalPrefix = Optional.ofNullable(rs.getString("LITERAL_PREFIX"));
+                final Optional<String> literalSuffix = Optional.ofNullable(rs.getString("LITERAL_SUFFIX"));
+                final Optional<String> createParams = Optional.ofNullable(rs.getString("CREATE_PARAMS"));
                 final Nullable nullable = TypeInfo.Nullable.of(rs.getShort("NULLABLE"));
                 final boolean caseSensitive = rs.getBoolean("CASE_SENSITIVE");
                 final Searchable searchable = TypeInfo.Searchable.of(rs.getShort("SEARCHABLE"));
-                final boolean unsignesAttribute = rs.getBoolean("UNSIGNED_ATTRIBUTE");
+                final boolean unsignedAttribute = rs.getBoolean("UNSIGNED_ATTRIBUTE");
                 final boolean fixedPrecScale = rs.getBoolean("FIXED_PREC_SCALE");
                 final boolean autoIncrement = rs.getBoolean("AUTO_INCREMENT");
                 final Optional<String> localTypeName = Optional.ofNullable(rs.getString("LOCAL_TYPE_NAME"));
@@ -376,8 +412,8 @@ public class DatabaseServiceImpl implements DatabaseService {
                     jdbcType = JDBCType.OTHER;
                     LOGGER.info("Unknown JDBC-Typcode: " + dataType + " (" + typeName + ")");
                 }
-                TypeInfoR typeInfo = new TypeInfoR(typeName, jdbcType, percision, literatPrefix, literatSuffix,
-                        createPragmas, nullable, caseSensitive, searchable, unsignesAttribute, fixedPrecScale,
+                TypeInfoR typeInfo = new TypeInfoR(typeName, jdbcType, precision, literalPrefix, literalSuffix,
+                        createParams, nullable, caseSensitive, searchable, unsignedAttribute, fixedPrecScale,
                         autoIncrement, localTypeName, minimumScale, maximumScale, numPrecRadix);
                 typeInfos.add(typeInfo);
             }
@@ -518,6 +554,28 @@ public class DatabaseServiceImpl implements DatabaseService {
 
                 final Optional<String> remarks = Optional.ofNullable(rs.getString("REMARKS"));
 
+                // Additional fields from JDBC spec
+                final Optional<String> columnDefault = Optional.ofNullable(rs.getString("COLUMN_DEF"));
+                final ColumnMetaData.Nullability nullability = oNullable.isPresent()
+                        ? ColumnMetaData.Nullability.of(oNullable.getAsInt())
+                        : ColumnMetaData.Nullability.UNKNOWN;
+
+                // IS_AUTOINCREMENT and IS_GENERATEDCOLUMN may not be available in all drivers
+                ColumnMetaData.AutoIncrement autoIncrement = ColumnMetaData.AutoIncrement.UNKNOWN;
+                ColumnMetaData.GeneratedColumn generatedColumn = ColumnMetaData.GeneratedColumn.UNKNOWN;
+                try {
+                    String isAutoIncrement = rs.getString("IS_AUTOINCREMENT");
+                    autoIncrement = ColumnMetaData.AutoIncrement.ofString(isAutoIncrement);
+                } catch (SQLException e) {
+                    LOGGER.debug("IS_AUTOINCREMENT not available for column: {}.{}", tableName, columName);
+                }
+                try {
+                    String isGeneratedColumn = rs.getString("IS_GENERATEDCOLUMN");
+                    generatedColumn = ColumnMetaData.GeneratedColumn.ofString(isGeneratedColumn);
+                } catch (SQLException e) {
+                    LOGGER.debug("IS_GENERATEDCOLUMN not available for column: {}.{}", tableName, columName);
+                }
+
                 Optional<CatalogReference> oCatRef = oCatalogName.map(cn -> new CatalogReferenceR(cn));
                 Optional<SchemaReference> oSchemaRef = oSchemaName.map(sn -> new SchemaReferenceR(oCatRef, sn));
 
@@ -533,8 +591,9 @@ public class DatabaseServiceImpl implements DatabaseService {
                 TableReference tableReference = new TableReferenceR(oSchemaRef, tableName);
 
                 ColumnReference columnReference = new ColumnReferenceR(Optional.of(tableReference), columName);
-                ColumnDefinition columnDefinition = new ColumnDefinitionR(columnReference, new ColumnMetaDataR(jdbcType,
-                        typeName, oColumnSize, oDecimalDigits, oNumPrecRadix, oNullable, oCharOctetLength, remarks));
+                ColumnDefinition columnDefinition = new ColumnDefinitionR(columnReference, new ColumnMetaDataR(
+                        jdbcType, typeName, oColumnSize, oDecimalDigits, oNumPrecRadix, oNullable, nullability,
+                        oCharOctetLength, remarks, columnDefault, autoIncrement, generatedColumn));
 
                 columnDefinitions.add(columnDefinition);
             }
@@ -593,6 +652,14 @@ public class DatabaseServiceImpl implements DatabaseService {
                 final String tableNameFk = rs.getString("FKTABLE_NAME");
                 final String columNameFk = rs.getString("FKCOLUMN_NAME");
 
+                // Additional fields from JDBC spec
+                final int keySeq = rs.getInt("KEY_SEQ");
+                final int updateRule = rs.getInt("UPDATE_RULE");
+                final int deleteRule = rs.getInt("DELETE_RULE");
+                final String fkName = rs.getString("FK_NAME");
+                final Optional<String> pkName = Optional.ofNullable(rs.getString("PK_NAME"));
+                final int deferrability = rs.getInt("DEFERRABILITY");
+
                 // PK
                 Optional<CatalogReference> oCatRefPk = oCatalogNamePK.map(cn -> new CatalogReferenceR(cn));
                 Optional<SchemaReference> oSchemaRefPk = oSchemaNamePk.map(sn -> new SchemaReferenceR(oCatRefPk, sn));
@@ -604,14 +671,73 @@ public class DatabaseServiceImpl implements DatabaseService {
                 Optional<SchemaReference> oSchemaRefFk = oSchemaNameFk.map(sn -> new SchemaReferenceR(oCatRefFk, sn));
                 TableReference tableReferenceFk = new TableReferenceR(oSchemaRefFk, tableNameFk);
                 ColumnReference foreignKeyColumn = new ColumnReferenceR(Optional.of(tableReferenceFk), columNameFk);
-                StringBuilder sb = new StringBuilder();
-                sb.append("fk_").append(tableReferenceFk.name()).append("_").append(foreignKeyColumn.name()).append("_")
-                        .append(tableReferencePk.name()).append("_").append(primaryKeyColumn.name());
-                ImportedKey importedKey = new ImportedKeyR(primaryKeyColumn, foreignKeyColumn, sb.toString());
+
+                // Use FK_NAME from database if available, otherwise generate one
+                String constraintName;
+                if (fkName != null && !fkName.isBlank()) {
+                    constraintName = fkName;
+                } else {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("fk_").append(tableReferenceFk.name()).append("_").append(foreignKeyColumn.name())
+                            .append("_").append(tableReferencePk.name()).append("_").append(primaryKeyColumn.name());
+                    constraintName = sb.toString();
+                }
+
+                ImportedKey importedKey = new ImportedKeyR(
+                        primaryKeyColumn,
+                        foreignKeyColumn,
+                        constraintName,
+                        keySeq,
+                        ImportedKey.ReferentialAction.of(updateRule),
+                        ImportedKey.ReferentialAction.of(deleteRule),
+                        pkName,
+                        ImportedKey.Deferrability.of(deferrability));
                 importedKeys.add(importedKey);
             }
         }
         return List.copyOf(importedKeys);
+    }
+
+    /**
+     * Gets the primary key for a table.
+     *
+     * @param databaseMetaData the database metadata
+     * @param table the table reference
+     * @return the primary key, or null if the table has no primary key
+     * @throws SQLException if a database access error occurs
+     */
+    public PrimaryKey getPrimaryKey(DatabaseMetaData databaseMetaData, TableReference table) throws SQLException {
+        Optional<SchemaReference> oSchema = table.schema();
+        String schema = oSchema.map(SchemaReference::name).orElse(null);
+        Optional<CatalogReference> oCatalog = oSchema.flatMap(SchemaReference::catalog);
+        String catalog = oCatalog.map(CatalogReference::name).orElse(null);
+
+        List<ColumnReference> columns = new ArrayList<>();
+        String pkName = null;
+
+        try (ResultSet rs = databaseMetaData.getPrimaryKeys(catalog, schema, table.name())) {
+            // Results are ordered by COLUMN_NAME, but we need to order by KEY_SEQ
+            // So we collect all columns first
+            java.util.TreeMap<Integer, ColumnReference> orderedColumns = new java.util.TreeMap<>();
+
+            while (rs.next()) {
+                final String columnName = rs.getString("COLUMN_NAME");
+                final int keySeq = rs.getInt("KEY_SEQ");
+                pkName = rs.getString("PK_NAME"); // Same for all rows
+
+                ColumnReference colRef = new ColumnReferenceR(Optional.of(table), columnName);
+                orderedColumns.put(keySeq, colRef);
+            }
+
+            // Add columns in KEY_SEQ order
+            columns.addAll(orderedColumns.values());
+        }
+
+        if (columns.isEmpty()) {
+            return null; // No primary key
+        }
+
+        return new PrimaryKeyR(table, List.copyOf(columns), Optional.ofNullable(pkName));
     }
 
     private static Set<List<Integer>> supportedResultSetStyles(DatabaseMetaData databaseMetaData) throws SQLException {
@@ -634,6 +760,297 @@ public class DatabaseServiceImpl implements DatabaseService {
             }
         }
         return supports;
+    }
+
+    @Override
+    public List<Procedure> getProcedures(DatabaseMetaData databaseMetaData) throws SQLException {
+        return getProcedures(databaseMetaData, null, null, null);
+    }
+
+    @Override
+    public List<Procedure> getProcedures(DatabaseMetaData databaseMetaData, String catalog, String schemaPattern,
+            String procedureNamePattern) throws SQLException {
+        List<Procedure> procedures = new ArrayList<>();
+
+        try (ResultSet rs = databaseMetaData.getProcedures(catalog, schemaPattern, procedureNamePattern)) {
+            while (rs.next()) {
+                final Optional<String> oCatalogName = Optional.ofNullable(rs.getString("PROCEDURE_CAT"));
+                final Optional<String> oSchemaName = Optional.ofNullable(rs.getString("PROCEDURE_SCHEM"));
+                final String procedureName = rs.getString("PROCEDURE_NAME");
+                final Optional<String> remarks = Optional.ofNullable(rs.getString("REMARKS"));
+                final int procedureType = rs.getInt("PROCEDURE_TYPE");
+                final String specificName = rs.getString("SPECIFIC_NAME");
+
+                Optional<CatalogReference> oCatRef = oCatalogName.map(CatalogReferenceR::new);
+                Optional<SchemaReference> oSchemaRef = oSchemaName.map(sn -> new SchemaReferenceR(oCatRef, sn));
+
+                ProcedureReferenceR reference = new ProcedureReferenceR(oSchemaRef, procedureName, specificName);
+
+                // Get procedure columns
+                List<ProcedureColumn> columns = getProcedureColumns(databaseMetaData,
+                        oCatalogName.orElse(null), oSchemaName.orElse(null), procedureName);
+
+                Procedure procedure = new ProcedureR(reference, Procedure.ProcedureType.of(procedureType), remarks, columns);
+                procedures.add(procedure);
+            }
+        }
+
+        return List.copyOf(procedures);
+    }
+
+    private List<ProcedureColumn> getProcedureColumns(DatabaseMetaData databaseMetaData, String catalog,
+            String schema, String procedureName) throws SQLException {
+        List<ProcedureColumn> columns = new ArrayList<>();
+
+        try (ResultSet rs = databaseMetaData.getProcedureColumns(catalog, schema, procedureName, null)) {
+            while (rs.next()) {
+                final String columnName = rs.getString("COLUMN_NAME");
+                final int columnType = rs.getInt("COLUMN_TYPE");
+                final int dataType = rs.getInt("DATA_TYPE");
+                final String typeName = rs.getString("TYPE_NAME");
+
+                OptionalInt precision = OptionalInt.of(rs.getInt("PRECISION"));
+                if (rs.wasNull()) {
+                    precision = OptionalInt.empty();
+                }
+
+                OptionalInt scale = OptionalInt.of(rs.getInt("SCALE"));
+                if (rs.wasNull()) {
+                    scale = OptionalInt.empty();
+                }
+
+                OptionalInt radix = OptionalInt.of(rs.getInt("RADIX"));
+                if (rs.wasNull()) {
+                    radix = OptionalInt.empty();
+                }
+
+                final int nullable = rs.getInt("NULLABLE");
+                final Optional<String> remarks = Optional.ofNullable(rs.getString("REMARKS"));
+                final Optional<String> columnDefault = Optional.ofNullable(rs.getString("COLUMN_DEF"));
+                final int ordinalPosition = rs.getInt("ORDINAL_POSITION");
+
+                JDBCType jdbcType;
+                try {
+                    jdbcType = JDBCType.valueOf(dataType);
+                } catch (IllegalArgumentException ex) {
+                    jdbcType = JDBCType.OTHER;
+                    LOGGER.debug("Unknown JDBC type code: {} ({}) for procedure column: {}.{}",
+                            dataType, typeName, procedureName, columnName);
+                }
+
+                ProcedureColumn column = new ProcedureColumnR(columnName, ProcedureColumn.ColumnType.of(columnType),
+                        jdbcType, typeName, precision, scale, radix, ProcedureColumn.Nullability.of(nullable),
+                        remarks, columnDefault, ordinalPosition);
+                columns.add(column);
+            }
+        }
+
+        return List.copyOf(columns);
+    }
+
+    @Override
+    public List<Function> getFunctions(DatabaseMetaData databaseMetaData) throws SQLException {
+        return getFunctions(databaseMetaData, null, null, null);
+    }
+
+    @Override
+    public List<Function> getFunctions(DatabaseMetaData databaseMetaData, String catalog, String schemaPattern,
+            String functionNamePattern) throws SQLException {
+        List<Function> functions = new ArrayList<>();
+
+        try (ResultSet rs = databaseMetaData.getFunctions(catalog, schemaPattern, functionNamePattern)) {
+            while (rs.next()) {
+                final Optional<String> oCatalogName = Optional.ofNullable(rs.getString("FUNCTION_CAT"));
+                final Optional<String> oSchemaName = Optional.ofNullable(rs.getString("FUNCTION_SCHEM"));
+                final String functionName = rs.getString("FUNCTION_NAME");
+                final Optional<String> remarks = Optional.ofNullable(rs.getString("REMARKS"));
+                final int functionType = rs.getInt("FUNCTION_TYPE");
+                final String specificName = rs.getString("SPECIFIC_NAME");
+
+                Optional<CatalogReference> oCatRef = oCatalogName.map(CatalogReferenceR::new);
+                Optional<SchemaReference> oSchemaRef = oSchemaName.map(sn -> new SchemaReferenceR(oCatRef, sn));
+
+                FunctionReferenceR reference = new FunctionReferenceR(oSchemaRef, functionName, specificName);
+
+                // Get function columns
+                List<FunctionColumn> columns = getFunctionColumns(databaseMetaData,
+                        oCatalogName.orElse(null), oSchemaName.orElse(null), functionName);
+
+                Function function = new FunctionR(reference, Function.FunctionType.of(functionType), remarks, columns);
+                functions.add(function);
+            }
+        }
+
+        return List.copyOf(functions);
+    }
+
+    private List<FunctionColumn> getFunctionColumns(DatabaseMetaData databaseMetaData, String catalog,
+            String schema, String functionName) throws SQLException {
+        List<FunctionColumn> columns = new ArrayList<>();
+
+        try (ResultSet rs = databaseMetaData.getFunctionColumns(catalog, schema, functionName, null)) {
+            while (rs.next()) {
+                final String columnName = rs.getString("COLUMN_NAME");
+                final int columnType = rs.getInt("COLUMN_TYPE");
+                final int dataType = rs.getInt("DATA_TYPE");
+                final String typeName = rs.getString("TYPE_NAME");
+
+                OptionalInt precision = OptionalInt.of(rs.getInt("PRECISION"));
+                if (rs.wasNull()) {
+                    precision = OptionalInt.empty();
+                }
+
+                OptionalInt scale = OptionalInt.of(rs.getInt("SCALE"));
+                if (rs.wasNull()) {
+                    scale = OptionalInt.empty();
+                }
+
+                OptionalInt radix = OptionalInt.of(rs.getInt("RADIX"));
+                if (rs.wasNull()) {
+                    radix = OptionalInt.empty();
+                }
+
+                final int nullable = rs.getInt("NULLABLE");
+                final Optional<String> remarks = Optional.ofNullable(rs.getString("REMARKS"));
+
+                OptionalInt charOctetLength = OptionalInt.of(rs.getInt("CHAR_OCTET_LENGTH"));
+                if (rs.wasNull()) {
+                    charOctetLength = OptionalInt.empty();
+                }
+
+                final int ordinalPosition = rs.getInt("ORDINAL_POSITION");
+
+                JDBCType jdbcType;
+                try {
+                    jdbcType = JDBCType.valueOf(dataType);
+                } catch (IllegalArgumentException ex) {
+                    jdbcType = JDBCType.OTHER;
+                    LOGGER.debug("Unknown JDBC type code: {} ({}) for function column: {}.{}",
+                            dataType, typeName, functionName, columnName);
+                }
+
+                FunctionColumn column = new FunctionColumnR(columnName, FunctionColumn.ColumnType.of(columnType),
+                        jdbcType, typeName, precision, scale, radix, FunctionColumn.Nullability.of(nullable),
+                        remarks, charOctetLength, ordinalPosition);
+                columns.add(column);
+            }
+        }
+
+        return List.copyOf(columns);
+    }
+
+    @Override
+    public List<ImportedKey> getExportedKeys(DatabaseMetaData databaseMetaData, TableReference table)
+            throws SQLException {
+        Optional<SchemaReference> oSchema = table.schema();
+        String schema = oSchema.map(SchemaReference::name).orElse(null);
+        Optional<CatalogReference> oCatalog = oSchema.flatMap(SchemaReference::catalog);
+        String catalog = oCatalog.map(CatalogReference::name).orElse(null);
+        return getExportedKeys(databaseMetaData, catalog, schema, table.name());
+    }
+
+    @Override
+    public List<ImportedKey> getExportedKeys(DatabaseMetaData databaseMetaData, String catalog, String schema,
+            String tableName) throws SQLException {
+        List<ImportedKey> exportedKeys = new ArrayList<>();
+
+        try (ResultSet rs = databaseMetaData.getExportedKeys(catalog, schema, tableName)) {
+            while (rs.next()) {
+                ImportedKey key = readForeignKeyFromResultSet(rs);
+                exportedKeys.add(key);
+            }
+        }
+        return List.copyOf(exportedKeys);
+    }
+
+    @Override
+    public List<ImportedKey> getCrossReference(DatabaseMetaData databaseMetaData, TableReference parentTable,
+            TableReference foreignTable) throws SQLException {
+        Optional<SchemaReference> parentSchema = parentTable.schema();
+        String pSchema = parentSchema.map(SchemaReference::name).orElse(null);
+        Optional<CatalogReference> parentCatalog = parentSchema.flatMap(SchemaReference::catalog);
+        String pCatalog = parentCatalog.map(CatalogReference::name).orElse(null);
+
+        Optional<SchemaReference> foreignSchema = foreignTable.schema();
+        String fSchema = foreignSchema.map(SchemaReference::name).orElse(null);
+        Optional<CatalogReference> foreignCatalog = foreignSchema.flatMap(SchemaReference::catalog);
+        String fCatalog = foreignCatalog.map(CatalogReference::name).orElse(null);
+
+        return getCrossReference(databaseMetaData, pCatalog, pSchema, parentTable.name(),
+                fCatalog, fSchema, foreignTable.name());
+    }
+
+    @Override
+    public List<ImportedKey> getCrossReference(DatabaseMetaData databaseMetaData, String parentCatalog,
+            String parentSchema, String parentTable, String foreignCatalog, String foreignSchema,
+            String foreignTable) throws SQLException {
+        List<ImportedKey> crossRefs = new ArrayList<>();
+
+        try (ResultSet rs = databaseMetaData.getCrossReference(parentCatalog, parentSchema, parentTable,
+                foreignCatalog, foreignSchema, foreignTable)) {
+            while (rs.next()) {
+                ImportedKey key = readForeignKeyFromResultSet(rs);
+                crossRefs.add(key);
+            }
+        }
+        return List.copyOf(crossRefs);
+    }
+
+    /**
+     * Helper method to read a foreign key relationship from a ResultSet.
+     * Used by getImportedKeys, getExportedKeys, and getCrossReference since
+     * they all return the same column structure.
+     */
+    private ImportedKey readForeignKeyFromResultSet(ResultSet rs) throws SQLException {
+        final Optional<String> oCatalogNamePK = Optional.ofNullable(rs.getString("PKTABLE_CAT"));
+        final Optional<String> oSchemaNamePk = Optional.ofNullable(rs.getString("PKTABLE_SCHEM"));
+        final String tableNamePk = rs.getString("PKTABLE_NAME");
+        final String columNamePk = rs.getString("PKCOLUMN_NAME");
+
+        final Optional<String> oCatalogNameFK = Optional.ofNullable(rs.getString("FKTABLE_CAT"));
+        final Optional<String> oSchemaNameFk = Optional.ofNullable(rs.getString("FKTABLE_SCHEM"));
+        final String tableNameFk = rs.getString("FKTABLE_NAME");
+        final String columNameFk = rs.getString("FKCOLUMN_NAME");
+
+        final int keySeq = rs.getInt("KEY_SEQ");
+        final int updateRule = rs.getInt("UPDATE_RULE");
+        final int deleteRule = rs.getInt("DELETE_RULE");
+        final String fkName = rs.getString("FK_NAME");
+        final Optional<String> pkName = Optional.ofNullable(rs.getString("PK_NAME"));
+        final int deferrability = rs.getInt("DEFERRABILITY");
+
+        // PK
+        Optional<CatalogReference> oCatRefPk = oCatalogNamePK.map(CatalogReferenceR::new);
+        Optional<SchemaReference> oSchemaRefPk = oSchemaNamePk.map(sn -> new SchemaReferenceR(oCatRefPk, sn));
+        TableReference tableReferencePk = new TableReferenceR(oSchemaRefPk, tableNamePk);
+        ColumnReference primaryKeyColumn = new ColumnReferenceR(Optional.of(tableReferencePk), columNamePk);
+
+        // FK
+        Optional<CatalogReference> oCatRefFk = oCatalogNameFK.map(CatalogReferenceR::new);
+        Optional<SchemaReference> oSchemaRefFk = oSchemaNameFk.map(sn -> new SchemaReferenceR(oCatRefFk, sn));
+        TableReference tableReferenceFk = new TableReferenceR(oSchemaRefFk, tableNameFk);
+        ColumnReference foreignKeyColumn = new ColumnReferenceR(Optional.of(tableReferenceFk), columNameFk);
+
+        // Use FK_NAME from database if available, otherwise generate one
+        String constraintName;
+        if (fkName != null && !fkName.isBlank()) {
+            constraintName = fkName;
+        } else {
+            StringBuilder sb = new StringBuilder();
+            sb.append("fk_").append(tableReferenceFk.name()).append("_").append(foreignKeyColumn.name())
+                    .append("_").append(tableReferencePk.name()).append("_").append(primaryKeyColumn.name());
+            constraintName = sb.toString();
+        }
+
+        return new ImportedKeyR(
+                primaryKeyColumn,
+                foreignKeyColumn,
+                constraintName,
+                keySeq,
+                ImportedKey.ReferentialAction.of(updateRule),
+                ImportedKey.ReferentialAction.of(deleteRule),
+                pkName,
+                ImportedKey.Deferrability.of(deferrability));
     }
 
 }

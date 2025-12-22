@@ -29,10 +29,9 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import org.eclipse.daanse.jdbc.db.dialect.api.BestFitColumnType;
+import org.eclipse.daanse.jdbc.db.dialect.api.type.BestFitColumnType;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.DialectUtil;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.JdbcDialectImpl;
-import org.eclipse.daanse.jdbc.db.dialect.db.common.Util;
 
 public class SnowflakeDialect extends JdbcDialectImpl {
 
@@ -54,7 +53,7 @@ public class SnowflakeDialect extends JdbcDialectImpl {
 
     @Override
     public void quoteStringLiteral(StringBuilder buf, String s) {
-        Util.singleQuoteString(s.replace("\\\\", "\\\\\\\\"), buf);
+        DialectUtil.singleQuoteString(s.replace("\\\\", "\\\\\\\\"), buf);
     }
 
     @Override

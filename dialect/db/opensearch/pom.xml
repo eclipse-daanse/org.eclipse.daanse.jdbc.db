@@ -22,7 +22,8 @@
   </parent>
   <artifactId>org.eclipse.daanse.jdbc.db.dialect.db.opensearch</artifactId>
   <name>Eclipse Daanse JDBC DB Dialect OpenSearch</name>
-  <description>OpenSearch database dialect implementation providing OpenSearch-specific SQL generation.</description>
+  <description>OpenSearch database dialect implementation providing
+    OpenSearch-specific SQL generation.</description>
   <dependencies>
     <dependency>
       <groupId>org.slf4j</groupId>

@@ -22,7 +22,10 @@
   </parent>
   <artifactId>org.eclipse.daanse.jdbc.db.dialect.db.neoview</artifactId>
   <name>Eclipse Daanse JDBC DB Dialect Neoview</name>
-  <description>HP Neoview database dialect implementation providing Neoview-specific SQL generation, query optimization, and enterprise database feature handling. Supports Neoview massively parallel processing and analytical capabilities for enterprise OLAP operations.</description>
+  <description>HP Neoview database dialect implementation providing
+    Neoview-specific SQL generation, query optimization, and enterprise database
+    feature handling. Supports Neoview massively parallel processing and
+    analytical capabilities for enterprise OLAP operations.</description>
   <dependencies>
     <dependency>
       <groupId>org.slf4j</groupId>

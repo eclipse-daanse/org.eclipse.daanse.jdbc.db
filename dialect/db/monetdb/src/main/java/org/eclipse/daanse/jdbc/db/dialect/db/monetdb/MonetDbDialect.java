@@ -26,7 +26,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
 
-import org.eclipse.daanse.jdbc.db.dialect.api.BestFitColumnType;
+import org.eclipse.daanse.jdbc.db.dialect.api.type.BestFitColumnType;
 import org.eclipse.daanse.jdbc.db.dialect.api.Dialect;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.JdbcDialectImpl;
 
@@ -85,7 +85,7 @@ public class MonetDbDialect extends JdbcDialectImpl {
 
     @Override
     public void quoteStringLiteral(StringBuilder buf, String s) {
-        // Go beyond Util.singleQuoteString; also quote backslash, like MySQL.
+        // Go beyond standard singleQuoteString; also quote backslash, like MySQL.
         buf.append('\'');
         String s0 = s.replace("'", "''");
         String s1 = s0.replace("\\", "\\\\");

@@ -22,7 +22,10 @@
   </parent>
   <artifactId>org.eclipse.daanse.jdbc.db.dialect.db.db2</artifactId>
   <name>Eclipse Daanse JDBC DB Dialect DB2</name>
-  <description>IBM DB2 database dialect implementation providing DB2-specific SQL generation, query optimization, and enterprise database feature handling. Supports DB2 advanced features, stored procedures, and analytical functions for enterprise OLAP operations.</description>
+  <description>IBM DB2 database dialect implementation providing DB2-specific
+    SQL generation, query optimization, and enterprise database feature
+    handling. Supports DB2 advanced features, stored procedures, and analytical
+    functions for enterprise OLAP operations.</description>
   <dependencies>
     <dependency>
       <groupId>org.slf4j</groupId>

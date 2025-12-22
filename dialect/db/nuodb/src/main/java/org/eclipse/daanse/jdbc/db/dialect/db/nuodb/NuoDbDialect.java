@@ -30,7 +30,7 @@ import java.util.List;
 import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
 import org.eclipse.daanse.jdbc.db.dialect.api.Dialect;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.JdbcDialectImpl;
-import org.eclipse.daanse.jdbc.db.dialect.db.common.Util;
+import org.eclipse.daanse.jdbc.db.dialect.db.common.DialectUtil;
 
 /**
  * Implementation of {@link Dialect} for the NuoDB database. In order to use
@@ -71,7 +71,7 @@ public class NuoDbDialect extends JdbcDialectImpl {
     @Override
     protected void quoteDateLiteral(StringBuilder buf, Date date) {
         buf.append("DATE(");
-        Util.singleQuoteString(date.toString(), buf);
+        DialectUtil.singleQuoteString(date.toString(), buf);
         buf.append(")");
     }
 

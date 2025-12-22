@@ -21,7 +21,9 @@
   </parent>
   <artifactId>org.eclipse.daanse.jdbc.db.record</artifactId>
   <name>Daanse JDBC DB Record</name>
-  <description>Record-based implementation of JDBC database operations for Daanse. Provides immutable Java record classes for representing database entities and query results with efficient memory usage and type safety.</description>
+  <description>Record-based implementation of JDBC database operations for
+    Daanse. Provides immutable Java record classes for representing database
+    entities and query results with efficient memory usage and type safety.</description>
 
   <dependencies>
     <dependency>
