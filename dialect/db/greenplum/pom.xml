@@ -22,7 +22,10 @@
   </parent>
   <artifactId>org.eclipse.daanse.jdbc.db.dialect.db.greenplum</artifactId>
   <name>Eclipse Daanse JDBC DB Dialect Greenplum</name>
-  <description>Greenplum database dialect implementation providing Greenplum-specific SQL generation, query optimization, and massively parallel processing database feature handling. Supports Greenplum analytical functions and distributed query processing for enterprise OLAP operations.</description>
+  <description>Greenplum database dialect implementation providing
+    Greenplum-specific SQL generation, query optimization, and massively
+    parallel processing database feature handling. Supports Greenplum analytical
+    functions and distributed query processing for enterprise OLAP operations.</description>
   <dependencies>
     <dependency>
       <groupId>org.slf4j</groupId>

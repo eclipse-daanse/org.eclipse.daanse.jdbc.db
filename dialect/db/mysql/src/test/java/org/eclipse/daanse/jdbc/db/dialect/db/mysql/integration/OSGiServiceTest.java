@@ -25,7 +25,6 @@ import org.osgi.test.common.annotation.InjectService;
 class OSGiServiceTest {
     @Test
     void serviceExists(@InjectService List<DialectFactory> dialects) throws Exception {
-
         assertThat(dialects).isNotNull().isNotEmpty().anyMatch(MySqlDialectFactory.class::isInstance);
     }
 }

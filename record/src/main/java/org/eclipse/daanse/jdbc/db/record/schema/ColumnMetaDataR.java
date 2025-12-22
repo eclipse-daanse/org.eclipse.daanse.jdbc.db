@@ -19,13 +19,18 @@ import java.util.OptionalInt;
 
 import org.eclipse.daanse.jdbc.db.api.schema.ColumnMetaData;
 
-public record ColumnMetaDataR(JDBCType dataType,
+public record ColumnMetaDataR(
+        JDBCType dataType,
         String typeName,
         OptionalInt columnSize,
         OptionalInt decimalDigits,
         OptionalInt numPrecRadix,
         OptionalInt nullable,
+        Nullability nullability,
         OptionalInt charOctetLength,
-        Optional<String> remarks) implements ColumnMetaData {
+        Optional<String> remarks,
+        Optional<String> columnDefault,
+        AutoIncrement autoIncrement,
+        GeneratedColumn generatedColumn) implements ColumnMetaData {
 
 }

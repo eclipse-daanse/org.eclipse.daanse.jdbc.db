@@ -11,11 +11,15 @@
  *   SmartCity Jena, Stefan Bischof - initial
  *
  */
-package org.eclipse.daanse.jdbc.db.dialect.db.common;
+package org.eclipse.daanse.jdbc.db.dialect.api;
 
 import java.sql.SQLException;
 
-public class DialectException extends RuntimeException{
+/**
+ * Runtime exception for dialect-related errors.
+ */
+@SuppressWarnings("serial")
+public class DialectException extends RuntimeException {
 
     public DialectException(String msg, SQLException e) {
         super(msg, e);

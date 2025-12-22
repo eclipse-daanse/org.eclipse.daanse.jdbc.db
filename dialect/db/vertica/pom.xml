@@ -22,7 +22,10 @@
   </parent>
   <artifactId>org.eclipse.daanse.jdbc.db.dialect.db.vertica</artifactId>
   <name>Eclipse Daanse JDBC DB Dialect Vertica</name>
-  <description>Vertica database dialect implementation providing Vertica-specific SQL generation, query optimization, and columnar analytical database feature handling. Supports Vertica massively parallel processing and advanced analytics capabilities for enterprise OLAP operations.</description>
+  <description>Vertica database dialect implementation providing
+    Vertica-specific SQL generation, query optimization, and columnar analytical
+    database feature handling. Supports Vertica massively parallel processing
+    and advanced analytics capabilities for enterprise OLAP operations.</description>
   <dependencies>
     <dependency>
       <groupId>org.slf4j</groupId>

@@ -10,7 +10,9 @@
 * SPDX-License-Identifier: EPL-2.0
 **********************************************************************/
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.eclipse.daanse</groupId>
@@ -21,7 +23,10 @@
   <artifactId>org.eclipse.daanse.jdbc.db.dialect</artifactId>
   <packaging>pom</packaging>
   <name>Eclipse Daanse JDBC DB Dialect</name>
-  <description>Database dialect framework providing extensible support for multiple database systems. Contains API definitions and concrete dialect implementations for 25+ database systems including PostgreSQL, MySQL, Oracle, SQL Server, H2, and more.</description>
+  <description>Database dialect framework providing extensible support for
+    multiple database systems. Contains API definitions and concrete dialect
+    implementations for 25+ database systems including PostgreSQL, MySQL,
+    Oracle, SQL Server, H2, and more.</description>
   <modules>
     <module>api</module>
     <module>db</module>

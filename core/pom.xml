@@ -11,8 +11,8 @@
 **********************************************************************/
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.eclipse.daanse</groupId>
@@ -21,16 +21,14 @@
   </parent>
   <artifactId>org.eclipse.daanse.jdbc.db.core</artifactId>
   <name>Eclipse Daanse JDBC DB Core</name>
-  <description>Core implementation of JDBC database operations for Daanse. Provides concrete implementations of database connectivity, SQL execution, and database metadata services with support for multiple database dialects.</description>
+  <description>Core implementation of JDBC database operations for Daanse.
+    Provides concrete implementations of database connectivity, SQL execution,
+    and database metadata services with support for multiple database dialects.</description>
 
   <dependencies>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.assertj</groupId>
-      <artifactId>assertj-core</artifactId>
     </dependency>
     <dependency>
       <groupId>org.eclipse.daanse</groupId>

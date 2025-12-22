@@ -22,14 +22,14 @@ public interface TypeInfo {
 
     String typeName();
     JDBCType dataType();
-    int percision();
-    Optional<String> literatPrefix();
-    Optional<String> literatSuffix();
-    Optional<String> createPragmas();
+    int precision();
+    Optional<String> literalPrefix();
+    Optional<String> literalSuffix();
+    Optional<String> createParams();
     Nullable nullable();
     boolean caseSensitive();
     Searchable searchable();
-    boolean unsignesAttribute();
+    boolean unsignedAttribute();
     boolean fixedPrecScale();
     boolean autoIncrement();
     Optional<String> localTypeName();
@@ -53,7 +53,7 @@ public interface TypeInfo {
     }
 
     enum Searchable {
-        PRED_NONE(DatabaseMetaData.typePredNone), PRRED_CHAR(DatabaseMetaData.typePredChar),
+        PRED_NONE(DatabaseMetaData.typePredNone), PRED_CHAR(DatabaseMetaData.typePredChar),
         PRED_BASIC(DatabaseMetaData.typePredBasic), SEARCHABLE(DatabaseMetaData.typeSearchable);
 
         int value;

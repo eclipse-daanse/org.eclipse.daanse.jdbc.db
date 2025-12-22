@@ -39,9 +39,6 @@ import org.eclipse.daanse.jdbc.db.dialect.db.hive.HiveDialect;
  */
 public class ImpalaDialect extends HiveDialect {
 
-    private static final String ESCAPE_REGEXP = "(\\\\Q([^\\\\Q]+)\\\\E)";
-    private static final Pattern escapePattern = Pattern.compile(ESCAPE_REGEXP);
-
     private static final String SUPPORTED_PRODUCT_NAME = "IMPALA";
     public static final String CAST = "cast(";
     public static final String AS_STRING = " as string)";
@@ -166,7 +163,7 @@ public class ImpalaDialect extends HiveDialect {
                 .contains("i")) {
             caseSensitive = false;
         }
-        final Matcher escapeMatcher = escapePattern.matcher(javaRegex);
+        final Matcher escapeMatcher = DialectUtil.ESCAPE_PATTERN.matcher(javaRegex);
         while (escapeMatcher.find()) {
             javaRegex = javaRegex.replace(escapeMatcher.group(1), escapeMatcher.group(2));
         }

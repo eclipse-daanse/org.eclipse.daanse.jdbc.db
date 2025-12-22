@@ -22,7 +22,10 @@
   </parent>
   <artifactId>org.eclipse.daanse.jdbc.db.dialect.db.infobright</artifactId>
   <name>Eclipse Daanse JDBC DB Dialect Infobright</name>
-  <description>Infobright database dialect implementation providing Infobright-specific SQL generation, query optimization, and columnar analytical database feature handling. Supports Infobright data compression and high-performance analytical operations for OLAP workloads.</description>
+  <description>Infobright database dialect implementation providing
+    Infobright-specific SQL generation, query optimization, and columnar
+    analytical database feature handling. Supports Infobright data compression
+    and high-performance analytical operations for OLAP workloads.</description>
   <dependencies>
     <dependency>
       <groupId>org.slf4j</groupId>

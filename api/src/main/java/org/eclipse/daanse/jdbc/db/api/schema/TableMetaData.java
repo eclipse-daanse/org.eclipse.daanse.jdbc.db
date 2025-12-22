@@ -27,6 +27,6 @@ public interface TableMetaData {
 
     Optional<String> selfReferencingColumnName();
 
-    Optional<String> referencingGenerationa();
+    Optional<String> refGeneration();
 
 }

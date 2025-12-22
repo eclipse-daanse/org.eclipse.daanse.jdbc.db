@@ -29,9 +29,9 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 
 import org.eclipse.daanse.jdbc.db.dialect.api.Dialect;
-import org.eclipse.daanse.jdbc.db.dialect.api.OrderedColumn;
+import org.eclipse.daanse.jdbc.db.dialect.api.order.OrderedColumn;
+import org.eclipse.daanse.jdbc.db.dialect.db.common.DialectUtil;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.JdbcDialectImpl;
-import org.eclipse.daanse.jdbc.db.dialect.db.common.Util;
 
 /**
  * Implementation of {@link Dialect} for the Microsoft SQL Server
@@ -82,7 +82,7 @@ public class MicrosoftSqlServerDialect extends JdbcDialectImpl {
             throw new NumberFormatException(
                 "Illegal BOOLEAN literal:  " + value);
         }
-        buf.append(Util.singleQuoteString(value));
+        buf.append(DialectUtil.singleQuoteString(value));
     }
 
     @Override
@@ -113,34 +113,12 @@ public class MicrosoftSqlServerDialect extends JdbcDialectImpl {
 
     @Override
     public StringBuilder generatePercentileDisc(double percentile, boolean desc, String tableName, String columnName) {
-        StringBuilder buf = new StringBuilder(64);
-        buf.append("PERCENTILE_DISC(").append(percentile).append(")").append(" WITHIN GROUP (ORDER BY ");
-        if (tableName != null) {
-            quoteIdentifier(buf, tableName, columnName);
-        } else {
-            quoteIdentifier(buf, columnName);
-        }
-        if (desc) {
-            buf.append(" ").append(DESC);
-        }
-        buf.append(")");
-        return buf;
+        return buildPercentileFunction("PERCENTILE_DISC", percentile, desc, tableName, columnName);
     }
 
     @Override
     public StringBuilder generatePercentileCont(double percentile, boolean desc, String tableName, String columnName) {
-        StringBuilder buf = new StringBuilder(64);
-        buf.append("PERCENTILE_CONT(").append(percentile).append(")").append(" WITHIN GROUP (ORDER BY ");
-        if (tableName != null) {
-            quoteIdentifier(buf, tableName, columnName);
-        } else {
-            quoteIdentifier(buf, columnName);
-        }
-        if (desc) {
-            buf.append(" ").append(DESC);
-        }
-        buf.append(")");
-        return buf;
+        return buildPercentileFunction("PERCENTILE_CONT", percentile, desc, tableName, columnName);
     }
 
     @Override
@@ -172,21 +150,7 @@ public class MicrosoftSqlServerDialect extends JdbcDialectImpl {
         buf.append(")");
         if (columns != null && !columns.isEmpty()) {
             buf.append(" WITHIN GROUP (ORDER BY ");
-            boolean first = true;
-            for(OrderedColumn c : columns) {
-                if (!first) {
-                    buf.append(", ");
-                }
-                if (c.getTableName() != null) {
-                    quoteIdentifier(buf, c.getTableName(), c.getColumnName());
-                } else {
-                    quoteIdentifier(buf, c.getColumnName());
-                }
-                if (!c.isAscend()) {
-                    buf.append(DESC);
-                }
-                first = false;
-            }
+            buf.append(buildOrderedColumnsClause(columns));
             buf.append(")");
         }
         //STRING_AGG(CONVERT (NVARCHAR (MAX), EmailAddress), ';') WITHIN GROUP (ORDER BY EmailAddress ASC)
@@ -195,53 +159,17 @@ public class MicrosoftSqlServerDialect extends JdbcDialectImpl {
 
     @Override
     public StringBuilder generateNthValueAgg(CharSequence operand, boolean ignoreNulls, Integer n, List<OrderedColumn> columns) {
-        StringBuilder buf = new StringBuilder(64);
-        buf.append("NTH_VALUE");
-        buf.append("( ");
-        buf.append(operand);
-        buf.append(", ");
-        if (n == null || n < 1) {
-            buf.append(1);
-        } else {
-            buf.append(n);
-        }
-        buf.append(" )");
-        if (ignoreNulls) {
-            buf.append(" IGNORE NULLS ");
-        } else {
-            buf.append(" RESPECT NULLS ");
-        }
-        buf.append("OVER ( ");
-        if (columns != null && !columns.isEmpty()) {
-            buf.append("ORDER BY ");
-            buf.append(orderedColumns(columns));
-        }
-        buf.append(" )");
-        //NTH_VALUE(price,2) IGNORE NULLS OVER (ORDER BY id)
-        //NTH_VALUE(price,2) IGNORE NULLS OVER ()
-        return buf;
+        return buildNthValueFunction("NTH_VALUE", operand, ignoreNulls, n, columns, true);
     }
 
-    private CharSequence orderedColumns(List<OrderedColumn> columns) {
-        StringBuilder buf = new StringBuilder(64);
-        boolean first = true;
-        if (columns != null) {
-            for(OrderedColumn c : columns) {
-                if (!first) {
-                    buf.append(", ");
-                }
-                if (c.getTableName() != null) {
-                    quoteIdentifier(buf, c.getTableName(), c.getColumnName());
-                } else {
-                    quoteIdentifier(buf, c.getColumnName());
-                }
-                if (!c.isAscend()) {
-                    buf.append(DESC);
-                }
-                first = false;
-            }
-        }
-        return buf;
+    @Override
+    public boolean supportsNthValue() {
+        return true;
+    }
+
+    @Override
+    public boolean supportsNthValueIgnoreNulls() {
+        return true;
     }
 
     @Override

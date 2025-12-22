@@ -21,8 +21,9 @@ package org.eclipse.daanse.jdbc.db.dialect.db.clickhouse;
 import java.sql.Connection;
 import java.util.List;
 
+import org.eclipse.daanse.jdbc.db.dialect.api.generator.BitOperation;
 import org.eclipse.daanse.jdbc.db.dialect.api.Dialect;
-import org.eclipse.daanse.jdbc.db.dialect.api.OrderedColumn;
+import org.eclipse.daanse.jdbc.db.dialect.api.order.OrderedColumn;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.JdbcDialectImpl;
 
 /**
@@ -59,76 +60,24 @@ public class ClickHouseDialect extends JdbcDialectImpl {
         return SUPPORTED_PRODUCT_NAME.toLowerCase();
     }
 
+    // Unified BitOperation methods
+
     @Override
-    public StringBuilder generateAndBitAggregation(CharSequence operand) {
+    public StringBuilder generateBitAggregation(BitOperation operation, CharSequence operand) {
         StringBuilder buf = new StringBuilder(64);
-        buf.append("groupBitAnd(").append(operand).append(")");
-        return buf;
-
+        return switch (operation) {
+            case AND -> buf.append("groupBitAnd(").append(operand).append(")");
+            case OR -> buf.append("groupBitOr(").append(operand).append(")");
+            case XOR -> buf.append("groupBitXor(").append(operand).append(")");
+            case NAND -> buf.append("NOT(groupBitAnd(").append(operand).append("))");
+            case NOR -> buf.append("NOT(groupBitOr(").append(operand).append("))");
+            case NXOR -> buf.append("NOT(groupBitXor(").append(operand).append("))");
+        };
     }
 
     @Override
-    public StringBuilder generateOrBitAggregation(CharSequence operand) {
-        StringBuilder buf = new StringBuilder(64);
-        buf.append("groupBitOr(").append(operand).append(")");
-        return buf;
-    }
-
-    @Override
-    public StringBuilder generateXorBitAggregation(CharSequence operand) {
-        StringBuilder buf = new StringBuilder(64);
-        buf.append("groupBitXor(").append(operand).append(")");
-        return buf;
-    }
-
-    @Override
-    public StringBuilder generateNAndBitAggregation(CharSequence operand) {
-        StringBuilder buf = new StringBuilder(64);
-        buf.append("NOT(groupBitAnd(").append(operand).append("))");
-        return buf;
-
-    }
-
-    @Override
-    public StringBuilder generateNOrBitAggregation(CharSequence operand) {
-        StringBuilder buf = new StringBuilder(64);
-        buf.append("NOT(groupBitOr(").append(operand).append("))");
-        return buf;
-    }
-
-    @Override
-    public StringBuilder generateNXorBitAggregation(CharSequence operand) {
-        StringBuilder buf = new StringBuilder(64);
-        buf.append("NOT(groupBitXor(").append(operand).append("))");
-        return buf;
-    }
-
-    public boolean supportsBitAndAgg() {
-        return true;
-    }
-
-    public boolean supportsBitOrAgg() {
-        return true;
-    }
-
-    @Override
-    public boolean supportsBitXorAgg() {
-        return true;
-    }
-
-    @Override
-    public boolean supportsBitNAndAgg() {
-        return true;
-    }
-
-    @Override
-    public boolean supportsBitNOrAgg() {
-        return true;
-    }
-
-    @Override
-    public boolean supportsBitNXorAgg() {
-        return true;
+    public boolean supportsBitAggregation(BitOperation operation) {
+        return true; // ClickHouse supports all bit operations
     }
 
     @Override
@@ -144,47 +93,12 @@ public class ClickHouseDialect extends JdbcDialectImpl {
 
     @Override
     public StringBuilder generateNthValueAgg(CharSequence operand, boolean ignoreNulls, Integer n, List<OrderedColumn> columns) {
-        StringBuilder buf = new StringBuilder(64);
-        buf.append("nth_value");
-        buf.append("( ");
-        buf.append(operand);
-        buf.append(", ");
-        if (n == null || n < 1) {
-            buf.append(1);
-        } else {
-            buf.append(n);
-        }
-        buf.append(" )");
-        buf.append("OVER ( ");
-        if (columns != null && !columns.isEmpty()) {
-            buf.append("ORDER BY ");
-            buf.append(orderedColumns(columns));
-        }
-        buf.append(" )");
-        //NTH_VALUE(employee_name, 2) OVER ( ORDER BY salary DESC )
-        return buf;
+        return buildNthValueFunction("nth_value", operand, ignoreNulls, n, columns, false);
     }
 
-    private CharSequence orderedColumns(List<OrderedColumn> columns) {
-        StringBuilder buf = new StringBuilder(64);
-        boolean first = true;
-        if (columns != null) {
-            for(OrderedColumn c : columns) {
-                if (!first) {
-                    buf.append(", ");
-                }
-                if (c.getTableName() != null) {
-                    quoteIdentifier(buf, c.getTableName(), c.getColumnName());
-                } else {
-                    quoteIdentifier(buf, c.getColumnName());
-                }
-                if (!c.isAscend()) {
-                    buf.append(DESC);
-                }
-                first = false;
-            }
-        }
-        return buf;
+    @Override
+    public boolean supportsNthValue() {
+        return true;
     }
 
     @Override

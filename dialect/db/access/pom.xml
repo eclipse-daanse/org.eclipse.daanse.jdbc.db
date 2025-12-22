@@ -22,7 +22,10 @@
   </parent>
   <artifactId>org.eclipse.daanse.jdbc.db.dialect.db.access</artifactId>
   <name>Eclipse Daanse JDBC DB Dialect Access</name>
-  <description>Microsoft Access database dialect implementation providing Access-specific SQL generation, query optimization, and database feature handling. Supports Access database connectivity with proper handling of Access-specific data types and SQL syntax variations.</description>
+  <description>Microsoft Access database dialect implementation providing
+    Access-specific SQL generation, query optimization, and database feature
+    handling. Supports Access database connectivity with proper handling of
+    Access-specific data types and SQL syntax variations.</description>
   <dependencies>
     <dependency>
       <groupId>org.slf4j</groupId>

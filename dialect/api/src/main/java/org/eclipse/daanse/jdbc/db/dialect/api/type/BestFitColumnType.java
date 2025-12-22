@@ -12,7 +12,7 @@
 *   Stefan Bischof (bipolis.org) - initial
 *   Sergei Semenkov - initial
 */
-package org.eclipse.daanse.jdbc.db.dialect.api;
+package org.eclipse.daanse.jdbc.db.dialect.api.type;
 
 public enum BestFitColumnType {
     /*OBJECT*/

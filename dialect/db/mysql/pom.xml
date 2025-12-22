@@ -22,7 +22,9 @@
   </parent>
   <artifactId>org.eclipse.daanse.jdbc.db.dialect.db.mysql</artifactId>
   <name>Eclipse Daanse JDBC DB Dialect MySQL</name>
-  <description>MySQL database dialect implementation for Daanse JDBC. Provides MySQL-specific SQL generation, query optimization, and database feature handling including MySQL data types, functions, and syntax variations.</description>
+  <description>MySQL database dialect implementation for Daanse JDBC. Provides
+    MySQL-specific SQL generation, query optimization, and database feature
+    handling including MySQL data types, functions, and syntax variations.</description>
   <dependencies>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -37,20 +39,6 @@
       <groupId>org.eclipse.daanse</groupId>
       <artifactId>org.eclipse.daanse.jdbc.db.dialect.db.common</artifactId>
       <version>${revision}</version>
-    </dependency>
-    <dependency>
-      <groupId>biz.aQute.bnd</groupId>
-      <artifactId>biz.aQute.bndlib</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-core</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.assertj</groupId>
-      <artifactId>assertj-core</artifactId>
-      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>

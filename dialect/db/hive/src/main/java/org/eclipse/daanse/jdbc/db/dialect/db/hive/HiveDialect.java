@@ -30,7 +30,7 @@ import java.util.List;
 
 import org.eclipse.daanse.jdbc.db.dialect.api.Dialect;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.JdbcDialectImpl;
-import org.eclipse.daanse.jdbc.db.dialect.db.common.Util;
+import org.eclipse.daanse.jdbc.db.dialect.db.common.DialectUtil;
 
 /**
  * Implementation of {@link Dialect} for the Hive database.
@@ -114,27 +114,13 @@ public class HiveDialect extends JdbcDialectImpl {
     @Override
     protected void quoteDateLiteral(StringBuilder buf, Date date) {
         // Hive doesn't support Date type; treat date as a string '2008-01-23'
-        Util.singleQuoteString(date.toString(), buf);
+        DialectUtil.singleQuoteString(date.toString(), buf);
     }
 
     @Override
     protected StringBuilder generateOrderByNulls(CharSequence expr, boolean ascending, boolean collateNullsLast) {
         // In Hive, Null values are worth negative infinity.
-        if (collateNullsLast) {
-            if (ascending) {
-                return new StringBuilder("ISNULL(").append(expr)
-                    .append(") ASC, ").append(expr).append(" ASC");
-            } else {
-                return new StringBuilder(expr).append(" DESC");
-            }
-        } else {
-            if (ascending) {
-                return new StringBuilder(expr).append(" ASC");
-            } else {
-                return new StringBuilder("ISNULL(").append(expr)
-                    .append(") DESC, ").append(expr).append(" DESC");
-            }
-        }
+        return DialectUtil.generateOrderByNullsWithIsnull(expr, ascending, collateNullsLast);
     }
 
     @Override
@@ -155,7 +141,7 @@ public class HiveDialect extends JdbcDialectImpl {
             throw new NumberFormatException("Illegal TIMESTAMP literal:  " + value);
         }
         buf.append("cast( ");
-        Util.singleQuoteString(value, buf);
+        DialectUtil.singleQuoteString(value, buf);
         buf.append(" as timestamp )");
     }
 

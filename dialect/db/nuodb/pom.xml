@@ -22,7 +22,10 @@
   </parent>
   <artifactId>org.eclipse.daanse.jdbc.db.dialect.db.nuodb</artifactId>
   <name>Eclipse Daanse JDBC DB Dialect NuoDB</name>
-  <description>NuoDB database dialect implementation providing NuoDB-specific SQL generation, query optimization, and distributed database feature handling. Supports NuoDB elastic scalability and cloud-native database capabilities for analytical operations.</description>
+  <description>NuoDB database dialect implementation providing NuoDB-specific
+    SQL generation, query optimization, and distributed database feature
+    handling. Supports NuoDB elastic scalability and cloud-native database
+    capabilities for analytical operations.</description>
   <dependencies>
     <dependency>
       <groupId>org.slf4j</groupId>

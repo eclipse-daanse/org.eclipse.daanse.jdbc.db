@@ -30,7 +30,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import org.eclipse.daanse.jdbc.db.dialect.api.OrderedColumn;
+import org.eclipse.daanse.jdbc.db.dialect.api.generator.BitOperation;
+import org.eclipse.daanse.jdbc.db.dialect.api.order.OrderedColumn;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.DialectUtil;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.JdbcDialectImpl;
 import org.slf4j.Logger;
@@ -46,9 +47,6 @@ import org.slf4j.LoggerFactory;
 public class MySqlDialect extends JdbcDialectImpl {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MySqlDialect.class);
-    private static final String ESCAPE_REGEXP = "(\\\\Q([^\\\\Q]+)\\\\E)";
-    private static final Pattern escapePattern = Pattern.compile(ESCAPE_REGEXP);
-
     private static final String SUPPORTED_PRODUCT_NAME = "MYSQL";
 
     public MySqlDialect(Connection connection) {
@@ -73,7 +71,9 @@ public class MySqlDialect extends JdbcDialectImpl {
      * @return Whether this is Infobright
      */
     public static boolean isInfobright(DatabaseMetaData metaData) {
-        //TODO add Infobright to dialect configuration
+        // Infobright detection is currently disabled. A separate Infobright dialect
+        // or a configurable flag could be added if Infobright support is needed.
+        // Detection would require querying for the BRIGHTHOUSE engine presence.
         return false;
     }
 
@@ -99,7 +99,10 @@ public class MySqlDialect extends JdbcDialectImpl {
 
     @Override
     protected boolean deduceSupportsSelectNotInGroupBy(DatabaseMetaData metaData) throws SQLException {
-        //TODO SupportsSelectNotInGroupBy to configuration
+        // MySQL 5.7+ includes ONLY_FULL_GROUP_BY in SQL_MODE by default, requiring all
+        // SELECT columns to be in GROUP BY or be aggregate functions. This method
+        // returns false to enforce strict GROUP BY compliance. For flexible GROUP BY
+        // behavior, the ConfigurableDialect provides this as a configurable option.
         return false;
     }
 
@@ -135,7 +138,7 @@ public class MySqlDialect extends JdbcDialectImpl {
 
     @Override
     public void quoteStringLiteral(StringBuilder buf, String s) {
-        // Go beyond Util.singleQuoteString; also quote backslash.
+        // Go beyond standard singleQuoteString; also quote backslash.
         buf.append('\'');
         String s0 = s.replace("'", "''");
         String s1 = s0.replace("\\", "\\\\");
@@ -160,20 +163,7 @@ public class MySqlDialect extends JdbcDialectImpl {
     @Override
     protected StringBuilder generateOrderByNulls(CharSequence expr, boolean ascending, boolean collateNullsLast) {
         // In MYSQL, Null values are worth negative infinity.
-        if (collateNullsLast) {
-            if (ascending) {
-                return new StringBuilder("ISNULL(").append(expr)
-                    .append(") ASC, ").append(expr).append(" ASC");
-            } else {
-                return new StringBuilder(expr).append(" DESC");
-            }
-        } else {
-            if (ascending) {
-                return new StringBuilder(expr).append(" ASC");
-            } else {
-                return new StringBuilder("ISNULL(").append(expr).append(") DESC, ").append(expr).append(" DESC");
-            }
-        }
+        return DialectUtil.generateOrderByNullsWithIsnull(expr, ascending, collateNullsLast);
     }
 
     @Override
@@ -214,7 +204,7 @@ public class MySqlDialect extends JdbcDialectImpl {
             .contains("i")) {
             caseSensitive = false;
         }
-        final Matcher escapeMatcher = escapePattern.matcher(javaRegex);
+        final Matcher escapeMatcher = DialectUtil.ESCAPE_PATTERN.matcher(javaRegex);
         while (escapeMatcher.find()) {
             javaRegex = javaRegex.replace(escapeMatcher.group(1), escapeMatcher.group(2));
         }
@@ -268,108 +258,34 @@ public class MySqlDialect extends JdbcDialectImpl {
         return SUPPORTED_PRODUCT_NAME.toLowerCase();
     }
 
+    // Unified BitOperation methods
+
     @Override
-    public StringBuilder generateAndBitAggregation(CharSequence operand) {
+    public StringBuilder generateBitAggregation(BitOperation operation, CharSequence operand) {
         StringBuilder buf = new StringBuilder(64);
-        buf.append("BIT_AND(").append(operand).append(")");
-        return buf;
+        return switch (operation) {
+            case AND -> buf.append("BIT_AND(").append(operand).append(")");
+            case OR -> buf.append("BIT_OR(").append(operand).append(")");
+            case XOR -> buf.append("BIT_XOR(").append(operand).append(")");
+            case NAND -> buf.append("NOT(BIT_AND(").append(operand).append("))");
+            case NOR -> buf.append("NOT(BIT_OR(").append(operand).append("))");
+            case NXOR -> buf.append("NOT(BIT_XOR(").append(operand).append("))");
+        };
     }
 
     @Override
-    public StringBuilder generateOrBitAggregation(CharSequence operand) {
-        StringBuilder buf = new StringBuilder(64);
-        buf.append("BIT_OR(").append(operand).append(")");
-        return buf;
-    }
-
-    @Override
-    public StringBuilder generateXorBitAggregation(CharSequence operand) {
-        StringBuilder buf = new StringBuilder(64);
-        buf.append("BIT_XOR(").append(operand).append(")");
-        return buf;
-    }
-
-    @Override
-    public StringBuilder generateNAndBitAggregation(CharSequence operand) {
-        StringBuilder buf = new StringBuilder(64);
-        buf.append("NOT(BIT_AND(").append(operand).append("))");
-        return buf;
-    }
-
-    @Override
-    public StringBuilder generateNOrBitAggregation(CharSequence operand) {
-        StringBuilder buf = new StringBuilder(64);
-        buf.append("NOT(BIT_OR(").append(operand).append("))");
-        return buf;
-    }
-
-    @Override
-    public StringBuilder generateNXorBitAggregation(CharSequence operand) {
-        StringBuilder buf = new StringBuilder(64);
-        buf.append("NOT(BIT_XOR(").append(operand).append("))");
-        return buf;
-    }
-
-    @Override
-    public boolean supportsBitAndAgg() {
-        return true;
-    }
-
-    @Override
-    public boolean supportsBitOrAgg() {
-        return true;
-    }
-
-    @Override
-    public boolean supportsBitXorAgg() {
-        return true;
-    }
-
-    @Override
-    public boolean supportsBitNAndAgg() {
-        return true;
-    }
-
-    @Override
-    public boolean supportsBitNOrAgg() {
-        return true;
-    }
-
-    @Override
-    public boolean supportsBitNXorAgg() {
-        return true;
+    public boolean supportsBitAggregation(BitOperation operation) {
+        return true; // MySQL supports all bit operations
     }
 
     @Override
     public StringBuilder generatePercentileDisc(double percentile, boolean desc, String tableName, String columnName) {
-        StringBuilder buf = new StringBuilder(64);
-        buf.append("PERCENTILE_DISC(").append(percentile).append(")").append(" WITHIN GROUP (ORDER BY ");
-        if (tableName != null) {
-            quoteIdentifier(buf, tableName, columnName);
-        } else {
-            quoteIdentifier(buf, columnName);
-        }
-        if (desc) {
-            buf.append(" ").append(DESC);
-        }
-        buf.append(")");
-        return buf;
+        return buildPercentileFunction("PERCENTILE_DISC", percentile, desc, tableName, columnName);
     }
 
     @Override
     public StringBuilder generatePercentileCont(double percentile, boolean desc, String tableName, String columnName) {
-        StringBuilder buf = new StringBuilder(64);
-        buf.append("PERCENTILE_CONT(").append(percentile).append(")").append(" WITHIN GROUP (ORDER BY ");
-        if (tableName != null) {
-            quoteIdentifier(buf, tableName, columnName);
-        } else {
-            quoteIdentifier(buf, columnName);
-        }
-        if (desc) {
-            buf.append(" ").append(DESC);
-        }
-        buf.append(")");
-        return buf;
+        return buildPercentileFunction("PERCENTILE_CONT", percentile, desc, tableName, columnName);
     }
 
     @Override
@@ -393,21 +309,7 @@ public class MySqlDialect extends JdbcDialectImpl {
         buf.append(operand);
         if (columns != null && !columns.isEmpty()) {
             buf.append(" ORDER BY ");
-            boolean first = true;
-            for(OrderedColumn c : columns) {
-                if (!first) {
-                    buf.append(", ");
-                }
-                if (c.getTableName() != null) {
-                    quoteIdentifier(buf, c.getTableName(), c.getColumnName());
-                } else {
-                    quoteIdentifier(buf, c.getColumnName());
-                }
-                if (!c.isAscend()) {
-                    buf.append(DESC);
-                }
-                first = false;
-            }
+            buf.append(buildOrderedColumnsClause(columns));
         }
         if (separator != null) {
             buf.append(" SEPARATOR '").append(separator).append("'");
@@ -419,47 +321,12 @@ public class MySqlDialect extends JdbcDialectImpl {
 
     @Override
     public StringBuilder generateNthValueAgg(CharSequence operand, boolean ignoreNulls, Integer n, List<OrderedColumn> columns) {
-        StringBuilder buf = new StringBuilder(64);
-        buf.append("NTH_VALUE");
-        buf.append("( ");
-        buf.append(operand);
-        buf.append(", ");
-        if (n == null || n < 1) {
-            buf.append(1);
-        } else {
-            buf.append(n);
-        }
-        buf.append(" )");
-        buf.append("OVER ( ");
-        if (columns != null && !columns.isEmpty()) {
-            buf.append("ORDER BY ");
-            buf.append(orderedColumns(columns));
-        }
-        buf.append(" )");
-        //NTH_VALUE(employee_name, 2) OVER ( ORDER BY salary DESC )
-        return buf;
+        return buildNthValueFunction("NTH_VALUE", operand, ignoreNulls, n, columns, false);
     }
 
-    private CharSequence orderedColumns(List<OrderedColumn> columns) {
-        StringBuilder buf = new StringBuilder(64);
-        boolean first = true;
-        if (columns != null) {
-            for(OrderedColumn c : columns) {
-                if (!first) {
-                    buf.append(", ");
-                }
-                if (c.getTableName() != null) {
-                    quoteIdentifier(buf, c.getTableName(), c.getColumnName());
-                } else {
-                    quoteIdentifier(buf, c.getColumnName());
-                }
-                if (!c.isAscend()) {
-                    buf.append(DESC);
-                }
-                first = false;
-            }
-        }
-        return buf;
+    @Override
+    public boolean supportsNthValue() {
+        return true;
     }
 
     @Override

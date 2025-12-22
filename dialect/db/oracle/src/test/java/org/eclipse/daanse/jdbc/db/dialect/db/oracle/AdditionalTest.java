@@ -31,7 +31,7 @@ import java.sql.Types;
 import org.eclipse.daanse.jdbc.db.api.meta.DatabaseInfo;
 import org.eclipse.daanse.jdbc.db.api.meta.IdentifierInfo;
 import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
-import org.eclipse.daanse.jdbc.db.dialect.api.BestFitColumnType;
+import org.eclipse.daanse.jdbc.db.dialect.api.type.BestFitColumnType;
 import org.eclipse.daanse.jdbc.db.dialect.api.Dialect;
 import org.eclipse.daanse.jdbc.db.dialect.db.oracle.OracleDialect;
 import org.junit.jupiter.api.Test;

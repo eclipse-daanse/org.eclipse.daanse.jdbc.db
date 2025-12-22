@@ -28,183 +28,35 @@ package org.eclipse.daanse.jdbc.db.dialect.api;
 
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.List;
-import java.util.Map;
+
+import org.eclipse.daanse.jdbc.db.dialect.api.capability.DialectCapabilitiesProvider;
+import org.eclipse.daanse.jdbc.db.dialect.api.generator.AggregationGenerator;
+import org.eclipse.daanse.jdbc.db.dialect.api.generator.IdentifierQuoter;
+import org.eclipse.daanse.jdbc.db.dialect.api.generator.LiteralQuoter;
+import org.eclipse.daanse.jdbc.db.dialect.api.generator.SqlGenerator;
+import org.eclipse.daanse.jdbc.db.dialect.api.type.BestFitColumnType;
+import org.eclipse.daanse.jdbc.db.dialect.api.type.TypeMapper;
 
 /**
  * Helper for generating proper SQL statements in the Dialect of the Database.
+ * <p>
+ * This interface extends several sub-interfaces that group related functionality:
+ * <ul>
+ *   <li>{@link IdentifierQuoter} - Methods for quoting SQL identifiers</li>
+ *   <li>{@link LiteralQuoter} - Methods for quoting SQL literals</li>
+ *   <li>{@link SqlGenerator} - Methods for generating SQL statements</li>
+ *   <li>{@link AggregationGenerator} - Methods for generating aggregate functions</li>
+ *   <li>{@link DialectCapabilitiesProvider} - Methods for querying dialect capabilities</li>
+ *   <li>{@link TypeMapper} - Methods for type mapping</li>
+ * </ul>
+ * <p>
+ * Consumers that only need a subset of functionality can depend on the appropriate
+ * sub-interface instead of the full Dialect interface.
  */
-public interface Dialect {
+public interface Dialect extends IdentifierQuoter, LiteralQuoter, SqlGenerator,
+        AggregationGenerator, DialectCapabilitiesProvider, TypeMapper {
 
-    /**
-     * Warps an {@link CharSequence} expression into an 'to upper case' SQL function
-     * call.
-     * <p>
-     * <p>
-     * "foo.bar" -> "UPPER(foo.bar)"
-     * "foo.bar" -> "UCASE(foo.bar)"
-     *
-     * @param sqlExpression to wrap
-     * @return function wrapped version
-     */
-    StringBuilder wrapIntoSqlUpperCaseFunction(CharSequence sqlExpression);
-
-    /**
-     * Warps an {@link CharSequence} expression into an 'If Then Else' SQL function
-     * call.
-     * <p>
-     * "case when ifValue then thenValue else elseValue end"
-     * ""Iif( ifValue , thenValue, elseValue)
-     *
-     * @param idCondition    {@link CharSequence} with the IF-Condition
-     * @param thenExpression {@link CharSequence} with the Then-Expression
-     * @param elseExpression {@link CharSequence} with the Else-Expression
-     * @return function wrapped version
-     */
-    StringBuilder wrapIntoSqlIfThenElseFunction(CharSequence idCondition, CharSequence thenExpression,
-                                                CharSequence elseExpression);
-
-    /**
-     * Encloses an identifier in quotation marks appropriate for this Dialect.
-     * <p>
-     * <p>
-     * For example, quoteIdentifier("emp") yields a string containing
-     * "emp" in Oracle, and a string containing [emp] in
-     * Access.
-     *
-     * @param val Identifier
-     * @return Quoted identifier
-     */
-    StringBuilder quoteIdentifier(CharSequence val);
-
-    /**
-     * Appends to a buffer an identifier, quoted appropriately for this Dialect.
-     *
-     * @param val identifier to quote (must not be null).
-     * @param buf Buffer
-     */
-    void quoteIdentifier(String val, StringBuilder buf);
-
-    /**
-     * Encloses an identifier in quotation marks appropriate for the current SQL
-     * dialect. For example, in Oracle, where the identifiers are quoted using
-     * double-quotes, quoteIdentifier("schema","table") yields a string
-     * containing "schema"."table".
-     *
-     * @param qual Qualifier. If it is not null, qual. is
-     *             prepended.
-     * @param name Name to be quoted.
-     * @return Quoted identifier
-     */
-    String quoteIdentifier(String qual, String name);
-
-    /**
-     * Appends to a buffer a list of identifiers, quoted appropriately for this
-     * Dialect.
-     * <p>
-     * <p>
-     * Names in the list may be null, but there must be at least one non-null name
-     * in the list.
-     *
-     * @param buf   Buffer
-     * @param names List of names to be quoted
-     */
-    void quoteIdentifier(StringBuilder buf, String... names);
-
-    /**
-     * Returns the character which is used to quote identifiers, or null if quoting
-     * is not supported.
-     *
-     * @return identifier quote
-     */
-    String getQuoteIdentifierString();
-
-    /**
-     * Appends to a buffer a single-quoted SQL string.
-     * <p>
-     * <p>
-     * For example, in the default dialect,
-     * quoteStringLiteral(buf, "Can't") appends "'Can''t'"
-     * to buf.
-     *
-     * @param buf Buffer to append to
-     * @param s   Literal
-     */
-    void quoteStringLiteral(StringBuilder buf, String s);
-
-    /**
-     * Appends to a buffer a numeric literal.
-     * <p>
-     * <p>
-     * In the default dialect, numeric literals are printed as is.
-     *
-     * @param buf   Buffer to append to
-     * @param value Literal
-     */
-    void quoteNumericLiteral(StringBuilder buf, String value);
-
-    /**
-     * Appends to a buffer a boolean literal.
-     * <p>
-     * <p>
-     * In the default dialect, boolean literals are printed as is.
-     *
-     * @param buf   Buffer to append to
-     * @param value Literal
-     */
-    void quoteBooleanLiteral(StringBuilder buf, String value);
-
-    /**
-     * Appends to a buffer a date literal.
-     * <p>
-     * <p>
-     * For example, in the default dialect,
-     * quoteStringLiteral(buf, "1969-03-17") appends
-     * DATE '1969-03-17'.
-     *
-     * @param buf   Buffer to append to
-     * @param value Literal
-     */
-    void quoteDateLiteral(StringBuilder buf, String value);
-
-    /**
-     * Appends to a buffer a time literal.
-     * <p>
-     * <p>
-     * For example, in the default dialect,
-     * quoteStringLiteral(buf, "12:34:56") appends
-     * TIME '12:34:56'.
-     *
-     * @param buf   Buffer to append to
-     * @param value Literal
-     */
-    void quoteTimeLiteral(StringBuilder buf, String value);
-
-    /**
-     * Appends to a buffer a timestamp literal.
-     * <p>
-     * <p>
-     * For example, in the default dialect,
-     * quoteStringLiteral(buf, "1969-03-17 12:34:56") appends
-     * TIMESTAMP '1969-03-17 12:34:56'.
-     *
-     * @param buf   Buffer to append to
-     * @param value Literal
-     */
-    void quoteTimestampLiteral(StringBuilder buf, String value);
-
-    /**
-     * Appends to a buffer a decimal literal.
-     * <p>
-     * <p>
-     * For example, in the default dialect,
-     * quoteDecimalLiteral(buf, "12.58") appends
-     * FLOAT('12.58') for DB2.
-     *
-     * @param value Literal
-     */
-
-    StringBuilder quoteDecimalLiteral(CharSequence value);
+    // ========== Capability methods (not in DialectCapabilitiesProvider) ==========
 
     /**
      * Returns whether this Dialect requires subqueries in the FROM clause to have
@@ -295,31 +147,6 @@ public interface Dialect {
     boolean allowsCountDistinctWithOtherAggs();
 
     /**
-     * Generates a SQL statement to represent an inline dataset.
-     * <p>
-     * <p>
-     * For example, for Oracle, generates
-     * <p>
-     * <p>
-     * SELECT 1 AS FOO, 'a' AS BAR FROM dual
-     * UNION ALL
-     * SELECT 2 AS FOO, 'b' AS BAR FROM dual
-     * <p>
-     * <p>
-     * <p>
-     * For ANSI SQL, generates:
-     * <p>
-     * <p>
-     * VALUES (1, 'a'), (2, 'b')
-     *
-     * @param columnNames List of column names
-     * @param columnTypes List of column types ("String" or "Numeric")
-     * @param valueList   List of rows values
-     * @return SQL string
-     */
-    StringBuilder generateInline(List<String> columnNames, List<String> columnTypes, List<String[]> valueList);
-
-    /**
      * If Double values need to include additional exponent in its string
      * represenation. This is to make sure that Double literals will be interpreted
      * as doubles by LucidDB.
@@ -329,15 +156,6 @@ public interface Dialect {
      * @return whether an additional exponent "E0" needs to be appended
      */
     boolean needsExponent(Object value, String valueString);
-
-    /**
-     * Appends to a buffer a value quoted for its type.
-     *
-     * @param buf      Buffer to append to
-     * @param value    Value
-     * @param datatype Datatype of value
-     */
-    void quote(StringBuilder buf, Object value, Datatype datatype);
 
     /**
      * Returns whether this dialect supports common SQL Data Definition Language
@@ -351,35 +169,6 @@ public interface Dialect {
      * @see java.sql.DatabaseMetaData#isReadOnly()
      */
     boolean allowsDdl();
-
-    /**
-     * Generates an item for an ORDER BY clause, sorting in the required direction,
-     * and ensuring that NULL values collate either before or after all non-NULL
-     * values, depending on the collateNullsLast parameter.
-     *
-     * @param expr             Expression
-     * @param nullable         Whether expression may have NULL values
-     * @param ascending        Whether to sort expression ascending
-     * @param collateNullsLast Whether the null values should be sorted first or
-     *                         last.
-     * @return Expression modified so that NULL values collate last
-     */
-    StringBuilder generateOrderItem(CharSequence expr, boolean nullable, boolean ascending, boolean collateNullsLast);
-
-    /**
-     * Generates an item for an ORDER BY clause, sorting in the required direction,
-     * and ensuring that orderValue values collate either before or after all
-     * values, depending on the collateNullsLast parameter.
-     *
-     * @param expr             Expression
-     * @param orderValue       Order value
-     * @param datatype         Order value data type
-     * @param ascending        Whether to sort expression ascending
-     * @param collateNullsLast Whether the null values should be sorted first or
-     *                         last.
-     * @return Expression modified so that orderValue values collate
-     */
-    StringBuilder generateOrderItemForOrderValue(CharSequence expr, String orderValue, Datatype datatype, boolean ascending, boolean collateNullsLast);
 
     /**
      * Returns whether this Dialect supports expressions in the GROUP BY clause.
@@ -578,17 +367,6 @@ public interface Dialect {
     int getMaxColumnNameLength();
 
     /**
-     * Assembles and returns a string containing any hints that should be appended
-     * after the FROM clause in a SELECT statement, based on any hints provided. Any
-     * unrecognized or unsupported hints will be ignored.
-     *
-     * @param buf   The Stringbuffer to which the dialect-specific syntax for any
-     *              relevant table hints may be appended. Must not be null.
-     * @param hints A map of table hints provided in the schema definition
-     */
-    void appendHintsAfterFromClause(StringBuilder buf, Map<String, String> hints);
-
-    /**
      * Returns whether this Dialect object can be used for all connections from the
      * same data source.
      * <p>
@@ -642,42 +420,6 @@ public interface Dialect {
     boolean allowsRegularExpressionInWhereClause();
 
     /**
-     * Some databases, like Greenplum, don't include nulls as part of the results of
-     * a COUNT sql call. This allows dialects to wrap the count expression in
-     * something before it is used in the query.
-     *
-     * @param exp The expression to wrap.
-     * @return A valid expression to use for a count operation.
-     */
-    StringBuilder generateCountExpression(CharSequence exp);
-
-    /**
-     * Must generate a String representing a regular expression match operation
-     * between a string literal and a Java regular expression. The string literal
-     * might be a column identifier or some other identifier, but the implementation
-     * must presume that it is already escaped and fit for use. The regular
-     * expression is not escaped and must be adapted to the proper dialect rules.
-     * Postgres / Greenplum example:
-     * generateRegularExpression(
-     * "'foodmart'.'customer_name'", "(?i).*oo.*") ->
-     * 'foodmart'.'customer_name' ~ "(?i).*oo.*"
-     * Oracle example:
-     * generateRegularExpression(
-     * "'foodmart'.'customer_name'", ".*oo.*") ->
-     * REGEXP_LIKE('foodmart'.'customer_name', ".*oo.*")
-     * <p>
-     * Dialects are allowed to return null if the dialect cannot convert that
-     * particular regular expression into something that the database would support.
-     *
-     * @param source     A String identifying the column to match against.
-     * @param javaRegExp A Java regular expression to match against.
-     * @return A dialect specific matching operation, or null if the dialect cannot
-     * convert that particular regular expression into something that the
-     * database would support.
-     */
-    StringBuilder generateRegularExpression(String source, String javaRegExp);
-
-    /**
      * Chooses the most appropriate type for accessing the values of a column in a
      * result set for a dialect.
      * <p>
@@ -712,60 +454,27 @@ public interface Dialect {
      */
     boolean allowsInnerDistinct();
 
+    // ========== Dialect-specific methods (not inherited from parent interfaces) ==========
+
+    /**
+     * Returns the name of this dialect.
+     *
+     * @return dialect name
+     */
     String getDialectName();
 
-    String clearTable(String schemaName, String tableName);
-
-    String dropTable(String schemaName, String tableName, boolean ifExists);
-
+    /**
+     * Returns whether this dialect supports parallel data loading.
+     *
+     * @return true if parallel loading is supported
+     */
     boolean supportParallelLoading();
 
+    /**
+     * Returns whether this dialect supports batch operations.
+     *
+     * @return true if batch operations are supported
+     */
     boolean supportBatchOperations();
-
-    String createSchema(String schemaName, boolean ifExists);
-
-    StringBuilder generateUnionAllSql(List<Map<String, Map.Entry<Datatype, Object>>> valueList);
-
-    StringBuilder generateAndBitAggregation(CharSequence operand);
-
-    StringBuilder generateOrBitAggregation(CharSequence operand);
-
-    StringBuilder generateXorBitAggregation(CharSequence operand);
-
-    StringBuilder generateNAndBitAggregation(CharSequence operand);
-
-    StringBuilder generateNOrBitAggregation(CharSequence operand);
-
-    StringBuilder generateNXorBitAggregation(CharSequence operand);
-
-    boolean supportsBitAndAgg();
-
-    boolean supportsBitOrAgg();
-
-    boolean supportsBitXorAgg();
-
-    boolean supportsBitNAndAgg();
-
-    boolean supportsBitNOrAgg();
-
-    boolean supportsBitNXorAgg();
-
-    boolean supportsPercentileContAgg();
-
-    boolean supportsPercentileDiscAgg();
-
-    StringBuilder generatePercentileDisc(double percentile, boolean desc, String tableName, String columnName);
-
-    StringBuilder generatePercentileCont(double percentile, boolean desc, String tableName, String columnName);
-
-    boolean supportsPercentileDisc();
-
-    boolean supportsPercentileCont();
-
-    StringBuilder generateListAgg(CharSequence operand, boolean distinct, String separator, String coalesce, String onOverflowTruncate, List<OrderedColumn> columns);
-
-    StringBuilder generateNthValueAgg(CharSequence operand, boolean ignoreNulls, Integer n, List<OrderedColumn> columns);
-
-    boolean supportsListAgg();
 
 }

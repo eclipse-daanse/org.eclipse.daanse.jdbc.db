@@ -22,7 +22,10 @@
   </parent>
   <artifactId>org.eclipse.daanse.jdbc.db.dialect.db.googlebigquery</artifactId>
   <name>Eclipse Daanse JDBC DB Dialect Google BigQuery</name>
-  <description>Google BigQuery database dialect implementation providing BigQuery-specific SQL generation, query optimization, and cloud analytics database feature handling. Supports BigQuery standard SQL, analytical functions, and big data processing capabilities for OLAP operations.</description>
+  <description>Google BigQuery database dialect implementation providing
+    BigQuery-specific SQL generation, query optimization, and cloud analytics
+    database feature handling. Supports BigQuery standard SQL, analytical
+    functions, and big data processing capabilities for OLAP operations.</description>
   <dependencies>
     <dependency>
       <groupId>org.slf4j</groupId>

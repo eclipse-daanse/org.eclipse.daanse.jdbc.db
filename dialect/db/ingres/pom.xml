@@ -22,7 +22,10 @@
   </parent>
   <artifactId>org.eclipse.daanse.jdbc.db.dialect.db.ingres</artifactId>
   <name>Eclipse Daanse JDBC DB Dialect Ingres</name>
-  <description>Ingres database dialect implementation providing Ingres-specific SQL generation, query optimization, and database feature handling. Supports Ingres database connectivity with proper handling of Ingres-specific data types and SQL syntax variations.</description>
+  <description>Ingres database dialect implementation providing Ingres-specific
+    SQL generation, query optimization, and database feature handling. Supports
+    Ingres database connectivity with proper handling of Ingres-specific data
+    types and SQL syntax variations.</description>
   <dependencies>
     <dependency>
       <groupId>org.slf4j</groupId>

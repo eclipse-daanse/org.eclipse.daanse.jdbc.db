@@ -1,5 +1,5 @@
 #*******************************************************************************
-# Copyright (c)  2004 Contributors to the Eclipse Foundation
+# Copyright (c) 2024 Contributors to the Eclipse Foundation
 #
 # This program and the accompanying materials are made
 # available under the terms of the Eclipse Public License 2.0
@@ -35,7 +35,8 @@
 -runrequires: \
 	bnd.identity;id='${project.artifactId}-tests',\
 	bnd.identity;id=junit-jupiter-engine,\
-	bnd.identity;id=junit-platform-launcher
+	bnd.identity;id=junit-platform-launcher,\
+	bnd.identity;id='org.apache.aries.spifly.dynamic.bundle'
 
 # -runbundles is calculated by the bnd-resolver-maven-plugin
 

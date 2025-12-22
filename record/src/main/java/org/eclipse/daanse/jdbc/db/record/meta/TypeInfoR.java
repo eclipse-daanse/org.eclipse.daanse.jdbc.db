@@ -18,9 +18,9 @@ import java.util.Optional;
 
 import org.eclipse.daanse.jdbc.db.api.meta.TypeInfo;
 
-public record TypeInfoR(String typeName, JDBCType dataType, int percision, Optional<String> literatPrefix,
-        Optional<String> literatSuffix, Optional<String> createPragmas, Nullable nullable, boolean caseSensitive,
-        Searchable searchable, boolean unsignesAttribute, boolean fixedPrecScale, boolean autoIncrement,
+public record TypeInfoR(String typeName, JDBCType dataType, int precision, Optional<String> literalPrefix,
+        Optional<String> literalSuffix, Optional<String> createParams, Nullable nullable, boolean caseSensitive,
+        Searchable searchable, boolean unsignedAttribute, boolean fixedPrecScale, boolean autoIncrement,
         Optional<String> localTypeName, short minimumScale, short maximumScale, int numPrecRadix) implements TypeInfo {
 
 }

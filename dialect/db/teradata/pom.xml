@@ -22,7 +22,10 @@
   </parent>
   <artifactId>org.eclipse.daanse.jdbc.db.dialect.db.teradata</artifactId>
   <name>Eclipse Daanse JDBC DB Dialect Teradata</name>
-  <description>Teradata database dialect implementation providing Teradata-specific SQL generation, query optimization, and enterprise data warehouse feature handling. Supports Teradata massively parallel processing and advanced analytical functions for enterprise OLAP operations.</description>
+  <description>Teradata database dialect implementation providing
+    Teradata-specific SQL generation, query optimization, and enterprise data
+    warehouse feature handling. Supports Teradata massively parallel processing
+    and advanced analytical functions for enterprise OLAP operations.</description>
   <dependencies>
     <dependency>
       <groupId>org.slf4j</groupId>

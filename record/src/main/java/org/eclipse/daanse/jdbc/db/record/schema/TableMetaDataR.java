@@ -19,7 +19,7 @@ import java.util.Optional;
 import org.eclipse.daanse.jdbc.db.api.schema.TableMetaData;
 
 public record TableMetaDataR(Optional<String> remarks, Optional<String> typeCatalog, Optional<String> typeSchema,
-        Optional<String> typeName, Optional<String> selfReferencingColumnName, Optional<String> referencingGenerationa)
+        Optional<String> typeName, Optional<String> selfReferencingColumnName, Optional<String> refGeneration)
         implements TableMetaData {
 
     public TableMetaDataR() {

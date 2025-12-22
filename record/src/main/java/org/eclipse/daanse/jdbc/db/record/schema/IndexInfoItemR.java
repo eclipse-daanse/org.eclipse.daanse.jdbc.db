@@ -13,8 +13,19 @@
 */
 package org.eclipse.daanse.jdbc.db.record.schema;
 
+import java.util.Optional;
+
 import org.eclipse.daanse.jdbc.db.api.meta.IndexInfoItem;
 
-public record IndexInfoItemR(int type, String columnName, int cardinalityColumn, boolean unique) implements IndexInfoItem {
+public record IndexInfoItemR(
+        Optional<String> indexName,
+        IndexType type,
+        Optional<String> columnName,
+        int ordinalPosition,
+        Optional<Boolean> ascending,
+        long cardinality,
+        long pages,
+        Optional<String> filterCondition,
+        boolean unique) implements IndexInfoItem {
 
 }
