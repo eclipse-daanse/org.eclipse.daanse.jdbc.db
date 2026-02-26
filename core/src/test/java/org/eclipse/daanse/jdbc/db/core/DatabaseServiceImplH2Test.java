@@ -41,9 +41,10 @@ import org.eclipse.daanse.jdbc.db.record.schema.SchemaReferenceR;
 import org.eclipse.daanse.jdbc.db.record.schema.TableReferenceR;
 import org.h2.jdbcx.JdbcDataSource;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
 
 class DatabaseServiceImplH2Test {
-
+    private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(DatabaseServiceImplH2Test.class);
     private DatabaseService databaseService = new DatabaseServiceImpl();
 
     private String catalogName = UUID.randomUUID().toString().toUpperCase();
@@ -63,14 +64,14 @@ class DatabaseServiceImplH2Test {
 
         statement.execute(sql);
 
-        System.out.println("Created test table.");
+        LOGGER.debug("Created test table.");
 
         sql = "Insert into test (ID, name, val, birthday, t) values (1, 'name', 13.3, '1973-01-07', '18:20:59')";
 
         int rows = statement.executeUpdate(sql);
 
         if (rows > 0) {
-            System.out.println("Inserted a new row.");
+            LOGGER.debug("Inserted a new row.");
         }
         connection.commit();
     }
