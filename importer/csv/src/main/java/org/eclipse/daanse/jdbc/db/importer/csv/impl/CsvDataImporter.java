@@ -78,14 +78,44 @@ public class CsvDataImporter implements FileSystemWatcherListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CsvDataImporter.class);
 
-    @Reference
-    DataSource dataSource;
+    private DataSource dataSource;
+
+    private DatabaseService databaseService;
+
+    private DialectFactory dialectFactory;
 
     @Reference
-    DatabaseService databaseService;
+    public void setDataSource(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
+
+    public void unsetDataSource(DataSource dataSource) {
+        if (this.dataSource == dataSource) {
+            this.dataSource = null;
+        }
+    }
 
     @Reference
-    DialectFactory dialectFactory;
+    public void setDatabaseService(DatabaseService databaseService) {
+        this.databaseService = databaseService;
+    }
+
+    public void unsetDatabaseService(DatabaseService databaseService) {
+        if (this.databaseService == databaseService) {
+            this.databaseService = null;
+        }
+    }
+
+    @Reference
+    public void setDialectFactory(DialectFactory dialectFactory) {
+        this.dialectFactory = dialectFactory;
+    }
+
+    public void unsetDialectFactory(DialectFactory dialectFactory) {
+        if (this.dialectFactory == dialectFactory) {
+            this.dialectFactory = null;
+        }
+    }
 
     private CsvDataImporterConfig config;
     private Dialect dialect;
