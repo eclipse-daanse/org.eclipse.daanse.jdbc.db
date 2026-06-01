@@ -28,9 +28,12 @@
     <module>common</module>
     <module>test-support</module>
     <module>h2</module>
+    <module>mariadb</module>
+    <module>mssqlserver</module>
     <module>mysql</module>
     <module>oracle</module>
     <module>postgresql</module>
+    <module>sqlite</module>
 <!--
     <module>configurable</module>
 
@@ -50,9 +53,7 @@
     <module>ingres</module>
     <module>interbase</module>
     <module>luciddb</module>
-    <module>mariadb</module>
     <module>monetdb</module>
-    <module>mssqlserver</module>
     <module>neoview</module>
     <module>netezza</module>
     <module>nuodb</module>
@@ -60,7 +61,6 @@
     <module>pdidataservice</module>
     <module>redshift</module>
     <module>snowflake</module>
-    <module>sqlite</module>
     <module>sqlstream</module>
     <module>sybase</module>
     <module>teradata</module>

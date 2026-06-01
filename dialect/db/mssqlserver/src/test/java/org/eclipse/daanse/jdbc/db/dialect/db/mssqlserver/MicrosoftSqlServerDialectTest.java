@@ -23,19 +23,13 @@ package org.eclipse.daanse.jdbc.db.dialect.db.mssqlserver;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.sql.Statement;
 
-import org.eclipse.daanse.jdbc.db.api.meta.DatabaseInfo;
-import org.eclipse.daanse.jdbc.db.api.meta.IdentifierInfo;
-import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.DialectUtil;
-import org.eclipse.daanse.jdbc.db.dialect.db.mssqlserver.MicrosoftSqlServerDialect;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -56,7 +50,8 @@ class MicrosoftSqlServerDialectTest {
     protected void setUp() throws Exception {
         when(connection.getMetaData()).thenReturn(metaData);
         when(metaData.getDatabaseProductName()).thenReturn("MSSQL");
-        dialect = new MicrosoftSqlServerDialect(connection);
+        dialect = new MicrosoftSqlServerDialect(
+                org.eclipse.daanse.jdbc.db.dialect.api.DialectInitData.fromConnection(connection));
         buf = new StringBuilder();
     }
 

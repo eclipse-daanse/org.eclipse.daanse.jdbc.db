@@ -14,10 +14,10 @@
 
 package org.eclipse.daanse.jdbc.db.dialect.db.sqlite;
 
-import java.sql.Connection;
 import java.util.function.Function;
 
 import org.eclipse.daanse.jdbc.db.dialect.api.DialectFactory;
+import org.eclipse.daanse.jdbc.db.dialect.api.DialectInitData;
 import org.eclipse.daanse.jdbc.db.dialect.api.DialectName;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.AbstractDialectFactory;
 import org.osgi.service.component.annotations.Component;
@@ -28,7 +28,7 @@ import org.osgi.service.component.annotations.ServiceScope;
 public class SqliteDialectFactory extends AbstractDialectFactory<SqliteDialect> {
 
     @Override
-    public Function<Connection, SqliteDialect> getConstructorFunction() {
+    public Function<DialectInitData, SqliteDialect> getConstructorFunction() {
         return SqliteDialect::new;
     }
 
