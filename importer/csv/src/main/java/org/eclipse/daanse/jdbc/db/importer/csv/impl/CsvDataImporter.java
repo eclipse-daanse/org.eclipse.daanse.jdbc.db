@@ -84,7 +84,7 @@ public class CsvDataImporter implements FileSystemWatcherListener {
 
     private DialectFactory dialectFactory;
 
-    @Reference
+    @Reference(name = "dataSource")
     public void setDataSource(DataSource dataSource) {
         this.dataSource = dataSource;
     }
@@ -95,7 +95,7 @@ public class CsvDataImporter implements FileSystemWatcherListener {
         }
     }
 
-    @Reference
+    @Reference(name = "databaseService")
     public void setDatabaseService(DatabaseService databaseService) {
         this.databaseService = databaseService;
     }
@@ -106,7 +106,7 @@ public class CsvDataImporter implements FileSystemWatcherListener {
         }
     }
 
-    @Reference
+    @Reference(name = "dialectFactory")
     public void setDialectFactory(DialectFactory dialectFactory) {
         this.dialectFactory = dialectFactory;
     }
