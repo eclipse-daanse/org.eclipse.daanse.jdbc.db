@@ -106,8 +106,9 @@ class AdditionalTest {
         when(resultSet.getColumnType(1)).thenReturn(Types.NUMERIC);
         when(resultSet.getPrecision(1)).thenReturn(0);
         when(resultSet.getScale(1)).thenReturn(-127);
-        assertSame(BestFitColumnType.OBJECT, oracleDialect.getType(resultSet, 0),
+        assertSame(BestFitColumnType.DOUBLE, oracleDialect.getType(resultSet, 0),
                 "Oracle dialect NUMBER type with precision =0 , scale = -127"
-                        + " should map to OBJECT if measure name starts with 'm'");
+                        + " should map to DOUBLE if measure name starts with 'm'"
+                        + " (not INT — data loss; not OBJECT — BigDecimal leaks to the cell layer)");
     }
 }

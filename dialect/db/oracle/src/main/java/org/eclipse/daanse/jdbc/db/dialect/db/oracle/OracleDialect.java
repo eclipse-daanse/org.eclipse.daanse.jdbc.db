@@ -72,6 +72,8 @@ import org.eclipse.daanse.jdbc.db.api.schema.UserDefinedType;
 import org.eclipse.daanse.jdbc.db.api.schema.UserDefinedTypeReference;
 import org.eclipse.daanse.jdbc.db.api.schema.ViewDefinition;
 import org.eclipse.daanse.jdbc.db.dialect.api.generator.BitOperation;
+import org.eclipse.daanse.jdbc.db.dialect.api.generator.KnownFunction;
+import org.eclipse.daanse.jdbc.db.dialect.api.generator.StatementHint;
 import org.eclipse.daanse.jdbc.db.dialect.api.sql.OrderedColumn;
 import org.eclipse.daanse.jdbc.db.dialect.api.type.BestFitColumnType;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.AbstractJdbcDialect;
@@ -360,8 +362,12 @@ public class OracleDialect extends AbstractJdbcDialect {
             // queries. We need integer GROUP BY columns to remain integers,
             // otherwise the segments won't be found; but if we convert
             // measure (whose column names are like "m0", "m1") to integers,
-            // data loss will occur.
-            return BestFitColumnType.OBJECT;
+            // data loss will occur. DOUBLE (not OBJECT) avoids the integer
+            // truncation while keeping measure values on the same double
+            // path every other dialect uses (OBJECT let Oracle BigDecimals
+            // through to the cell layer, where exact half-way decimal sums
+            // format differently than double-summed values).
+            return BestFitColumnType.DOUBLE;
         } else if (scale == -127 && precision == 0) {
             return BestFitColumnType.INT;
         } else if (scale == 0 && (precision == 38 || precision == 0)) {
@@ -388,7 +394,71 @@ public class OracleDialect extends AbstractJdbcDialect {
         return true; // Oracle supports NULLS FIRST/LAST
     }
 
+    /**
+     * Oracle spells statement hints as an optimizer block directly after the {@code SELECT}
+     * keyword: {@code /*+ name(arg1, arg2) name2 *}{@code /} (trailing space). Hints are
+     * joined by a space; a hint without arguments is the bare name. Any {@code *}{@code /}
+     * inside a name or argument is stripped so the block cannot terminate early.
+     */
+    @Override
+    public StringBuilder selectHint(List<StatementHint> hints) {
+        if (hints.isEmpty()) {
+            return new StringBuilder();
+        }
+        StringBuilder sb = new StringBuilder("/*+ ");
+        boolean first = true;
+        for (StatementHint hint : hints) {
+            if (!first) {
+                sb.append(' ');
+            }
+            first = false;
+            sb.append(stripCommentEnd(hint.name()));
+            if (!hint.arguments().isEmpty()) {
+                sb.append('(');
+                for (int i = 0; i < hint.arguments().size(); i++) {
+                    if (i > 0) {
+                        sb.append(", ");
+                    }
+                    sb.append(stripCommentEnd(hint.arguments().get(i)));
+                }
+                sb.append(')');
+            }
+        }
+        return sb.append(" */ ");
+    }
+
+    /** Neutralizes a premature comment terminator inside a hint name/argument. */
+    private static String stripCommentEnd(String s) {
+        return s.replace("*/", "");
+    }
+
     // Unified BitOperation methods
+
+    @Override
+    public StringBuilder generateKnownFunction(KnownFunction function, List<? extends CharSequence> arguments) {
+        return switch (function) {
+        case SUBSTRING -> {
+            if (arguments.size() < 2 || arguments.size() > 3) {
+                throw new IllegalArgumentException("SUBSTRING expects 2..3 argument(s), got " + arguments.size());
+            }
+            StringBuilder sb = new StringBuilder("SUBSTR(").append(arguments.get(0)).append(", ")
+                    .append(arguments.get(1));
+            if (arguments.size() == 3) {
+                sb.append(", ").append(arguments.get(2));
+            }
+            yield sb.append(")");
+        }
+        case INDEX_OF -> {
+            if (arguments.size() != 2) {
+                throw new IllegalArgumentException("INDEX_OF expects 2 argument(s), got " + arguments.size());
+            }
+            // Oracle INSTR takes (haystack, needle) - swapped vs INDEX_OF(needle, haystack).
+            yield new StringBuilder("INSTR(").append(arguments.get(1)).append(", ").append(arguments.get(0))
+                    .append(")");
+        }
+        default -> super.generateKnownFunction(function, arguments);
+        };
+    }
 
     @Override
     public java.util.Optional<String> generateBitAggregation(BitOperation operation, CharSequence operand) {

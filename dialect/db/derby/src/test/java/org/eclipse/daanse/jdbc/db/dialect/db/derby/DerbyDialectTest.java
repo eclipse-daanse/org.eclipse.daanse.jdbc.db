@@ -36,12 +36,12 @@ class DerbyDialectTest {
         when(connection.getMetaData()).thenReturn(metaData);
         when(metaData.getDatabaseProductName()).thenReturn("Apache Derby");
         when(metaData.getDatabaseProductVersion()).thenReturn("10.15.2.0");
-        dialect = new DerbyDialect(connection);
+        dialect = new DerbyDialect(org.eclipse.daanse.jdbc.db.dialect.api.DialectInitData.fromConnection(connection));
     }
 
     @Test
     void testGetDialectName() {
-        assertEquals("derby", dialect.getDialectName());
+        assertEquals("derby", dialect.name());
     }
 
     @Test
@@ -61,7 +61,8 @@ class DerbyDialectTest {
 
     @Test
     void testAllowsFieldAs() {
-        assertFalse(dialect.allowsFieldAs());
+        // Derby supports (quoted) select-list aliases, including ones with spaces.
+        assertTrue(dialect.allowsFieldAlias());
     }
 
     @Test

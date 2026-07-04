@@ -18,23 +18,39 @@
  */
 package org.eclipse.daanse.jdbc.db.dialect.db.clickhouse;
 
-import java.sql.Connection;
 import java.util.List;
 
 import org.eclipse.daanse.jdbc.db.dialect.api.generator.BitOperation;
-import org.eclipse.daanse.jdbc.db.dialect.api.Dialect;
-import org.eclipse.daanse.jdbc.db.dialect.api.order.OrderedColumn;
-import org.eclipse.daanse.jdbc.db.dialect.db.common.JdbcDialectImpl;
+import org.eclipse.daanse.jdbc.db.dialect.api.sql.OrderedColumn;
+import org.eclipse.daanse.jdbc.db.dialect.db.common.AbstractJdbcDialect;
 
-/**
- * Implementation of {@link Dialect} for ClickHouse
- */
-public class ClickHouseDialect extends JdbcDialectImpl {
+public class ClickHouseDialect extends AbstractJdbcDialect {
 
     private static final String SUPPORTED_PRODUCT_NAME = "CLICKHOUSE";
 
-    public ClickHouseDialect(Connection connection) {
-        super(connection);
+    /** JDBC-free constructor for SQL generation. */
+    public ClickHouseDialect() {
+        super(org.eclipse.daanse.jdbc.db.dialect.api.DialectInitData.ansiDefaults());
+    }
+
+    /** Construct from a captured snapshot — the canonical entry point. */
+    public ClickHouseDialect(org.eclipse.daanse.jdbc.db.dialect.api.DialectInitData init) {
+        super(init);
+    }
+
+    @Override
+    public boolean supportsSequences() {
+        return false;
+    }
+
+    @Override
+    public boolean supportsDropConstraintIfExists() {
+        return false;
+    }
+
+    @Override
+    public boolean supportsCreateOrReplaceView() {
+        return false;
     }
 
     @Override
@@ -42,10 +58,19 @@ public class ClickHouseDialect extends JdbcDialectImpl {
         return true;
     }
 
+    /**
+     * ClickHouse rejects a bare {@code UNION} when the server-side
+     * {@code union_default_mode} setting is empty (the default):
+     * {@code Code: 558 DB::Exception: Expected ALL or DISTINCT in SelectWithUnion
+     * query}. Spell the duplicate-eliminating union explicitly.
+     */
     @Override
-    public void quoteStringLiteral(
-        StringBuilder buf,
-        String s) {
+    public String unionDistinctKeyword() {
+        return "union distinct";
+    }
+
+    @Override
+    public void quoteStringLiteral(StringBuilder buf, String s) {
         buf.append('\'');
 
         String s0 = s.replace("\\", "\\\\");
@@ -56,23 +81,24 @@ public class ClickHouseDialect extends JdbcDialectImpl {
     }
 
     @Override
-    public String getDialectName() {
+    public String name() {
         return SUPPORTED_PRODUCT_NAME.toLowerCase();
     }
 
     // Unified BitOperation methods
 
     @Override
-    public StringBuilder generateBitAggregation(BitOperation operation, CharSequence operand) {
+    public java.util.Optional<String> generateBitAggregation(BitOperation operation, CharSequence operand) {
         StringBuilder buf = new StringBuilder(64);
-        return switch (operation) {
-            case AND -> buf.append("groupBitAnd(").append(operand).append(")");
-            case OR -> buf.append("groupBitOr(").append(operand).append(")");
-            case XOR -> buf.append("groupBitXor(").append(operand).append(")");
-            case NAND -> buf.append("NOT(groupBitAnd(").append(operand).append("))");
-            case NOR -> buf.append("NOT(groupBitOr(").append(operand).append("))");
-            case NXOR -> buf.append("NOT(groupBitXor(").append(operand).append("))");
+        StringBuilder result = switch (operation) {
+        case AND -> buf.append("groupBitAnd(").append(operand).append(")");
+        case OR -> buf.append("groupBitOr(").append(operand).append(")");
+        case XOR -> buf.append("groupBitXor(").append(operand).append(")");
+        case NAND -> buf.append("NOT(groupBitAnd(").append(operand).append("))");
+        case NOR -> buf.append("NOT(groupBitOr(").append(operand).append("))");
+        case NXOR -> buf.append("NOT(groupBitXor(").append(operand).append("))");
         };
+        return java.util.Optional.of(result.toString());
     }
 
     @Override
@@ -81,19 +107,22 @@ public class ClickHouseDialect extends JdbcDialectImpl {
     }
 
     @Override
-    public StringBuilder generateListAgg(CharSequence operand, boolean distinct, String separator, String coalesce, String onOverflowTruncate, List<OrderedColumn> columns) {
+    public java.util.Optional<String> generateListAgg(CharSequence operand, boolean distinct, String separator,
+            String coalesce, String onOverflowTruncate, List<OrderedColumn> columns) {
         StringBuilder buf = new StringBuilder(64);
         buf.append("groupArrayArray");
         buf.append("( ");
         buf.append(operand);
         buf.append(")");
-        //groupArrayArray(page_visits)
-        return buf;
+        // groupArrayArray(page_visits)
+        return java.util.Optional.of((buf).toString());
     }
 
     @Override
-    public StringBuilder generateNthValueAgg(CharSequence operand, boolean ignoreNulls, Integer n, List<OrderedColumn> columns) {
-        return buildNthValueFunction("nth_value", operand, ignoreNulls, n, columns, false);
+    public java.util.Optional<String> generateNthValueAgg(CharSequence operand, boolean ignoreNulls, Integer n,
+            List<OrderedColumn> columns) {
+        return java.util.Optional
+                .of((buildNthValueFunction("nth_value", operand, ignoreNulls, n, columns, false)).toString());
     }
 
     @Override

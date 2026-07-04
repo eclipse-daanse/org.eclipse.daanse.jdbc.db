@@ -32,8 +32,8 @@ class ConfigurableDialectTest {
             ConfigurableDialect dialect = ConfigurableDialect.builder().build();
 
             assertThat(dialect.getQuoteIdentifierString()).isEqualTo("\"");
-            assertThat(dialect.getDialectName()).isEqualTo("configurable");
-            assertThat(dialect.allowsAs()).isTrue();
+            assertThat(dialect.name()).isEqualTo("configurable");
+            assertThat(dialect.allowsFromAlias()).isTrue();
             assertThat(dialect.allowsFromQuery()).isTrue();
             assertThat(dialect.allowsJoinOn()).isTrue();
             assertThat(dialect.allowsCountDistinct()).isTrue();
@@ -52,25 +52,25 @@ class ConfigurableDialectTest {
         void testBuilder_CustomDialectName() {
             ConfigurableDialect dialect = ConfigurableDialect.builder().dialectName("custom-db").build();
 
-            assertThat(dialect.getDialectName()).isEqualTo("custom-db");
+            assertThat(dialect.name()).isEqualTo("custom-db");
         }
 
         @Test
         void testBuilder_MySqlStyle() {
             ConfigurableDialect dialect = ConfigurableDialect.builder().quoteIdentifierString("`").dialectName("mysql")
-                    .allowsAs(true).supportsGroupingSets(false).build();
+                    .allowsFromAlias(true).supportsGroupingSets(false).build();
 
             assertThat(dialect.getQuoteIdentifierString()).isEqualTo("`");
-            assertThat(dialect.getDialectName()).isEqualTo("mysql");
+            assertThat(dialect.name()).isEqualTo("mysql");
         }
 
         @Test
         void testBuilder_SqlServerStyle() {
             ConfigurableDialect dialect = ConfigurableDialect.builder().quoteIdentifierString("[")
-                    .dialectName("sqlserver").allowsAs(true).build();
+                    .dialectName("sqlserver").allowsFromAlias(true).build();
 
             assertThat(dialect.getQuoteIdentifierString()).isEqualTo("[");
-            assertThat(dialect.getDialectName()).isEqualTo("sqlserver");
+            assertThat(dialect.name()).isEqualTo("sqlserver");
         }
     }
 
@@ -82,18 +82,18 @@ class ConfigurableDialectTest {
         void testQuoteIdentifier_SingleName() {
             ConfigurableDialect dialect = ConfigurableDialect.builder().build();
 
-            StringBuilder result = dialect.quoteIdentifier("columnName");
+            String result = dialect.quoteIdentifier("columnName");
 
-            assertThat(result.toString()).isEqualTo("\"columnName\"");
+            assertThat(result).isEqualTo("\"columnName\"");
         }
 
         @Test
         void testQuoteIdentifier_SingleName_Backticks() {
             ConfigurableDialect dialect = ConfigurableDialect.builder().quoteIdentifierString("`").build();
 
-            StringBuilder result = dialect.quoteIdentifier("columnName");
+            String result = dialect.quoteIdentifier("columnName");
 
-            assertThat(result.toString()).isEqualTo("`columnName`");
+            assertThat(result).isEqualTo("`columnName`");
         }
 
         @Test
@@ -240,7 +240,7 @@ class ConfigurableDialectTest {
         void testWrapIntoSqlUpperCaseFunction() {
             ConfigurableDialect dialect = ConfigurableDialect.builder().build();
 
-            StringBuilder result = dialect.wrapIntoSqlUpperCaseFunction("column1");
+            StringBuilder result = dialect.functionGenerator().wrapIntoSqlUpperCaseFunction("column1");
 
             assertThat(result.toString()).isEqualTo("UPPER(column1)");
         }
@@ -249,7 +249,8 @@ class ConfigurableDialectTest {
         void testWrapIntoSqlIfThenElseFunction() {
             ConfigurableDialect dialect = ConfigurableDialect.builder().build();
 
-            StringBuilder result = dialect.wrapIntoSqlIfThenElseFunction("cond", "then_val", "else_val");
+            StringBuilder result = dialect.functionGenerator().wrapIntoSqlIfThenElseFunction("cond", "then_val",
+                    "else_val");
 
             assertThat(result.toString()).isEqualTo("CASE WHEN cond THEN then_val ELSE else_val END");
         }
@@ -263,7 +264,7 @@ class ConfigurableDialectTest {
         void testClearTable() {
             ConfigurableDialect dialect = ConfigurableDialect.builder().build();
 
-            String result = dialect.clearTable("schema", "table");
+            String result = dialect.ddlGenerator().clearTable("schema", "table");
 
             assertThat(result).isEqualTo("TRUNCATE TABLE \"schema\".\"table\"");
         }
@@ -272,7 +273,7 @@ class ConfigurableDialectTest {
         void testDropTable() {
             ConfigurableDialect dialect = ConfigurableDialect.builder().build();
 
-            String result = dialect.dropTable("schema", "table", false);
+            String result = dialect.ddlGenerator().dropTable("schema", "table", false);
 
             assertThat(result).isEqualTo("DROP TABLE \"schema\".\"table\"");
         }
@@ -281,7 +282,7 @@ class ConfigurableDialectTest {
         void testDropTable_IfExists() {
             ConfigurableDialect dialect = ConfigurableDialect.builder().build();
 
-            String result = dialect.dropTable("schema", "table", true);
+            String result = dialect.ddlGenerator().dropTable("schema", "table", true);
 
             assertThat(result).isEqualTo("DROP TABLE IF EXISTS \"schema\".\"table\"");
         }
@@ -290,7 +291,7 @@ class ConfigurableDialectTest {
         void testCreateSchema() {
             ConfigurableDialect dialect = ConfigurableDialect.builder().build();
 
-            String result = dialect.createSchema("myschema", false);
+            String result = dialect.ddlGenerator().createSchema("myschema", false);
 
             assertThat(result).isEqualTo("CREATE SCHEMA \"myschema\"");
         }
@@ -299,7 +300,7 @@ class ConfigurableDialectTest {
         void testCreateSchema_IfNotExists() {
             ConfigurableDialect dialect = ConfigurableDialect.builder().build();
 
-            String result = dialect.createSchema("myschema", true);
+            String result = dialect.ddlGenerator().createSchema("myschema", true);
 
             assertThat(result).isEqualTo("CREATE SCHEMA IF NOT EXISTS \"myschema\"");
         }
@@ -311,11 +312,11 @@ class ConfigurableDialectTest {
 
         @Test
         void testFeatureFlags() {
-            ConfigurableDialect dialect = ConfigurableDialect.builder().allowsAs(false).allowsFromQuery(false)
+            ConfigurableDialect dialect = ConfigurableDialect.builder().allowsFromAlias(false).allowsFromQuery(false)
                     .requiresAliasForFromQuery(true).allowsJoinOn(false).supportsGroupingSets(true)
                     .requiresGroupByAlias(true).maxColumnNameLength(64).build();
 
-            assertThat(dialect.allowsAs()).isFalse();
+            assertThat(dialect.allowsFromAlias()).isFalse();
             assertThat(dialect.allowsFromQuery()).isFalse();
             assertThat(dialect.requiresAliasForFromQuery()).isTrue();
             assertThat(dialect.allowsJoinOn()).isFalse();
@@ -334,11 +335,9 @@ class ConfigurableDialectTest {
             ConfigurableDialect dialect = ConfigurableDialect.builder().supportsBitAndAgg(false).supportsBitOrAgg(false)
                     .build();
 
-            assertThatThrownBy(() -> dialect.generateBitAggregation(BitOperation.AND, "col"))
-                    .isInstanceOf(UnsupportedOperationException.class);
+            assertThat(dialect.aggregationGenerator().generateBitAggregation(BitOperation.AND, "col")).isEmpty();
 
-            assertThatThrownBy(() -> dialect.generateBitAggregation(BitOperation.OR, "col"))
-                    .isInstanceOf(UnsupportedOperationException.class);
+            assertThat(dialect.aggregationGenerator().generateBitAggregation(BitOperation.OR, "col")).isEmpty();
         }
 
         @Test
@@ -346,11 +345,14 @@ class ConfigurableDialectTest {
             ConfigurableDialect dialect = ConfigurableDialect.builder().supportsBitAndAgg(true).supportsBitOrAgg(true)
                     .supportsBitXorAgg(true).build();
 
-            assertThat(dialect.generateBitAggregation(BitOperation.AND, "col").toString()).isEqualTo("BIT_AND(col)");
+            assertThat(dialect.aggregationGenerator().generateBitAggregation(BitOperation.AND, "col").orElseThrow())
+                    .isEqualTo("BIT_AND(col)");
 
-            assertThat(dialect.generateBitAggregation(BitOperation.OR, "col").toString()).isEqualTo("BIT_OR(col)");
+            assertThat(dialect.aggregationGenerator().generateBitAggregation(BitOperation.OR, "col").orElseThrow())
+                    .isEqualTo("BIT_OR(col)");
 
-            assertThat(dialect.generateBitAggregation(BitOperation.XOR, "col").toString()).isEqualTo("BIT_XOR(col)");
+            assertThat(dialect.aggregationGenerator().generateBitAggregation(BitOperation.XOR, "col").orElseThrow())
+                    .isEqualTo("BIT_XOR(col)");
         }
 
         @Test
@@ -358,10 +360,10 @@ class ConfigurableDialectTest {
             ConfigurableDialect dialect = ConfigurableDialect.builder().supportsPercentileCont(false)
                     .supportsPercentileDisc(false).build();
 
-            assertThatThrownBy(() -> dialect.generatePercentileCont(0.5, false, null, "col"))
+            assertThatThrownBy(() -> dialect.aggregationGenerator().generatePercentileCont(0.5, false, null, "col"))
                     .isInstanceOf(UnsupportedOperationException.class);
 
-            assertThatThrownBy(() -> dialect.generatePercentileDisc(0.5, false, null, "col"))
+            assertThatThrownBy(() -> dialect.aggregationGenerator().generatePercentileDisc(0.5, false, null, "col"))
                     .isInstanceOf(UnsupportedOperationException.class);
         }
 
@@ -370,12 +372,14 @@ class ConfigurableDialectTest {
             ConfigurableDialect dialect = ConfigurableDialect.builder().supportsPercentileCont(true)
                     .supportsPercentileDisc(true).build();
 
-            String contResult = dialect.generatePercentileCont(0.5, false, null, "col").toString();
+            String contResult = dialect.aggregationGenerator().generatePercentileCont(0.5, false, null, "col")
+                    .orElseThrow();
             assertThat(contResult).contains("PERCENTILE_CONT(0.5)");
             assertThat(contResult).contains("ORDER BY");
             assertThat(contResult).contains("\"col\"");
 
-            String discResult = dialect.generatePercentileDisc(0.5, true, "tbl", "col").toString();
+            String discResult = dialect.aggregationGenerator().generatePercentileDisc(0.5, true, "tbl", "col")
+                    .orElseThrow();
             assertThat(discResult).contains("PERCENTILE_DISC(0.5)");
             assertThat(discResult).contains("DESC");
         }
@@ -384,7 +388,8 @@ class ConfigurableDialectTest {
         void testListAgg_NotSupported() {
             ConfigurableDialect dialect = ConfigurableDialect.builder().supportsListAgg(false).build();
 
-            assertThatThrownBy(() -> dialect.generateListAgg("col", false, ",", null, null, null))
+            assertThatThrownBy(
+                    () -> dialect.aggregationGenerator().generateListAgg("col", false, ",", null, null, null))
                     .isInstanceOf(UnsupportedOperationException.class);
         }
 
@@ -392,7 +397,8 @@ class ConfigurableDialectTest {
         void testListAgg_Supported() {
             ConfigurableDialect dialect = ConfigurableDialect.builder().supportsListAgg(true).build();
 
-            String result = dialect.generateListAgg("col", true, ";", null, null, null).toString();
+            String result = dialect.aggregationGenerator().generateListAgg("col", true, ";", null, null, null)
+                    .orElseThrow();
             assertThat(result).contains("LISTAGG(");
             assertThat(result).contains("DISTINCT");
             assertThat(result).contains("';'");

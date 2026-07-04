@@ -13,26 +13,14 @@
  */
 package org.eclipse.daanse.jdbc.db.dialect.db.configurable;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-
 import org.eclipse.daanse.jdbc.db.dialect.api.Dialect;
 import org.eclipse.daanse.jdbc.db.dialect.api.DialectFactory;
+import org.eclipse.daanse.jdbc.db.dialect.api.DialectInitData;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.metatype.annotations.Designate;
 
-/**
- * OSGi component factory for creating {@link ConfigurableDialect} instances.
- * <p>
- * This factory is registered as a {@link DialectFactory} service and creates
- * dialect instances based on OSGi configuration. The dialect can be configured
- * via Configuration Admin using the {@link ConfigurableDialectConfig} metatype.
- * <p>
- * Unlike other dialect factories, this one creates dialects purely from
- * configuration without requiring database metadata from a JDBC connection.
- */
 @Component(service = DialectFactory.class, configurationPid = Constants.PID_DIALECT)
 @Designate(ocd = ConfigurableDialectConfig.class, factory = true)
 public class ConfigurableDialectFactory implements DialectFactory {
@@ -52,26 +40,12 @@ public class ConfigurableDialectFactory implements DialectFactory {
         this.dialect = new ConfigurableDialect(config);
     }
 
-    /**
-     * Creates a dialect based on the current configuration.
-     * <p>
-     * Note: The connection parameter is ignored since ConfigurableDialect is
-     * entirely configuration-driven and does not require database metadata.
-     *
-     * @param connection the JDBC connection (ignored)
-     * @return the configured dialect
-     */
     @Override
-    public Dialect createDialect(Connection connection) throws SQLException {
+    public Dialect createDialect(DialectInitData init) {
         return dialect;
     }
 
     /**
-     * Returns the dialect created from the current configuration.
-     * <p>
-     * This is a convenience method for programmatic access to the dialect without
-     * needing a JDBC connection.
-     *
      * @return the configured dialect
      */
     public Dialect getDialect() {
@@ -79,8 +53,6 @@ public class ConfigurableDialectFactory implements DialectFactory {
     }
 
     /**
-     * Returns the current configuration.
-     *
      * @return the configuration
      */
     public ConfigurableDialectConfig getConfig() {

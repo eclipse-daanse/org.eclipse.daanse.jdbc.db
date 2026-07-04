@@ -69,6 +69,8 @@ import org.eclipse.daanse.jdbc.db.api.schema.UniqueConstraint;
 import org.eclipse.daanse.jdbc.db.api.schema.UserDefinedType;
 import org.eclipse.daanse.jdbc.db.api.schema.UserDefinedTypeReference;
 import org.eclipse.daanse.jdbc.db.api.schema.ViewDefinition;
+import org.eclipse.daanse.jdbc.db.dialect.api.generator.KnownFunction;
+import org.eclipse.daanse.jdbc.db.dialect.api.generator.StatementHint;
 import org.eclipse.daanse.jdbc.db.dialect.api.sql.OrderedColumn;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.AbstractJdbcDialect;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.DialectUtil;
@@ -112,6 +114,31 @@ public class MicrosoftSqlServerDialect extends AbstractJdbcDialect {
     /** Construct from a captured snapshot — the canonical entry point. */
     public MicrosoftSqlServerDialect(org.eclipse.daanse.jdbc.db.dialect.api.DialectInitData init) {
         super(init);
+    }
+
+    @Override
+    public org.eclipse.daanse.jdbc.db.dialect.api.generator.PaginationGenerator paginationGenerator() {
+        return new org.eclipse.daanse.jdbc.db.dialect.api.generator.PaginationGenerator() {
+            @Override
+            public java.util.Optional<String> selectPrefix(java.util.OptionalLong limit, java.util.OptionalLong offset) {
+                // SQL Server expresses a pure row cap as a leading "TOP n". When an offset is
+                // present it uses the trailing OFFSET/FETCH form instead (see paginate).
+                if (limit.isPresent() && offset.isEmpty()) {
+                    return java.util.Optional.of("TOP " + limit.getAsLong());
+                }
+                return java.util.Optional.empty();
+            }
+
+            @Override
+            public String paginate(java.util.OptionalLong limit, java.util.OptionalLong offset) {
+                // No offset → the cap is emitted as a leading TOP (selectPrefix), so nothing
+                // trailing. With an offset, fall back to ANSI OFFSET/FETCH (SQL Server 2012+).
+                return offset.isEmpty()
+                        ? ""
+                        : org.eclipse.daanse.jdbc.db.dialect.api.generator.PaginationGenerator.super.paginate(limit,
+                                offset);
+            }
+        };
     }
 
     @Override
@@ -342,6 +369,82 @@ public class MicrosoftSqlServerDialect extends AbstractJdbcDialect {
     @Override
     public org.eclipse.daanse.jdbc.db.dialect.api.IdentifierCaseFolding caseFolding() {
         return org.eclipse.daanse.jdbc.db.dialect.api.IdentifierCaseFolding.PRESERVE;
+    }
+
+    /**
+     * T-SQL spells statement hints as a trailing query-option clause:
+     * {@code OPTION (RECOMPILE, MAXDOP 2)} (leading space) — per hint the name followed by
+     * its arguments separated by spaces ({@code name args...}), hints separated by commas.
+     */
+    @Override
+    public StringBuilder statementOption(List<StatementHint> hints) {
+        if (hints.isEmpty()) {
+            return new StringBuilder();
+        }
+        StringBuilder sb = new StringBuilder(" OPTION (");
+        boolean first = true;
+        for (StatementHint hint : hints) {
+            if (!first) {
+                sb.append(", ");
+            }
+            first = false;
+            sb.append(hint.name());
+            for (String argument : hint.arguments()) {
+                sb.append(' ').append(argument);
+            }
+        }
+        return sb.append(")");
+    }
+
+    @Override
+    public StringBuilder generateKnownFunction(KnownFunction function, List<? extends CharSequence> arguments) {
+        return switch (function) {
+        case LENGTH -> {
+            if (arguments.size() != 1) {
+                throw new IllegalArgumentException("LENGTH expects 1 argument(s), got " + arguments.size());
+            }
+            yield new StringBuilder("LEN(").append(arguments.get(0)).append(")");
+        }
+        case CONCAT -> {
+            // T-SQL + concatenates but coerces/NULL-propagates awkwardly; CONCAT is the idiom.
+            if (arguments.size() < 2) {
+                throw new IllegalArgumentException("CONCAT expects 2 or more argument(s), got " + arguments.size());
+            }
+            StringBuilder sb = new StringBuilder("CONCAT(");
+            for (int i = 0; i < arguments.size(); i++) {
+                if (i > 0) {
+                    sb.append(", ");
+                }
+                sb.append(arguments.get(i));
+            }
+            yield sb.append(")");
+        }
+        case INDEX_OF -> {
+            if (arguments.size() != 2) {
+                throw new IllegalArgumentException("INDEX_OF expects 2 argument(s), got " + arguments.size());
+            }
+            yield new StringBuilder("CHARINDEX(").append(arguments.get(0)).append(", ").append(arguments.get(1))
+                    .append(")");
+        }
+        case YEAR, MONTH, DAY, HOUR, MINUTE, SECOND -> {
+            if (arguments.size() != 1) {
+                throw new IllegalArgumentException(
+                        function.name() + " expects 1 argument(s), got " + arguments.size());
+            }
+            // T-SQL has no EXTRACT; DATEPART covers the whole family.
+            yield new StringBuilder("DATEPART(").append(function.name().toLowerCase(java.util.Locale.ROOT))
+                    .append(", ").append(arguments.get(0)).append(")");
+        }
+        case NOW -> {
+            if (!arguments.isEmpty()) {
+                throw new IllegalArgumentException("NOW expects 0 argument(s), got " + arguments.size());
+            }
+            // GETDATE() (datetime) chosen over SYSDATETIME() (datetime2): it is the
+            // ubiquitous T-SQL spelling and its precision suffices for NOW's intent.
+            yield new StringBuilder("GETDATE()");
+        }
+        default -> super.generateKnownFunction(function, arguments);
+        };
     }
 
     @Override

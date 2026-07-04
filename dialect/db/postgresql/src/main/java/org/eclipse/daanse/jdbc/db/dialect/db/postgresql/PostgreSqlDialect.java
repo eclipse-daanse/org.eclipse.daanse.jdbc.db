@@ -341,10 +341,13 @@ public class PostgreSqlDialect extends AbstractJdbcDialect {
         // cases.
         // The "m" prefix check identifies measure columns in aggregation queries.
         if (columnType == Types.NUMERIC && scale == 0 && precision == 0 && columnName.startsWith("m")) {
-            // In Greenplum, NUMBER/NUMERIC with no precision or scale means floating point.
-            // Using OBJECT is safer than DOUBLE to avoid potential precision issues.
-            logTypeInfo(metaData, columnIndex, BestFitColumnType.OBJECT);
-            return BestFitColumnType.OBJECT;
+            // In Greenplum/PostgreSQL, NUMERIC with no precision or scale means floating point.
+            // DOUBLE (not OBJECT): the historical data-loss concern was INT truncation of measure
+            // values; OBJECT let PostgreSQL BigDecimals through to the cell layer, where exact
+            // half-way decimal sums format differently than the double-summed values every other
+            // dialect produces (mondrian's GreenplumDialect used DOUBLE here as well).
+            logTypeInfo(metaData, columnIndex, BestFitColumnType.DOUBLE);
+            return BestFitColumnType.DOUBLE;
         }
         return super.getType(metaData, columnIndex);
     }

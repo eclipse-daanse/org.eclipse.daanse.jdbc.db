@@ -18,26 +18,89 @@
  */
 package org.eclipse.daanse.jdbc.db.dialect.db.derby;
 
-import java.sql.Connection;
 import java.sql.Date;
 import java.util.List;
 
-import org.eclipse.daanse.jdbc.db.dialect.api.Dialect;
-import org.eclipse.daanse.jdbc.db.dialect.db.common.JdbcDialectImpl;
+import org.eclipse.daanse.jdbc.db.dialect.db.common.AbstractJdbcDialect;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.DialectUtil;
 
 /**
- * Implementation of {@link Dialect} for the Apache Derby database.
- *
  * @author jhyde
  * @since Nov 23, 2008
  */
-public class DerbyDialect extends JdbcDialectImpl {
+public class DerbyDialect extends AbstractJdbcDialect {
 
     private static final String SUPPORTED_PRODUCT_NAME = "DERBY";
 
-    public DerbyDialect(Connection connection) {
-        super(connection);
+    /** JDBC-free constructor for SQL generation. */
+    public DerbyDialect() {
+        super(org.eclipse.daanse.jdbc.db.dialect.api.DialectInitData.ansiDefaults());
+    }
+
+    /** Construct from a captured snapshot — the canonical entry point. */
+    public DerbyDialect(org.eclipse.daanse.jdbc.db.dialect.api.DialectInitData init) {
+        super(init);
+    }
+
+    /** Derby has no {@code IF NOT EXISTS} on any DDL. */
+    @Override
+    public boolean supportsCreateTableIfNotExists() {
+        return false;
+    }
+
+    @Override
+    public boolean supportsCreateIndexIfNotExists() {
+        return false;
+    }
+
+    @Override
+    public boolean supportsDropIndexIfExists() {
+        return false;
+    }
+
+    @Override
+    public boolean supportsCreateOrReplaceView() {
+        return false;
+    }
+
+    @Override
+    public boolean supportsDropViewIfExists() {
+        return false;
+    }
+
+    @Override
+    public boolean supportsDropConstraintIfExists() {
+        return false;
+    }
+
+    @Override
+    public boolean supportsDropSchemaIfExists() {
+        return false;
+    }
+
+    /** Derby's {@code DROP TABLE} doesn't accept {@code CASCADE}. */
+    @Override
+    public boolean supportsDropTableCascade() {
+        return false;
+    }
+
+    @Override
+    public boolean supportsDropTableIfExists() {
+        return false;
+    }
+
+    /** Derby has no {@code IF NOT EXISTS} on {@code CREATE SCHEMA} — strip it. */
+    @Override
+    public String createSchema(String schemaName, boolean ifNotExists) {
+        return "CREATE SCHEMA " + quoteIdentifier(schemaName);
+    }
+
+    /**
+     * Derby requires the SQL-92 {@code RESTRICT} keyword on {@code DROP SCHEMA}.
+     */
+    @Override
+    public boolean requiresDropSchemaRestrict() {
+        return true;
     }
 
     @Override
@@ -70,12 +133,16 @@ public class DerbyDialect extends JdbcDialectImpl {
     }
 
     @Override
-    public boolean allowsFieldAs() {
-        return false;
+    public boolean allowsFieldAlias() {
+        // Derby fully supports (quoted) field aliases — `select x as "Store Sqft"` executes
+        // fine (the false setting was inherited for DB2/AS400-style dialects and made the
+        // engine drop select-list aliases, so drill-through result labels degraded to the
+        // physical column names and per-dialect SQL asserts diverged).
+        return true;
     }
 
     @Override
-    public String getDialectName() {
+    public String name() {
         return SUPPORTED_PRODUCT_NAME.toLowerCase();
     }
 }
