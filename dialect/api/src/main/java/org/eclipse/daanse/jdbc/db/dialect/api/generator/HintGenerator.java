@@ -9,6 +9,7 @@
  */
 package org.eclipse.daanse.jdbc.db.dialect.api.generator;
 
+import java.util.List;
 import java.util.Map;
 
 public interface HintGenerator {
@@ -19,5 +20,30 @@ public interface HintGenerator {
      */
     default void appendHintsAfterFromClause(StringBuilder buf, Map<String, String> hints) {
         // dialect-specific; default no-op
+    }
+
+    /**
+     * The optimizer-hint block placed directly after the {@code SELECT} keyword
+     * (Oracle/MySQL {@code /*+ ... *}{@code /} style), including a trailing space when
+     * non-empty.
+     *
+     * @param hints the statement-level hint intents
+     * @return the hint block, or an empty builder when this dialect has no such block
+     *         (the default: the hints are silently ignored)
+     */
+    default StringBuilder selectHint(List<StatementHint> hints) {
+        return new StringBuilder();
+    }
+
+    /**
+     * The trailing statement option clause (SQL Server {@code OPTION (...)} style),
+     * including a leading space when non-empty.
+     *
+     * @param hints the statement-level hint intents
+     * @return the option clause, or an empty builder when this dialect has no such
+     *         clause (the default: the hints are silently ignored)
+     */
+    default StringBuilder statementOption(List<StatementHint> hints) {
+        return new StringBuilder();
     }
 }

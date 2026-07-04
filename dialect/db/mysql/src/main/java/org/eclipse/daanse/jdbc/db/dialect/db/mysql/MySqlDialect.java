@@ -62,6 +62,8 @@ import org.eclipse.daanse.jdbc.db.api.schema.TriggerReference;
 import org.eclipse.daanse.jdbc.db.api.schema.UniqueConstraint;
 import org.eclipse.daanse.jdbc.db.api.schema.ViewDefinition;
 import org.eclipse.daanse.jdbc.db.dialect.api.generator.BitOperation;
+import org.eclipse.daanse.jdbc.db.dialect.api.generator.KnownFunction;
+import org.eclipse.daanse.jdbc.db.dialect.api.generator.StatementHint;
 import org.eclipse.daanse.jdbc.db.dialect.api.sql.OrderedColumn;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.AbstractJdbcDialect;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.DialectUtil;
@@ -273,6 +275,44 @@ public class MySqlDialect extends AbstractJdbcDialect {
         }
     }
 
+    /**
+     * MySQL spells statement hints as an optimizer block directly after the {@code SELECT}
+     * keyword: {@code /*+ name(arg1, arg2) name2 *}{@code /} (trailing space). Hints are
+     * joined by a space; a hint without arguments is the bare name. Any {@code *}{@code /}
+     * inside a name or argument is stripped so the block cannot terminate early.
+     */
+    @Override
+    public StringBuilder selectHint(List<StatementHint> hints) {
+        if (hints.isEmpty()) {
+            return new StringBuilder();
+        }
+        StringBuilder sb = new StringBuilder("/*+ ");
+        boolean first = true;
+        for (StatementHint hint : hints) {
+            if (!first) {
+                sb.append(' ');
+            }
+            first = false;
+            sb.append(stripCommentEnd(hint.name()));
+            if (!hint.arguments().isEmpty()) {
+                sb.append('(');
+                for (int i = 0; i < hint.arguments().size(); i++) {
+                    if (i > 0) {
+                        sb.append(", ");
+                    }
+                    sb.append(stripCommentEnd(hint.arguments().get(i)));
+                }
+                sb.append(')');
+            }
+        }
+        return sb.append(" */ ");
+    }
+
+    /** Neutralizes a premature comment terminator inside a hint name/argument. */
+    private static String stripCommentEnd(String s) {
+        return s.replace("*/", "");
+    }
+
     @Override
     public boolean requiresAliasForFromQuery() {
         return true;
@@ -280,9 +320,11 @@ public class MySqlDialect extends AbstractJdbcDialect {
 
     @Override
     public boolean allowsFromQuery() {
-        // MySQL before 4.0 does not allow FROM
-        // subqueries in the FROM clause.
-        return productVersion.compareTo("4.") >= 0;
+        // MySQL before 4.0 does not allow FROM subqueries in the FROM clause.
+        // Compare numerically: the former lexicographic productVersion
+        // comparison against "4." misclassified two-digit majors (MariaDB
+        // "10.x"/"11.x" < "4." as strings) as pre-4.0.
+        return dialectVersion.isUnknownOrAtLeast(4, 0);
     }
 
     @Override
@@ -387,7 +429,10 @@ public class MySqlDialect extends AbstractJdbcDialect {
      */
     @Override
     public boolean requiresOrderByAlias() {
-        return productVersion.compareTo("5.7") >= 0;
+        // Compare numerically: the former lexicographic productVersion comparison
+        // against "5.7" misclassified two-digit majors (MariaDB "10.x"/"11.x" < "5.7"
+        // as strings) as pre-5.7. MySQL byte-neutral: majors 4-9 agree in both forms.
+        return dialectVersion.isUnknownOrAtLeast(5, 7);
     }
 
     @Override
@@ -398,6 +443,35 @@ public class MySqlDialect extends AbstractJdbcDialect {
     @Override
     public org.eclipse.daanse.jdbc.db.dialect.api.IdentifierCaseFolding caseFolding() {
         return org.eclipse.daanse.jdbc.db.dialect.api.IdentifierCaseFolding.PRESERVE;
+    }
+
+    @Override
+    public StringBuilder generateKnownFunction(KnownFunction function, List<? extends CharSequence> arguments) {
+        return switch (function) {
+        case CONCAT -> {
+            // MySQL treats || as logical OR (unless PIPES_AS_CONCAT); use CONCAT(...).
+            if (arguments.size() < 2) {
+                throw new IllegalArgumentException("CONCAT expects 2 or more argument(s), got " + arguments.size());
+            }
+            StringBuilder sb = new StringBuilder("CONCAT(");
+            for (int i = 0; i < arguments.size(); i++) {
+                if (i > 0) {
+                    sb.append(", ");
+                }
+                sb.append(arguments.get(i));
+            }
+            yield sb.append(")");
+        }
+        case INDEX_OF -> {
+            if (arguments.size() != 2) {
+                throw new IllegalArgumentException("INDEX_OF expects 2 argument(s), got " + arguments.size());
+            }
+            yield new StringBuilder("LOCATE(").append(arguments.get(0)).append(", ").append(arguments.get(1))
+                    .append(")");
+        }
+        // LENGTH stays CHAR_LENGTH: MySQL's LENGTH() counts bytes, CHAR_LENGTH() characters.
+        default -> super.generateKnownFunction(function, arguments);
+        };
     }
 
     // Unified BitOperation methods
@@ -437,12 +511,14 @@ public class MySqlDialect extends AbstractJdbcDialect {
 
     @Override
     public boolean supportsPercentileDisc() {
-        return productVersion.compareTo("8.0") >= 0;
+        // Numeric compare — see requiresOrderByAlias (MariaDB "10.x"/"11.x" vs "8.0").
+        return dialectVersion.isUnknownOrAtLeast(8, 0);
     }
 
     @Override
     public boolean supportsPercentileCont() {
-        return productVersion.compareTo("8.0") >= 0;
+        // Numeric compare — see requiresOrderByAlias (MariaDB "10.x"/"11.x" vs "8.0").
+        return dialectVersion.isUnknownOrAtLeast(8, 0);
     }
 
     @Override

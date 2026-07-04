@@ -15,31 +15,77 @@ package org.eclipse.daanse.jdbc.db.dialect.db.configurable;
 
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
-import org.eclipse.daanse.jdbc.db.dialect.api.type.BestFitColumnType;
-import org.eclipse.daanse.jdbc.db.dialect.api.generator.BitOperation;
-import org.eclipse.daanse.jdbc.db.dialect.api.type.Datatype;
 import org.eclipse.daanse.jdbc.db.dialect.api.Dialect;
-import org.eclipse.daanse.jdbc.db.dialect.api.order.OrderedColumn;
+import org.eclipse.daanse.jdbc.db.dialect.api.generator.AggregationGenerator;
+import org.eclipse.daanse.jdbc.db.dialect.api.generator.BitOperation;
+import org.eclipse.daanse.jdbc.db.dialect.api.generator.DdlGenerator;
+import org.eclipse.daanse.jdbc.db.dialect.api.generator.FunctionGenerator;
+import org.eclipse.daanse.jdbc.db.dialect.api.generator.HintGenerator;
+import org.eclipse.daanse.jdbc.db.dialect.api.generator.OrderByGenerator;
+import org.eclipse.daanse.jdbc.db.dialect.api.generator.RegexGenerator;
+import org.eclipse.daanse.jdbc.db.dialect.api.generator.SqlGenerator;
+import org.eclipse.daanse.jdbc.db.dialect.api.sql.OrderedColumn;
+import org.eclipse.daanse.jdbc.db.dialect.api.type.BestFitColumnType;
+import org.eclipse.daanse.jdbc.db.dialect.api.type.Datatype;
 
-/**
- * A configurable SQL dialect implementation that reads all settings from
- * configuration.
- * <p>
- * This dialect can be configured either programmatically via the builder or via
- * OSGi configuration using {@link ConfigurableDialectConfig}.
- */
-public class ConfigurableDialect implements Dialect {
+public class ConfigurableDialect implements Dialect, SqlGenerator, DdlGenerator, OrderByGenerator, RegexGenerator,
+        AggregationGenerator, FunctionGenerator, HintGenerator {
+
+    @Override
+    public SqlGenerator sqlGenerator() {
+        return this;
+    }
+
+    @Override
+    public DdlGenerator ddlGenerator() {
+        return this;
+    }
+
+    @Override
+    public OrderByGenerator orderByGenerator() {
+        return this;
+    }
+
+    @Override
+    public RegexGenerator regexGenerator() {
+        return this;
+    }
+
+    @Override
+    public AggregationGenerator aggregationGenerator() {
+        return this;
+    }
+
+    @Override
+    public FunctionGenerator functionGenerator() {
+        return this;
+    }
+
+    @Override
+    public HintGenerator hintGenerator() {
+        return this;
+    }
+
+    @Override
+    public org.eclipse.daanse.jdbc.db.dialect.api.capability.WindowFunctionCapabilities getWindowFunctionCapabilities() {
+        return new org.eclipse.daanse.jdbc.db.dialect.api.capability.WindowFunctionCapabilities(
+                supportsPercentileDisc(), supportsPercentileCont(), supportsListAgg(), supportsNthValue(),
+                supportsNthValueIgnoreNulls());
+    }
 
     private final String quoteIdentifierString;
     private final String dialectName;
-    private final boolean allowsAs;
+    private final boolean allowsFromAlias;
     private final boolean allowsFromQuery;
     private final boolean requiresAliasForFromQuery;
     private final boolean allowsJoinOn;
-    private final boolean allowsFieldAs;
+    private final boolean allowsFieldAlias;
     private final boolean allowsCountDistinct;
     private final boolean allowsMultipleCountDistinct;
     private final boolean allowsCompoundCountDistinct;
@@ -53,42 +99,44 @@ public class ConfigurableDialect implements Dialect {
     private final boolean requiresOrderByAlias;
     private final boolean allowsOrderByAlias;
     private final boolean requiresUnionOrderByOrdinal;
-    private final boolean requiresUnionOrderByExprToBeInSelectClause;
+    private final boolean requiresUnionOrderByExprInSelect;
     private final boolean requiresHavingAlias;
     private final boolean supportsUnlimitedValueList;
     private final boolean supportsMultiValueInExpr;
-    private final boolean allowsDdl;
+    private final boolean supportsDdl;
     private final boolean allowsRegularExpressionInWhereClause;
-    private final boolean supportsBitAndAgg;
-    private final boolean supportsBitOrAgg;
-    private final boolean supportsBitXorAgg;
-    private final boolean supportsBitNAndAgg;
-    private final boolean supportsBitNOrAgg;
-    private final boolean supportsBitNXorAgg;
-    private final boolean supportsPercentileContAgg;
-    private final boolean supportsPercentileDiscAgg;
+    private final Set<BitOperation> supportedBitAggregations;
     private final boolean supportsPercentileCont;
     private final boolean supportsPercentileDisc;
     private final boolean supportsListAgg;
     private final int maxColumnNameLength;
     private final boolean allowsDialectSharing;
     private final boolean requiresDrillthroughMaxRowsInLimit;
-    private final boolean supportParallelLoading;
-    private final boolean supportBatchOperations;
+    private final boolean supportsParallelLoading;
+    private final boolean supportsBatchOperations;
+    private final org.eclipse.daanse.jdbc.db.dialect.api.IdentifierCaseFolding caseFolding;
+    private volatile org.eclipse.daanse.jdbc.db.dialect.api.IdentifierQuotingPolicy quotingPolicy;
+    private final java.util.Set<String> sqlKeywordsLower = java.util.Set.of("all", "and", "any", "as", "asc", "between",
+            "by", "case", "check", "column", "create", "cross", "current_date", "current_time", "current_timestamp",
+            "default", "delete", "desc", "distinct", "drop", "else", "end", "escape", "except", "exists", "false",
+            "for", "foreign", "from", "full", "group", "having", "in", "inner", "insert", "intersect", "into", "is",
+            "join", "key", "left", "like", "natural", "not", "null", "on", "or", "order", "outer", "primary",
+            "references", "right", "select", "set", "some", "table", "then", "true", "union", "unique", "update",
+            "user", "using", "values", "view", "when", "where", "with");
+    private static final java.util.regex.Pattern TRIVIAL_IDENT_PATTERN = java.util.regex.Pattern
+            .compile("[A-Za-z_][A-Za-z0-9_]*");
 
     /**
-     * Creates a ConfigurableDialect from an OSGi configuration.
-     *
      * @param config the OSGi metatype configuration
      */
     public ConfigurableDialect(ConfigurableDialectConfig config) {
         this.quoteIdentifierString = config.quoteIdentifierString();
         this.dialectName = config.dialectName();
-        this.allowsAs = config.allowsAs();
+        this.allowsFromAlias = config.allowsFromAlias();
         this.allowsFromQuery = config.allowsFromQuery();
         this.requiresAliasForFromQuery = config.requiresAliasForFromQuery();
         this.allowsJoinOn = config.allowsJoinOn();
-        this.allowsFieldAs = config.allowsFieldAs();
+        this.allowsFieldAlias = config.allowsFieldAlias();
         this.allowsCountDistinct = config.allowsCountDistinct();
         this.allowsMultipleCountDistinct = config.allowsMultipleCountDistinct();
         this.allowsCompoundCountDistinct = config.allowsCompoundCountDistinct();
@@ -102,43 +150,53 @@ public class ConfigurableDialect implements Dialect {
         this.requiresOrderByAlias = config.requiresOrderByAlias();
         this.allowsOrderByAlias = config.allowsOrderByAlias();
         this.requiresUnionOrderByOrdinal = config.requiresUnionOrderByOrdinal();
-        this.requiresUnionOrderByExprToBeInSelectClause = config.requiresUnionOrderByExprToBeInSelectClause();
+        this.requiresUnionOrderByExprInSelect = config.requiresUnionOrderByExprInSelect();
         this.requiresHavingAlias = config.requiresHavingAlias();
         this.supportsUnlimitedValueList = config.supportsUnlimitedValueList();
         this.supportsMultiValueInExpr = config.supportsMultiValueInExpr();
-        this.allowsDdl = config.allowsDdl();
+        this.supportsDdl = config.supportsDdl();
         this.allowsRegularExpressionInWhereClause = config.allowsRegularExpressionInWhereClause();
-        this.supportsBitAndAgg = config.supportsBitAndAgg();
-        this.supportsBitOrAgg = config.supportsBitOrAgg();
-        this.supportsBitXorAgg = config.supportsBitXorAgg();
-        this.supportsBitNAndAgg = config.supportsBitNAndAgg();
-        this.supportsBitNOrAgg = config.supportsBitNOrAgg();
-        this.supportsBitNXorAgg = config.supportsBitNXorAgg();
-        this.supportsPercentileContAgg = config.supportsPercentileContAgg();
-        this.supportsPercentileDiscAgg = config.supportsPercentileDiscAgg();
+        EnumSet<BitOperation> bitAggs = EnumSet.noneOf(BitOperation.class);
+        if (config.supportsBitAndAgg())
+            bitAggs.add(BitOperation.AND);
+        if (config.supportsBitOrAgg())
+            bitAggs.add(BitOperation.OR);
+        if (config.supportsBitXorAgg())
+            bitAggs.add(BitOperation.XOR);
+        if (config.supportsBitNAndAgg())
+            bitAggs.add(BitOperation.NAND);
+        if (config.supportsBitNOrAgg())
+            bitAggs.add(BitOperation.NOR);
+        if (config.supportsBitNXorAgg())
+            bitAggs.add(BitOperation.NXOR);
+        this.supportedBitAggregations = Set.copyOf(bitAggs);
         this.supportsPercentileCont = config.supportsPercentileCont();
         this.supportsPercentileDisc = config.supportsPercentileDisc();
         this.supportsListAgg = config.supportsListAgg();
         this.maxColumnNameLength = config.maxColumnNameLength();
         this.allowsDialectSharing = config.allowsDialectSharing();
         this.requiresDrillthroughMaxRowsInLimit = config.requiresDrillthroughMaxRowsInLimit();
-        this.supportParallelLoading = config.supportParallelLoading();
-        this.supportBatchOperations = config.supportBatchOperations();
+        this.supportsParallelLoading = config.supportsParallelLoading();
+        this.supportsBatchOperations = config.supportsBatchOperations();
+        this.caseFolding = config.caseFolding() == null
+                ? org.eclipse.daanse.jdbc.db.dialect.api.IdentifierCaseFolding.UPPER
+                : config.caseFolding();
+        this.quotingPolicy = config.quotingPolicy() == null
+                ? org.eclipse.daanse.jdbc.db.dialect.api.IdentifierQuotingPolicy.ALWAYS
+                : config.quotingPolicy();
     }
 
     /**
-     * Creates a ConfigurableDialect from a builder.
-     *
      * @param builder the builder with configuration values
      */
     private ConfigurableDialect(Builder builder) {
         this.quoteIdentifierString = builder.quoteIdentifierString;
         this.dialectName = builder.dialectName;
-        this.allowsAs = builder.allowsAs;
+        this.allowsFromAlias = builder.allowsFromAlias;
         this.allowsFromQuery = builder.allowsFromQuery;
         this.requiresAliasForFromQuery = builder.requiresAliasForFromQuery;
         this.allowsJoinOn = builder.allowsJoinOn;
-        this.allowsFieldAs = builder.allowsFieldAs;
+        this.allowsFieldAlias = builder.allowsFieldAlias;
         this.allowsCountDistinct = builder.allowsCountDistinct;
         this.allowsMultipleCountDistinct = builder.allowsMultipleCountDistinct;
         this.allowsCompoundCountDistinct = builder.allowsCompoundCountDistinct;
@@ -152,33 +210,63 @@ public class ConfigurableDialect implements Dialect {
         this.requiresOrderByAlias = builder.requiresOrderByAlias;
         this.allowsOrderByAlias = builder.allowsOrderByAlias;
         this.requiresUnionOrderByOrdinal = builder.requiresUnionOrderByOrdinal;
-        this.requiresUnionOrderByExprToBeInSelectClause = builder.requiresUnionOrderByExprToBeInSelectClause;
+        this.requiresUnionOrderByExprInSelect = builder.requiresUnionOrderByExprInSelect;
         this.requiresHavingAlias = builder.requiresHavingAlias;
         this.supportsUnlimitedValueList = builder.supportsUnlimitedValueList;
         this.supportsMultiValueInExpr = builder.supportsMultiValueInExpr;
-        this.allowsDdl = builder.allowsDdl;
+        this.supportsDdl = builder.supportsDdl;
         this.allowsRegularExpressionInWhereClause = builder.allowsRegularExpressionInWhereClause;
-        this.supportsBitAndAgg = builder.supportsBitAndAgg;
-        this.supportsBitOrAgg = builder.supportsBitOrAgg;
-        this.supportsBitXorAgg = builder.supportsBitXorAgg;
-        this.supportsBitNAndAgg = builder.supportsBitNAndAgg;
-        this.supportsBitNOrAgg = builder.supportsBitNOrAgg;
-        this.supportsBitNXorAgg = builder.supportsBitNXorAgg;
-        this.supportsPercentileContAgg = builder.supportsPercentileContAgg;
-        this.supportsPercentileDiscAgg = builder.supportsPercentileDiscAgg;
+        this.supportedBitAggregations = Set.copyOf(builder.supportedBitAggregations);
         this.supportsPercentileCont = builder.supportsPercentileCont;
         this.supportsPercentileDisc = builder.supportsPercentileDisc;
         this.supportsListAgg = builder.supportsListAgg;
         this.maxColumnNameLength = builder.maxColumnNameLength;
         this.allowsDialectSharing = builder.allowsDialectSharing;
         this.requiresDrillthroughMaxRowsInLimit = builder.requiresDrillthroughMaxRowsInLimit;
-        this.supportParallelLoading = builder.supportParallelLoading;
-        this.supportBatchOperations = builder.supportBatchOperations;
+        this.supportsParallelLoading = builder.supportsParallelLoading;
+        this.supportsBatchOperations = builder.supportsBatchOperations;
+        this.caseFolding = builder.caseFolding == null
+                ? org.eclipse.daanse.jdbc.db.dialect.api.IdentifierCaseFolding.UPPER
+                : builder.caseFolding;
+        this.quotingPolicy = builder.quotingPolicy == null
+                ? org.eclipse.daanse.jdbc.db.dialect.api.IdentifierQuotingPolicy.ALWAYS
+                : builder.quotingPolicy;
+    }
+
+    @Override
+    public org.eclipse.daanse.jdbc.db.dialect.api.IdentifierCaseFolding caseFolding() {
+        return caseFolding;
+    }
+
+    @Override
+    public org.eclipse.daanse.jdbc.db.dialect.api.IdentifierQuotingPolicy quotingPolicy() {
+        return quotingPolicy;
     }
 
     /**
-     * Creates a new builder for programmatic configuration.
-     *
+     * Replaces the active quoting policy. Mutates dialect state — see also
+     * {@code quoteIdentifierWith(...)} for non-mutating per-call overrides.
+     */
+    public void setQuotingPolicy(org.eclipse.daanse.jdbc.db.dialect.api.IdentifierQuotingPolicy policy) {
+        this.quotingPolicy = policy == null ? org.eclipse.daanse.jdbc.db.dialect.api.IdentifierQuotingPolicy.ALWAYS
+                : policy;
+    }
+
+    private boolean needsQuoting(String val) {
+        if (val == null || val.isEmpty()) {
+            return true;
+        }
+        if (!TRIVIAL_IDENT_PATTERN.matcher(val).matches()) {
+            return true;
+        }
+        if (sqlKeywordsLower.contains(val.toLowerCase(java.util.Locale.ROOT))) {
+            return true;
+        }
+        return caseFolding != org.eclipse.daanse.jdbc.db.dialect.api.IdentifierCaseFolding.PRESERVE
+                && !caseFolding.isCanonical(val);
+    }
+
+    /**
      * @return a new builder instance
      */
     public static Builder builder() {
@@ -193,18 +281,59 @@ public class ConfigurableDialect implements Dialect {
     }
 
     @Override
-    public StringBuilder quoteIdentifier(CharSequence val) {
+    public String quoteIdentifier(CharSequence val) {
         StringBuilder buf = new StringBuilder(val.length() + 10);
         quoteIdentifier(val.toString(), buf);
-        return buf;
+        return buf.toString();
     }
 
     @Override
     public void quoteIdentifier(String val, StringBuilder buf) {
+        emitIdentifier(val, buf, quotingPolicy);
+    }
+
+    @Override
+    public void quoteIdentifierWith(String val, StringBuilder buf,
+            org.eclipse.daanse.jdbc.db.dialect.api.IdentifierQuotingPolicy policy) {
+        if (val == null) {
+            return;
+        }
+        emitIdentifier(val, buf,
+                policy == null ? org.eclipse.daanse.jdbc.db.dialect.api.IdentifierQuotingPolicy.ALWAYS : policy);
+    }
+
+    @Override
+    public String quoteIdentifierWith(CharSequence val,
+            org.eclipse.daanse.jdbc.db.dialect.api.IdentifierQuotingPolicy policy) {
+        if (val == null) {
+            return "";
+        }
+        StringBuilder buf = new StringBuilder(val.length() + 10);
+        emitIdentifier(val.toString(), buf,
+                policy == null ? org.eclipse.daanse.jdbc.db.dialect.api.IdentifierQuotingPolicy.ALWAYS : policy);
+        return buf.toString();
+    }
+
+    private void emitIdentifier(String val, StringBuilder buf,
+            org.eclipse.daanse.jdbc.db.dialect.api.IdentifierQuotingPolicy policy) {
         String q = getQuoteIdentifierString();
         if (q == null || (val.startsWith(q) && val.endsWith(q))) {
             buf.append(val);
             return;
+        }
+        switch (policy) {
+        case NEVER:
+            buf.append(val);
+            return;
+        case WHEN_NEEDED:
+            if (!needsQuoting(val)) {
+                buf.append(val);
+                return;
+            }
+            break;
+        case ALWAYS:
+        default:
+            break;
         }
         String val2 = val.replace(q, q + q);
         buf.append(q).append(val2).append(q);
@@ -307,9 +436,9 @@ public class ConfigurableDialect implements Dialect {
     }
 
     @Override
-    public StringBuilder generateRegularExpression(String source, String javaRegExp) {
+    public Optional<String> generateRegularExpression(String source, String javaRegExp) {
         // Default implementation returns null (not supported)
-        return null;
+        return Optional.empty();
     }
 
     // ========== ORDER BY Generation ==========
@@ -391,7 +520,7 @@ public class ConfigurableDialect implements Dialect {
                 }
                 first = false;
                 quote(buf, en.getValue().getValue(), en.getValue().getKey());
-                if (allowsAs()) {
+                if (allowsFromAlias()) {
                     buf.append(" AS ");
                 } else {
                     buf.append(' ');
@@ -405,12 +534,12 @@ public class ConfigurableDialect implements Dialect {
     // ========== Bit Aggregation Functions ==========
 
     @Override
-    public StringBuilder generateBitAggregation(BitOperation operation, CharSequence operand) {
+    public java.util.Optional<String> generateBitAggregation(BitOperation operation, CharSequence operand) {
         if (!supportsBitAggregation(operation)) {
-            throw new UnsupportedOperationException(operation + " bit aggregation not supported");
+            return java.util.Optional.empty();
         }
         StringBuilder buf = new StringBuilder(64);
-        return switch (operation) {
+        StringBuilder result = switch (operation) {
         case AND -> buf.append("BIT_AND(").append(operand).append(")");
         case OR -> buf.append("BIT_OR(").append(operand).append(")");
         case XOR -> buf.append("BIT_XOR(").append(operand).append(")");
@@ -418,24 +547,19 @@ public class ConfigurableDialect implements Dialect {
         case NOR -> buf.append("BIT_NOR(").append(operand).append(")");
         case NXOR -> buf.append("BIT_XNOR(").append(operand).append(")");
         };
+        return java.util.Optional.of(result.toString());
     }
 
     @Override
     public boolean supportsBitAggregation(BitOperation operation) {
-        return switch (operation) {
-        case AND -> supportsBitAndAgg;
-        case OR -> supportsBitOrAgg;
-        case XOR -> supportsBitXorAgg;
-        case NAND -> supportsBitNAndAgg;
-        case NOR -> supportsBitNOrAgg;
-        case NXOR -> supportsBitNXorAgg;
-        };
+        return supportedBitAggregations.contains(operation);
     }
 
     // ========== Percentile Functions ==========
 
     @Override
-    public StringBuilder generatePercentileDisc(double percentile, boolean desc, String tableName, String columnName) {
+    public java.util.Optional<String> generatePercentileDisc(double percentile, boolean desc, String tableName,
+            String columnName) {
         if (!supportsPercentileDisc()) {
             throw new UnsupportedOperationException("PERCENTILE_DISC not supported");
         }
@@ -450,11 +574,12 @@ public class ConfigurableDialect implements Dialect {
             buf.append(" DESC");
         }
         buf.append(")");
-        return buf;
+        return java.util.Optional.of((buf).toString());
     }
 
     @Override
-    public StringBuilder generatePercentileCont(double percentile, boolean desc, String tableName, String columnName) {
+    public java.util.Optional<String> generatePercentileCont(double percentile, boolean desc, String tableName,
+            String columnName) {
         if (!supportsPercentileCont()) {
             throw new UnsupportedOperationException("PERCENTILE_CONT not supported");
         }
@@ -469,14 +594,14 @@ public class ConfigurableDialect implements Dialect {
             buf.append(" DESC");
         }
         buf.append(")");
-        return buf;
+        return java.util.Optional.of((buf).toString());
     }
 
     // ========== List Aggregation ==========
 
     @Override
-    public StringBuilder generateListAgg(CharSequence operand, boolean distinct, String separator, String coalesce,
-            String onOverflowTruncate, List<OrderedColumn> columns) {
+    public java.util.Optional<String> generateListAgg(CharSequence operand, boolean distinct, String separator,
+            String coalesce, String onOverflowTruncate, List<OrderedColumn> columns) {
         if (!supportsListAgg()) {
             throw new UnsupportedOperationException("LISTAGG not supported");
         }
@@ -501,11 +626,11 @@ public class ConfigurableDialect implements Dialect {
             appendOrderedColumns(buf, columns);
             buf.append(")");
         }
-        return buf;
+        return java.util.Optional.of((buf).toString());
     }
 
     @Override
-    public StringBuilder generateNthValueAgg(CharSequence operand, boolean ignoreNulls, Integer n,
+    public java.util.Optional<String> generateNthValueAgg(CharSequence operand, boolean ignoreNulls, Integer n,
             List<OrderedColumn> columns) {
         StringBuilder buf = new StringBuilder("NTH_VALUE(").append(operand).append(", ")
                 .append(n == null || n < 1 ? 1 : n).append(")");
@@ -520,7 +645,7 @@ public class ConfigurableDialect implements Dialect {
             appendOrderedColumns(buf, columns);
         }
         buf.append(")");
-        return buf;
+        return java.util.Optional.of((buf).toString());
     }
 
     private void appendOrderedColumns(StringBuilder buf, List<OrderedColumn> columns) {
@@ -567,23 +692,32 @@ public class ConfigurableDialect implements Dialect {
         return sb.toString();
     }
 
-    // ========== Hints ==========
-
     @Override
-    public void appendHintsAfterFromClause(StringBuilder buf, Map<String, String> hints) {
-        // Default: no hints
+    public String dropSchema(String schemaName, boolean ifExists, boolean cascade) {
+        StringBuilder sb = new StringBuilder("DROP SCHEMA ");
+        if (ifExists && supportsDropSchemaIfExists())
+            sb.append("IF EXISTS ");
+        sb.append(quoteIdentifier(schemaName));
+        if (requiresDropSchemaRestrict()) {
+            sb.append(" RESTRICT");
+        } else if (cascade && supportsDropTableCascade()) {
+            sb.append(" CASCADE");
+        }
+        return sb.toString();
     }
+
+    // appendHintsAfterFromClause inherited from HintGenerator default (no-op).
 
     // ========== Feature Support Flags ==========
 
     @Override
-    public String getDialectName() {
+    public String name() {
         return dialectName;
     }
 
     @Override
-    public boolean allowsAs() {
-        return allowsAs;
+    public boolean allowsFromAlias() {
+        return allowsFromAlias;
     }
 
     @Override
@@ -602,8 +736,8 @@ public class ConfigurableDialect implements Dialect {
     }
 
     @Override
-    public boolean allowsFieldAs() {
-        return allowsFieldAs;
+    public boolean allowsFieldAlias() {
+        return allowsFieldAlias;
     }
 
     @Override
@@ -672,8 +806,8 @@ public class ConfigurableDialect implements Dialect {
     }
 
     @Override
-    public boolean requiresUnionOrderByExprToBeInSelectClause() {
-        return requiresUnionOrderByExprToBeInSelectClause;
+    public boolean requiresUnionOrderByExprInSelect() {
+        return requiresUnionOrderByExprInSelect;
     }
 
     @Override
@@ -692,23 +826,13 @@ public class ConfigurableDialect implements Dialect {
     }
 
     @Override
-    public boolean allowsDdl() {
-        return allowsDdl;
+    public boolean supportsDdl() {
+        return supportsDdl;
     }
 
     @Override
     public boolean allowsRegularExpressionInWhereClause() {
         return allowsRegularExpressionInWhereClause;
-    }
-
-    @Override
-    public boolean supportsPercentileContAgg() {
-        return supportsPercentileContAgg;
-    }
-
-    @Override
-    public boolean supportsPercentileDiscAgg() {
-        return supportsPercentileDiscAgg;
     }
 
     @Override
@@ -742,13 +866,13 @@ public class ConfigurableDialect implements Dialect {
     }
 
     @Override
-    public boolean supportParallelLoading() {
-        return supportParallelLoading;
+    public boolean supportsParallelLoading() {
+        return supportsParallelLoading;
     }
 
     @Override
-    public boolean supportBatchOperations() {
-        return supportBatchOperations;
+    public boolean supportsBatchOperations() {
+        return supportsBatchOperations;
     }
 
     // ========== Methods Not Configurable (Runtime Dependent) ==========
@@ -772,17 +896,14 @@ public class ConfigurableDialect implements Dialect {
 
     // ========== Builder ==========
 
-    /**
-     * Builder for creating ConfigurableDialect instances programmatically.
-     */
     public static class Builder {
         private String quoteIdentifierString = "\"";
         private String dialectName = "configurable";
-        private boolean allowsAs = true;
+        private boolean allowsFromAlias = true;
         private boolean allowsFromQuery = true;
         private boolean requiresAliasForFromQuery = false;
         private boolean allowsJoinOn = true;
-        private boolean allowsFieldAs = true;
+        private boolean allowsFieldAlias = true;
         private boolean allowsCountDistinct = true;
         private boolean allowsMultipleCountDistinct = true;
         private boolean allowsCompoundCountDistinct = false;
@@ -796,28 +917,23 @@ public class ConfigurableDialect implements Dialect {
         private boolean requiresOrderByAlias = false;
         private boolean allowsOrderByAlias = true;
         private boolean requiresUnionOrderByOrdinal = true;
-        private boolean requiresUnionOrderByExprToBeInSelectClause = true;
+        private boolean requiresUnionOrderByExprInSelect = true;
         private boolean requiresHavingAlias = false;
         private boolean supportsUnlimitedValueList = false;
         private boolean supportsMultiValueInExpr = false;
-        private boolean allowsDdl = true;
+        private boolean supportsDdl = true;
         private boolean allowsRegularExpressionInWhereClause = false;
-        private boolean supportsBitAndAgg = false;
-        private boolean supportsBitOrAgg = false;
-        private boolean supportsBitXorAgg = false;
-        private boolean supportsBitNAndAgg = false;
-        private boolean supportsBitNOrAgg = false;
-        private boolean supportsBitNXorAgg = false;
-        private boolean supportsPercentileContAgg = false;
-        private boolean supportsPercentileDiscAgg = false;
+        private final EnumSet<BitOperation> supportedBitAggregations = EnumSet.noneOf(BitOperation.class);
         private boolean supportsPercentileCont = false;
         private boolean supportsPercentileDisc = false;
         private boolean supportsListAgg = false;
         private int maxColumnNameLength = 128;
         private boolean allowsDialectSharing = true;
         private boolean requiresDrillthroughMaxRowsInLimit = false;
-        private boolean supportParallelLoading = true;
-        private boolean supportBatchOperations = true;
+        private boolean supportsParallelLoading = true;
+        private boolean supportsBatchOperations = true;
+        private org.eclipse.daanse.jdbc.db.dialect.api.IdentifierCaseFolding caseFolding = org.eclipse.daanse.jdbc.db.dialect.api.IdentifierCaseFolding.UPPER;
+        private org.eclipse.daanse.jdbc.db.dialect.api.IdentifierQuotingPolicy quotingPolicy = org.eclipse.daanse.jdbc.db.dialect.api.IdentifierQuotingPolicy.ALWAYS;
 
         public Builder quoteIdentifierString(String quoteIdentifierString) {
             this.quoteIdentifierString = quoteIdentifierString;
@@ -829,8 +945,8 @@ public class ConfigurableDialect implements Dialect {
             return this;
         }
 
-        public Builder allowsAs(boolean allowsAs) {
-            this.allowsAs = allowsAs;
+        public Builder allowsFromAlias(boolean allowsFromAlias) {
+            this.allowsFromAlias = allowsFromAlias;
             return this;
         }
 
@@ -849,8 +965,8 @@ public class ConfigurableDialect implements Dialect {
             return this;
         }
 
-        public Builder allowsFieldAs(boolean allowsFieldAs) {
-            this.allowsFieldAs = allowsFieldAs;
+        public Builder allowsFieldAlias(boolean allowsFieldAlias) {
+            this.allowsFieldAlias = allowsFieldAlias;
             return this;
         }
 
@@ -919,8 +1035,8 @@ public class ConfigurableDialect implements Dialect {
             return this;
         }
 
-        public Builder requiresUnionOrderByExprToBeInSelectClause(boolean requiresUnionOrderByExprToBeInSelectClause) {
-            this.requiresUnionOrderByExprToBeInSelectClause = requiresUnionOrderByExprToBeInSelectClause;
+        public Builder requiresUnionOrderByExprInSelect(boolean requiresUnionOrderByExprInSelect) {
+            this.requiresUnionOrderByExprInSelect = requiresUnionOrderByExprInSelect;
             return this;
         }
 
@@ -939,8 +1055,8 @@ public class ConfigurableDialect implements Dialect {
             return this;
         }
 
-        public Builder allowsDdl(boolean allowsDdl) {
-            this.allowsDdl = allowsDdl;
+        public Builder supportsDdl(boolean supportsDdl) {
+            this.supportsDdl = supportsDdl;
             return this;
         }
 
@@ -949,43 +1065,42 @@ public class ConfigurableDialect implements Dialect {
             return this;
         }
 
-        public Builder supportsBitAndAgg(boolean supportsBitAndAgg) {
-            this.supportsBitAndAgg = supportsBitAndAgg;
+        public Builder supportsBitAndAgg(boolean supported) {
+            return setBitAggregation(BitOperation.AND, supported);
+        }
+
+        public Builder supportsBitOrAgg(boolean supported) {
+            return setBitAggregation(BitOperation.OR, supported);
+        }
+
+        public Builder supportsBitXorAgg(boolean supported) {
+            return setBitAggregation(BitOperation.XOR, supported);
+        }
+
+        public Builder supportsBitNAndAgg(boolean supported) {
+            return setBitAggregation(BitOperation.NAND, supported);
+        }
+
+        public Builder supportsBitNOrAgg(boolean supported) {
+            return setBitAggregation(BitOperation.NOR, supported);
+        }
+
+        public Builder supportsBitNXorAgg(boolean supported) {
+            return setBitAggregation(BitOperation.NXOR, supported);
+        }
+
+        public Builder supportsBitAggregations(Set<BitOperation> operations) {
+            this.supportedBitAggregations.clear();
+            this.supportedBitAggregations.addAll(operations);
             return this;
         }
 
-        public Builder supportsBitOrAgg(boolean supportsBitOrAgg) {
-            this.supportsBitOrAgg = supportsBitOrAgg;
-            return this;
-        }
-
-        public Builder supportsBitXorAgg(boolean supportsBitXorAgg) {
-            this.supportsBitXorAgg = supportsBitXorAgg;
-            return this;
-        }
-
-        public Builder supportsBitNAndAgg(boolean supportsBitNAndAgg) {
-            this.supportsBitNAndAgg = supportsBitNAndAgg;
-            return this;
-        }
-
-        public Builder supportsBitNOrAgg(boolean supportsBitNOrAgg) {
-            this.supportsBitNOrAgg = supportsBitNOrAgg;
-            return this;
-        }
-
-        public Builder supportsBitNXorAgg(boolean supportsBitNXorAgg) {
-            this.supportsBitNXorAgg = supportsBitNXorAgg;
-            return this;
-        }
-
-        public Builder supportsPercentileContAgg(boolean supportsPercentileContAgg) {
-            this.supportsPercentileContAgg = supportsPercentileContAgg;
-            return this;
-        }
-
-        public Builder supportsPercentileDiscAgg(boolean supportsPercentileDiscAgg) {
-            this.supportsPercentileDiscAgg = supportsPercentileDiscAgg;
+        private Builder setBitAggregation(BitOperation op, boolean supported) {
+            if (supported) {
+                this.supportedBitAggregations.add(op);
+            } else {
+                this.supportedBitAggregations.remove(op);
+            }
             return this;
         }
 
@@ -1019,13 +1134,27 @@ public class ConfigurableDialect implements Dialect {
             return this;
         }
 
-        public Builder supportParallelLoading(boolean supportParallelLoading) {
-            this.supportParallelLoading = supportParallelLoading;
+        public Builder supportsParallelLoading(boolean supportsParallelLoading) {
+            this.supportsParallelLoading = supportsParallelLoading;
             return this;
         }
 
-        public Builder supportBatchOperations(boolean supportBatchOperations) {
-            this.supportBatchOperations = supportBatchOperations;
+        public Builder supportsBatchOperations(boolean supportsBatchOperations) {
+            this.supportsBatchOperations = supportsBatchOperations;
+            return this;
+        }
+
+        public Builder caseFolding(org.eclipse.daanse.jdbc.db.dialect.api.IdentifierCaseFolding caseFolding) {
+            this.caseFolding = (caseFolding == null)
+                    ? org.eclipse.daanse.jdbc.db.dialect.api.IdentifierCaseFolding.UPPER
+                    : caseFolding;
+            return this;
+        }
+
+        public Builder quotingPolicy(org.eclipse.daanse.jdbc.db.dialect.api.IdentifierQuotingPolicy policy) {
+            this.quotingPolicy = (policy == null)
+                    ? org.eclipse.daanse.jdbc.db.dialect.api.IdentifierQuotingPolicy.ALWAYS
+                    : policy;
             return this;
         }
 

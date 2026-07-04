@@ -17,13 +17,6 @@ import org.osgi.service.metatype.annotations.AttributeDefinition;
 import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 import org.osgi.service.metatype.annotations.Option;
 
-/**
- * OSGi metatype configuration for a configurable SQL dialect.
- * <p>
- * This interface defines all configurable aspects of a SQL dialect that can be
- * set programmatically or via OSGi configuration. It covers identifier quoting,
- * SQL syntax features, and dialect-specific behaviors.
- */
 @ObjectClassDefinition(name = ConfigurableDialectConfig.L10N_OCD_NAME, description = ConfigurableDialectConfig.L10N_OCD_DESCRIPTION, localization = ConfigurableDialectConfig.OCD_LOCALIZATION)
 public @interface ConfigurableDialectConfig {
 
@@ -111,8 +104,6 @@ public @interface ConfigurableDialectConfig {
     boolean DEFAULT_SUPPORTS_BIT_NAND_AGG = false;
     boolean DEFAULT_SUPPORTS_BIT_NOR_AGG = false;
     boolean DEFAULT_SUPPORTS_BIT_NXOR_AGG = false;
-    boolean DEFAULT_SUPPORTS_PERCENTILE_CONT_AGG = false;
-    boolean DEFAULT_SUPPORTS_PERCENTILE_DISC_AGG = false;
     boolean DEFAULT_SUPPORTS_PERCENTILE_CONT = false;
     boolean DEFAULT_SUPPORTS_PERCENTILE_DISC = false;
     boolean DEFAULT_SUPPORTS_LIST_AGG = false;
@@ -140,7 +131,7 @@ public @interface ConfigurableDialectConfig {
 
     @AttributeDefinition(name = L10N_ALLOWS_AS_NAME, description = L10N_ALLOWS_AS_DESCRIPTION, defaultValue = DEFAULT_ALLOWS_AS
             + "")
-    boolean allowsAs() default DEFAULT_ALLOWS_AS;
+    boolean allowsFromAlias() default DEFAULT_ALLOWS_AS;
 
     @AttributeDefinition(name = L10N_ALLOWS_FROM_QUERY_NAME, description = L10N_ALLOWS_FROM_QUERY_DESCRIPTION, defaultValue = DEFAULT_ALLOWS_FROM_QUERY
             + "")
@@ -156,7 +147,7 @@ public @interface ConfigurableDialectConfig {
 
     @AttributeDefinition(name = L10N_ALLOWS_FIELD_AS_NAME, description = L10N_ALLOWS_FIELD_AS_DESCRIPTION, defaultValue = DEFAULT_ALLOWS_FIELD_AS
             + "")
-    boolean allowsFieldAs() default DEFAULT_ALLOWS_FIELD_AS;
+    boolean allowsFieldAlias() default DEFAULT_ALLOWS_FIELD_AS;
 
     // ========== COUNT and DISTINCT Features ==========
 
@@ -216,9 +207,9 @@ public @interface ConfigurableDialectConfig {
             + "")
     boolean requiresUnionOrderByOrdinal() default DEFAULT_REQUIRES_UNION_ORDER_BY_ORDINAL;
 
-    @AttributeDefinition(name = "%requiresUnionOrderByExprToBeInSelectClause.name", description = "%requiresUnionOrderByExprToBeInSelectClause.description", defaultValue = DEFAULT_REQUIRES_UNION_ORDER_BY_EXPR_IN_SELECT
+    @AttributeDefinition(name = "%requiresUnionOrderByExprInSelect.name", description = "%requiresUnionOrderByExprInSelect.description", defaultValue = DEFAULT_REQUIRES_UNION_ORDER_BY_EXPR_IN_SELECT
             + "")
-    boolean requiresUnionOrderByExprToBeInSelectClause() default DEFAULT_REQUIRES_UNION_ORDER_BY_EXPR_IN_SELECT;
+    boolean requiresUnionOrderByExprInSelect() default DEFAULT_REQUIRES_UNION_ORDER_BY_EXPR_IN_SELECT;
 
     // ========== HAVING Features ==========
 
@@ -238,9 +229,9 @@ public @interface ConfigurableDialectConfig {
 
     // ========== DDL Features ==========
 
-    @AttributeDefinition(name = "%allowsDdl.name", description = "%allowsDdl.description", defaultValue = DEFAULT_ALLOWS_DDL
+    @AttributeDefinition(name = "%supportsDdl.name", description = "%supportsDdl.description", defaultValue = DEFAULT_ALLOWS_DDL
             + "")
-    boolean allowsDdl() default DEFAULT_ALLOWS_DDL;
+    boolean supportsDdl() default DEFAULT_ALLOWS_DDL;
 
     // ========== Regular Expression Features ==========
 
@@ -274,14 +265,6 @@ public @interface ConfigurableDialectConfig {
             + "")
     boolean supportsBitNXorAgg() default DEFAULT_SUPPORTS_BIT_NXOR_AGG;
 
-    @AttributeDefinition(name = "%supportsPercentileContAgg.name", description = "%supportsPercentileContAgg.description", defaultValue = DEFAULT_SUPPORTS_PERCENTILE_CONT_AGG
-            + "")
-    boolean supportsPercentileContAgg() default DEFAULT_SUPPORTS_PERCENTILE_CONT_AGG;
-
-    @AttributeDefinition(name = "%supportsPercentileDiscAgg.name", description = "%supportsPercentileDiscAgg.description", defaultValue = DEFAULT_SUPPORTS_PERCENTILE_DISC_AGG
-            + "")
-    boolean supportsPercentileDiscAgg() default DEFAULT_SUPPORTS_PERCENTILE_DISC_AGG;
-
     @AttributeDefinition(name = "%supportsPercentileCont.name", description = "%supportsPercentileCont.description", defaultValue = DEFAULT_SUPPORTS_PERCENTILE_CONT
             + "")
     boolean supportsPercentileCont() default DEFAULT_SUPPORTS_PERCENTILE_CONT;
@@ -310,11 +293,17 @@ public @interface ConfigurableDialectConfig {
             + "")
     boolean requiresDrillthroughMaxRowsInLimit() default DEFAULT_REQUIRES_DRILLTHROUGH_MAX_ROWS_IN_LIMIT;
 
-    @AttributeDefinition(name = "%supportParallelLoading.name", description = "%supportParallelLoading.description", defaultValue = DEFAULT_SUPPORT_PARALLEL_LOADING
+    @AttributeDefinition(name = "%supportsParallelLoading.name", description = "%supportsParallelLoading.description", defaultValue = DEFAULT_SUPPORT_PARALLEL_LOADING
             + "")
-    boolean supportParallelLoading() default DEFAULT_SUPPORT_PARALLEL_LOADING;
+    boolean supportsParallelLoading() default DEFAULT_SUPPORT_PARALLEL_LOADING;
 
-    @AttributeDefinition(name = "%supportBatchOperations.name", description = "%supportBatchOperations.description", defaultValue = DEFAULT_SUPPORT_BATCH_OPERATIONS
+    @AttributeDefinition(name = "%supportsBatchOperations.name", description = "%supportsBatchOperations.description", defaultValue = DEFAULT_SUPPORT_BATCH_OPERATIONS
             + "")
-    boolean supportBatchOperations() default DEFAULT_SUPPORT_BATCH_OPERATIONS;
+    boolean supportsBatchOperations() default DEFAULT_SUPPORT_BATCH_OPERATIONS;
+
+    @AttributeDefinition(name = "%caseFolding.name", description = "%caseFolding.description")
+    org.eclipse.daanse.jdbc.db.dialect.api.IdentifierCaseFolding caseFolding() default org.eclipse.daanse.jdbc.db.dialect.api.IdentifierCaseFolding.UPPER;
+
+    @AttributeDefinition(name = "%quotingPolicy.name", description = "%quotingPolicy.description")
+    org.eclipse.daanse.jdbc.db.dialect.api.IdentifierQuotingPolicy quotingPolicy() default org.eclipse.daanse.jdbc.db.dialect.api.IdentifierQuotingPolicy.ALWAYS;
 }

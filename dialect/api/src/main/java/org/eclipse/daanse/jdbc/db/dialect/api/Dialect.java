@@ -173,4 +173,12 @@ public interface Dialect
         };
     }
 
+    /**
+     * The spelling of the duplicate-eliminating set-union operator. ANSI SQL and
+     * virtually every DBMS accept the bare {@code union};
+     */
+    default String unionDistinctKeyword() {
+        return "union";
+    }
+
 }

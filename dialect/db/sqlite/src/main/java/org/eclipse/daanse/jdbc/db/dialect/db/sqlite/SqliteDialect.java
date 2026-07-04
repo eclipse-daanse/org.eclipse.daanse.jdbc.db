@@ -21,6 +21,11 @@
  */
 package org.eclipse.daanse.jdbc.db.dialect.db.sqlite;
 
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Types;
+
+import org.eclipse.daanse.jdbc.db.dialect.api.type.BestFitColumnType;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.AbstractJdbcDialect;
 
 public class SqliteDialect extends AbstractJdbcDialect {
@@ -62,9 +67,53 @@ public class SqliteDialect extends AbstractJdbcDialect {
         return false;
     }
 
+    /**
+     * SQLite does not support the ANSI derived-column-list aliasing
+     * {@code (VALUES ...) AS t (c1, c2)} ("near \"(\": syntax error"); inline
+     * datasets render as the generic {@code select ... union all select ...}
+     * form instead (SQLite allows SELECT without FROM).
+     */
+    @Override
+    public StringBuilder generateInline(java.util.List<String> columnNames, java.util.List<String> columnTypes,
+            java.util.List<String[]> valueList) {
+        return generateInlineGeneric(columnNames, columnTypes, valueList, null, false);
+    }
+
     @Override
     public StringBuilder generateOrderByNulls(CharSequence expr, boolean ascending, boolean collateNullsLast) {
         return generateOrderByNullsAnsi(expr, ascending, collateNullsLast);
+    }
+
+    /**
+     * SQLite has no static column types: for expression columns (no source table,
+     * e.g. {@code sum(x)}) the xerial driver derives the reported JDBC type from
+     * the CURRENT ROW's storage class. A {@code sum()} over a NUMERIC-affinity
+     * column therefore reports {@code INTEGER} whenever the first row's total
+     * happens to be integral, an INT/LONG accessor is chosen once for the whole
+     * result, and every later REAL row is silently truncated by {@code getInt()}
+     * (e.g. a closure-table salary rollup losing exactly the sum of all
+     * fractional parts). For numeric expression columns use the OBJECT accessor,
+     * which reads each row with its own storage class. Plain table columns keep
+     * the default mapping — their metadata comes from the declared type and is
+     * row-independent.
+     */
+    @Override
+    public BestFitColumnType getType(ResultSetMetaData metaData, int columnIndex) throws SQLException {
+        final int columnType = metaData.getColumnType(columnIndex + 1);
+        switch (columnType) {
+        case Types.TINYINT, Types.SMALLINT, Types.INTEGER, Types.BIGINT, Types.NUMERIC, Types.DECIMAL, Types.REAL,
+                Types.FLOAT, Types.DOUBLE: {
+            final String table = metaData.getTableName(columnIndex + 1);
+            if (table == null || table.isEmpty()) {
+                logTypeInfo(metaData, columnIndex, BestFitColumnType.OBJECT);
+                return BestFitColumnType.OBJECT;
+            }
+            break;
+        }
+        default:
+            break;
+        }
+        return super.getType(metaData, columnIndex);
     }
 
     @Override

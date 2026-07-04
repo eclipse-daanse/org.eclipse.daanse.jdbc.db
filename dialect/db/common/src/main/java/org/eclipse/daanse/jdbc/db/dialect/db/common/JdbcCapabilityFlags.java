@@ -61,7 +61,7 @@ final class JdbcCapabilityFlags {
     }
 
     boolean allowsJoinOn() {
-        return false;
+        return true;
     }
 
     boolean supportsGroupingSets() {

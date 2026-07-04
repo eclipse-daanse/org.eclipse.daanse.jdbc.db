@@ -15,6 +15,25 @@ import java.util.OptionalLong;
 public interface PaginationGenerator {
 
     /**
+     * Limit fragment that must be placed immediately after {@code SELECT [DISTINCT]}, used by
+     * dialects that express row limits as a leading clause (e.g. SQL Server / Sybase
+     * {@code TOP n}) rather than a trailing clause.
+     * <p>
+     * The default is {@link Optional#empty()}, meaning the dialect uses the trailing
+     * {@link #paginate(OptionalLong, OptionalLong)} form instead. A dialect must implement
+     * <em>either</em> this leading form <em>or</em> the trailing form, never both for the
+     * same query.
+     *
+     * @param limit  maximum rows to return (must be ≥ 0 if present)
+     * @param offset rows to skip (must be ≥ 0 if present)
+     * @return the {@code SELECT}-prefix fragment (without trailing space), or empty when the
+     *         dialect paginates with a trailing clause
+     */
+    default Optional<String> selectPrefix(OptionalLong limit, OptionalLong offset) {
+        return Optional.empty();
+    }
+
+    /**
      * @param limit  maximum rows to return (must be ≥ 0 if present)
      * @param offset rows to skip (must be ≥ 0 if present)
      * @return suffix to append after {@code ORDER BY …} (may be empty, never null)

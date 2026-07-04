@@ -14,6 +14,7 @@
 package org.eclipse.daanse.jdbc.db.dialect.db.clickhouse;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -40,17 +41,29 @@ class ClickHouseDialectTest {
         when(connection.getMetaData()).thenReturn(metaData);
         when(metaData.getDatabaseProductName()).thenReturn("ClickHouse");
         when(metaData.getDatabaseProductVersion()).thenReturn("23.0");
-        dialect = new ClickHouseDialect(connection);
+        dialect = new ClickHouseDialect(
+                org.eclipse.daanse.jdbc.db.dialect.api.DialectInitData.fromConnection(connection));
     }
 
     @Test
     void testGetDialectName() {
-        assertEquals("clickhouse", dialect.getDialectName());
+        assertEquals("clickhouse", dialect.name());
     }
 
     @Test
     void testRequiresDrillthroughMaxRowsInLimit() {
         assertTrue(dialect.requiresDrillthroughMaxRowsInLimit());
+    }
+
+    @Test
+    void capability_flags_reflect_clickhouse_constraints() {
+        // ClickHouse: no FK / sequences, no DROP CONSTRAINT IF EXISTS, no
+        // CREATE OR REPLACE VIEW. Most other IF EXISTS forms ARE supported.
+        assertFalse(dialect.supportsSequences());
+        assertFalse(dialect.supportsDropConstraintIfExists());
+        assertFalse(dialect.supportsCreateOrReplaceView());
+        assertTrue(dialect.supportsDropTableIfExists());
+        assertTrue(dialect.supportsCreateTableIfNotExists());
     }
 
     @Nested
@@ -98,37 +111,37 @@ class ClickHouseDialectTest {
 
         @Test
         void testGenerateBitAggregation_AND() {
-            String result = dialect.generateBitAggregation(BitOperation.AND, "column1").toString();
+            String result = dialect.generateBitAggregation(BitOperation.AND, "column1").orElseThrow();
             assertEquals("groupBitAnd(column1)", result);
         }
 
         @Test
         void testGenerateBitAggregation_OR() {
-            String result = dialect.generateBitAggregation(BitOperation.OR, "column1").toString();
+            String result = dialect.generateBitAggregation(BitOperation.OR, "column1").orElseThrow();
             assertEquals("groupBitOr(column1)", result);
         }
 
         @Test
         void testGenerateBitAggregation_XOR() {
-            String result = dialect.generateBitAggregation(BitOperation.XOR, "column1").toString();
+            String result = dialect.generateBitAggregation(BitOperation.XOR, "column1").orElseThrow();
             assertEquals("groupBitXor(column1)", result);
         }
 
         @Test
         void testGenerateBitAggregation_NAND() {
-            String result = dialect.generateBitAggregation(BitOperation.NAND, "column1").toString();
+            String result = dialect.generateBitAggregation(BitOperation.NAND, "column1").orElseThrow();
             assertEquals("NOT(groupBitAnd(column1))", result);
         }
 
         @Test
         void testGenerateBitAggregation_NOR() {
-            String result = dialect.generateBitAggregation(BitOperation.NOR, "column1").toString();
+            String result = dialect.generateBitAggregation(BitOperation.NOR, "column1").orElseThrow();
             assertEquals("NOT(groupBitOr(column1))", result);
         }
 
         @Test
         void testGenerateBitAggregation_NXOR() {
-            String result = dialect.generateBitAggregation(BitOperation.NXOR, "column1").toString();
+            String result = dialect.generateBitAggregation(BitOperation.NXOR, "column1").orElseThrow();
             assertEquals("NOT(groupBitXor(column1))", result);
         }
     }
@@ -149,7 +162,7 @@ class ClickHouseDialectTest {
 
         @Test
         void testGenerateListAgg() {
-            String result = dialect.generateListAgg("column1", false, null, null, null, null).toString();
+            String result = dialect.generateListAgg("column1", false, null, null, null, null).orElseThrow();
             assertEquals("groupArrayArray( column1)", result);
         }
     }
