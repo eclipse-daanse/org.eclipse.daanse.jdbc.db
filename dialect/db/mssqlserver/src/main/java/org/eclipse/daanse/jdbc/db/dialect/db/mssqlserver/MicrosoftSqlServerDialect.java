@@ -525,7 +525,7 @@ public class MicrosoftSqlServerDialect extends AbstractJdbcDialect {
     public List<Trigger> getAllTriggers(Connection connection, String catalog, String schema) throws SQLException {
         String sql = """
                 SELECT t.name AS trigger_name, OBJECT_SCHEMA_NAME(t.parent_id) AS schema_name,
-                       OBJECT_NAME(t.parent_id) AS table_name, t.is_instead_of_trigger, m.definition
+                        OBJECT_NAME(t.parent_id) AS table_name, t.is_instead_of_trigger, m.definition
                 FROM sys.triggers t JOIN sys.sql_modules m ON m.object_id = t.object_id
                 WHERE t.parent_id > 0 AND OBJECT_SCHEMA_NAME(t.parent_id) = ?
                 ORDER BY OBJECT_NAME(t.parent_id), t.name
@@ -548,10 +548,10 @@ public class MicrosoftSqlServerDialect extends AbstractJdbcDialect {
             throws SQLException {
         String sql = """
                 SELECT t.name AS trigger_name, OBJECT_SCHEMA_NAME(t.parent_id) AS schema_name,
-                       OBJECT_NAME(t.parent_id) AS table_name, t.is_instead_of_trigger, m.definition
+                        OBJECT_NAME(t.parent_id) AS table_name, t.is_instead_of_trigger, m.definition
                 FROM sys.triggers t JOIN sys.sql_modules m ON m.object_id = t.object_id
                 WHERE t.parent_id > 0 AND OBJECT_SCHEMA_NAME(t.parent_id) = ?
-                  AND OBJECT_NAME(t.parent_id) = ?
+                    AND OBJECT_NAME(t.parent_id) = ?
                 ORDER BY t.name
                 """;
         String schemaName = resolveSchema(schema, connection);
@@ -572,10 +572,10 @@ public class MicrosoftSqlServerDialect extends AbstractJdbcDialect {
     public List<Sequence> getAllSequences(Connection connection, String catalog, String schema) throws SQLException {
         String sql = """
                 SELECT s.name AS sequence_name, SCHEMA_NAME(s.schema_id) AS schema_name,
-                       CAST(s.start_value AS BIGINT) AS start_value, CAST(s.increment AS BIGINT) AS increment,
-                       CAST(s.minimum_value AS BIGINT) AS minimum_value, CAST(s.maximum_value AS BIGINT) AS maximum_value,
-                       s.is_cycling, CAST(s.current_value AS BIGINT) AS current_value,
-                       TYPE_NAME(s.system_type_id) AS data_type
+                        CAST(s.start_value AS BIGINT) AS start_value, CAST(s.increment AS BIGINT) AS increment,
+                        CAST(s.minimum_value AS BIGINT) AS minimum_value, CAST(s.maximum_value AS BIGINT) AS maximum_value,
+                        s.is_cycling, CAST(s.current_value AS BIGINT) AS current_value,
+                        TYPE_NAME(s.system_type_id) AS data_type
                 FROM sys.sequences s WHERE s.schema_id = SCHEMA_ID(?)
                 ORDER BY s.name
                 """;
@@ -618,21 +618,21 @@ public class MicrosoftSqlServerDialect extends AbstractJdbcDialect {
         // partition_number.
         String sql = """
                 SELECT OBJECT_NAME(p.object_id) AS table_name,
-                       p.partition_number,
-                       p.rows AS row_count,
-                       prv.value AS boundary_value,
-                       (SELECT TOP 1 col.name
+                        p.partition_number,
+                        p.rows AS row_count,
+                        prv.value AS boundary_value,
+                        (SELECT TOP 1 col.name
                         FROM sys.index_columns ic
                         JOIN sys.columns col ON col.object_id = ic.object_id AND col.column_id = ic.column_id
                         WHERE ic.object_id = p.object_id AND ic.index_id = p.index_id AND ic.partition_ordinal > 0
-                       ) AS partition_column
+                        ) AS partition_column
                 FROM sys.partitions p
                 JOIN sys.tables t ON t.object_id = p.object_id
                 JOIN sys.indexes i ON i.object_id = p.object_id AND i.index_id = p.index_id
                 JOIN sys.partition_schemes ps ON ps.data_space_id = i.data_space_id
                 JOIN sys.partition_functions pf ON pf.function_id = ps.function_id
                 LEFT JOIN sys.partition_range_values prv
-                  ON prv.function_id = pf.function_id AND prv.boundary_id = p.partition_number
+                    ON prv.function_id = pf.function_id AND prv.boundary_id = p.partition_number
                 WHERE SCHEMA_NAME(t.schema_id) = ? AND i.index_id IN (0, 1)
                 ORDER BY OBJECT_NAME(p.object_id), p.partition_number
                 """;
@@ -699,7 +699,7 @@ public class MicrosoftSqlServerDialect extends AbstractJdbcDialect {
                 SELECT cc.name AS constraint_name, OBJECT_NAME(cc.parent_object_id) AS table_name, cc.definition
                 FROM sys.check_constraints cc
                 WHERE OBJECT_SCHEMA_NAME(cc.parent_object_id) = ?
-                  AND OBJECT_NAME(cc.parent_object_id) = ?
+                    AND OBJECT_NAME(cc.parent_object_id) = ?
                 ORDER BY cc.name
                 """;
         String schemaName = resolveSchema(schema, connection);
@@ -727,7 +727,7 @@ public class MicrosoftSqlServerDialect extends AbstractJdbcDialect {
             throws SQLException {
         String sql = """
                 SELECT i.name AS constraint_name, OBJECT_NAME(i.object_id) AS table_name,
-                       c.name AS column_name, ic.key_ordinal
+                        c.name AS column_name, ic.key_ordinal
                 FROM sys.indexes i
                 JOIN sys.index_columns ic ON ic.object_id = i.object_id AND ic.index_id = i.index_id
                 JOIN sys.columns c ON c.object_id = ic.object_id AND c.column_id = ic.column_id
@@ -742,12 +742,12 @@ public class MicrosoftSqlServerDialect extends AbstractJdbcDialect {
             String tableName) throws SQLException {
         String sql = """
                 SELECT i.name AS constraint_name, OBJECT_NAME(i.object_id) AS table_name,
-                       c.name AS column_name, ic.key_ordinal
+                        c.name AS column_name, ic.key_ordinal
                 FROM sys.indexes i
                 JOIN sys.index_columns ic ON ic.object_id = i.object_id AND ic.index_id = i.index_id
                 JOIN sys.columns c ON c.object_id = ic.object_id AND c.column_id = ic.column_id
                 WHERE i.is_unique_constraint = 1 AND OBJECT_SCHEMA_NAME(i.object_id) = ?
-                  AND OBJECT_NAME(i.object_id) = ?
+                    AND OBJECT_NAME(i.object_id) = ?
                 ORDER BY i.name, ic.key_ordinal
                 """;
         return readUniqueConstraints(connection, sql, schema, tableName);
@@ -758,7 +758,7 @@ public class MicrosoftSqlServerDialect extends AbstractJdbcDialect {
             throws SQLException {
         String sql = """
                 SELECT i.name AS constraint_name, OBJECT_NAME(i.object_id) AS table_name,
-                       c.name AS column_name, ic.key_ordinal
+                        c.name AS column_name, ic.key_ordinal
                 FROM sys.indexes i
                 JOIN sys.index_columns ic ON ic.object_id = i.object_id AND ic.index_id = i.index_id
                 JOIN sys.columns c ON c.object_id = ic.object_id AND c.column_id = ic.column_id
@@ -793,10 +793,10 @@ public class MicrosoftSqlServerDialect extends AbstractJdbcDialect {
             throws SQLException {
         String sql = """
                 SELECT fk.name AS fk_name, OBJECT_NAME(fk.parent_object_id) AS fk_table,
-                       fk_col.name AS fk_column, OBJECT_NAME(fk.referenced_object_id) AS pk_table,
-                       pk_col.name AS pk_column, fkc.constraint_column_id AS key_seq,
-                       fk.delete_referential_action_desc AS delete_rule,
-                       fk.update_referential_action_desc AS update_rule
+                        fk_col.name AS fk_column, OBJECT_NAME(fk.referenced_object_id) AS pk_table,
+                        pk_col.name AS pk_column, fkc.constraint_column_id AS key_seq,
+                        fk.delete_referential_action_desc AS delete_rule,
+                        fk.update_referential_action_desc AS update_rule
                 FROM sys.foreign_keys fk
                 JOIN sys.foreign_key_columns fkc ON fkc.constraint_object_id = fk.object_id
                 JOIN sys.columns fk_col ON fk_col.object_id = fkc.parent_object_id AND fk_col.column_id = fkc.parent_column_id
@@ -824,10 +824,10 @@ public class MicrosoftSqlServerDialect extends AbstractJdbcDialect {
         // table.
         String sql = """
                 SELECT fk.name AS fk_name, OBJECT_NAME(fk.parent_object_id) AS fk_table,
-                       fk_col.name AS fk_column, OBJECT_NAME(fk.referenced_object_id) AS pk_table,
-                       pk_col.name AS pk_column, fkc.constraint_column_id AS key_seq,
-                       fk.delete_referential_action_desc AS delete_rule,
-                       fk.update_referential_action_desc AS update_rule
+                        fk_col.name AS fk_column, OBJECT_NAME(fk.referenced_object_id) AS pk_table,
+                        pk_col.name AS pk_column, fkc.constraint_column_id AS key_seq,
+                        fk.delete_referential_action_desc AS delete_rule,
+                        fk.update_referential_action_desc AS update_rule
                 FROM sys.foreign_keys fk
                 JOIN sys.foreign_key_columns fkc ON fkc.constraint_object_id = fk.object_id
                 JOIN sys.columns fk_col ON fk_col.object_id = fkc.parent_object_id AND fk_col.column_id = fkc.parent_column_id
@@ -853,13 +853,13 @@ public class MicrosoftSqlServerDialect extends AbstractJdbcDialect {
             throws SQLException {
         String sql = """
                 SELECT i.name AS index_name, i.type_desc AS index_type, i.is_unique,
-                       OBJECT_NAME(i.object_id) AS table_name, c.name AS column_name,
-                       ic.key_ordinal, ic.is_descending_key
+                        OBJECT_NAME(i.object_id) AS table_name, c.name AS column_name,
+                        ic.key_ordinal, ic.is_descending_key
                 FROM sys.indexes i
                 JOIN sys.index_columns ic ON ic.object_id = i.object_id AND ic.index_id = i.index_id
                 JOIN sys.columns c ON c.object_id = ic.object_id AND c.column_id = ic.column_id
                 WHERE OBJECT_SCHEMA_NAME(i.object_id) = ? AND i.type > 0
-                  AND i.is_primary_key = 0 AND i.is_unique_constraint = 0
+                    AND i.is_primary_key = 0 AND i.is_unique_constraint = 0
                 ORDER BY OBJECT_NAME(i.object_id), i.name, ic.key_ordinal
                 """;
         String schemaName = resolveSchema(schema, connection);
@@ -937,7 +937,7 @@ public class MicrosoftSqlServerDialect extends AbstractJdbcDialect {
 
         String sql = """
                 SELECT p.name AS routine_name, OBJECT_SCHEMA_NAME(p.object_id) AS schema_name,
-                       m.definition AS body, p.modify_date
+                        m.definition AS body, p.modify_date
                 FROM sys.procedures p
                 LEFT JOIN sys.sql_modules m ON m.object_id = p.object_id
                 WHERE OBJECT_SCHEMA_NAME(p.object_id) = ?
@@ -1013,8 +1013,8 @@ public class MicrosoftSqlServerDialect extends AbstractJdbcDialect {
             throws SQLException {
         String sql = """
                 SELECT OBJECT_NAME(p.object_id) AS routine_name, p.name AS param_name,
-                       p.is_output, TYPE_NAME(p.system_type_id) AS data_type,
-                       p.parameter_id, p.precision, p.scale
+                        p.is_output, TYPE_NAME(p.system_type_id) AS data_type,
+                        p.parameter_id, p.precision, p.scale
                 FROM sys.parameters p
                 JOIN sys.procedures pr ON pr.object_id = p.object_id
                 WHERE OBJECT_SCHEMA_NAME(p.object_id) = ? AND p.parameter_id > 0
@@ -1060,12 +1060,12 @@ public class MicrosoftSqlServerDialect extends AbstractJdbcDialect {
             throws SQLException {
         String sql = """
                 SELECT OBJECT_NAME(p.object_id) AS routine_name, p.name AS param_name,
-                       p.is_output, TYPE_NAME(p.system_type_id) AS data_type,
-                       p.parameter_id, p.precision, p.scale
+                        p.is_output, TYPE_NAME(p.system_type_id) AS data_type,
+                        p.parameter_id, p.precision, p.scale
                 FROM sys.parameters p
                 JOIN sys.objects o ON o.object_id = p.object_id
                 WHERE o.type IN ('FN', 'IF', 'TF') AND OBJECT_SCHEMA_NAME(p.object_id) = ?
-                      AND p.parameter_id > 0
+                        AND p.parameter_id > 0
                 ORDER BY OBJECT_NAME(p.object_id), p.parameter_id
                 """;
         Map<String, List<FunctionColumn>> result = new LinkedHashMap<>();
@@ -1238,8 +1238,8 @@ public class MicrosoftSqlServerDialect extends AbstractJdbcDialect {
         String schemaName = resolveSchema(schema, connection);
         String sql = """
                 SELECT t.name AS type_name, SCHEMA_NAME(t.schema_id) AS schema_name,
-                       TYPE_NAME(t.system_type_id) AS base_type_name,
-                       t.is_table_type
+                        TYPE_NAME(t.system_type_id) AS base_type_name,
+                        t.is_table_type
                 FROM sys.types t
                 WHERE t.is_user_defined = 1 AND SCHEMA_NAME(t.schema_id) = ?
                 ORDER BY t.name
@@ -1275,8 +1275,8 @@ public class MicrosoftSqlServerDialect extends AbstractJdbcDialect {
         // minor_id > 0).
         StringBuilder sql = new StringBuilder("""
                 SELECT s.name AS schema_name, o.name AS table_name,
-                       USER_NAME(p.grantor_principal_id) AS grantor,
-                       pp.name AS grantee, p.permission_name, p.state_desc
+                        USER_NAME(p.grantor_principal_id) AS grantor,
+                        pp.name AS grantee, p.permission_name, p.state_desc
                 FROM sys.database_permissions p
                 JOIN sys.objects o ON o.object_id = p.major_id
                 JOIN sys.schemas s ON s.schema_id = o.schema_id
@@ -1327,8 +1327,8 @@ public class MicrosoftSqlServerDialect extends AbstractJdbcDialect {
         // columns.column_id.
         StringBuilder sql = new StringBuilder("""
                 SELECT c.name AS column_name,
-                       USER_NAME(p.grantor_principal_id) AS grantor,
-                       pp.name AS grantee, p.permission_name, p.state_desc
+                        USER_NAME(p.grantor_principal_id) AS grantor,
+                        pp.name AS grantee, p.permission_name, p.state_desc
                 FROM sys.database_permissions p
                 JOIN sys.objects o ON o.object_id = p.major_id
                 JOIN sys.schemas s ON s.schema_id = o.schema_id
@@ -1383,14 +1383,14 @@ public class MicrosoftSqlServerDialect extends AbstractJdbcDialect {
         // implicit row IDs.
         StringBuilder sql = new StringBuilder("""
                 SELECT s.name AS schema_name, o.name AS table_name, c.name AS column_name,
-                       TYPE_NAME(c.system_type_id) AS type_name, c.max_length, c.precision, c.scale,
-                       c.is_nullable, c.is_computed, c.is_rowguidcol, c.system_type_id
+                        TYPE_NAME(c.system_type_id) AS type_name, c.max_length, c.precision, c.scale,
+                        c.is_nullable, c.is_computed, c.is_rowguidcol, c.system_type_id
                 FROM sys.columns c
                 JOIN sys.objects o ON o.object_id = c.object_id
                 JOIN sys.schemas s ON s.schema_id = o.schema_id
                 WHERE (c.is_computed = 1 OR c.system_type_id = 189 OR c.is_rowguidcol = 1)
-                  AND o.type = 'U'
-                  AND s.name = ?
+                    AND o.type = 'U'
+                    AND s.name = ?
                 """);
         boolean hasTableFilter = tableNamePattern != null && !tableNamePattern.isBlank()
                 && !"%".equals(tableNamePattern);

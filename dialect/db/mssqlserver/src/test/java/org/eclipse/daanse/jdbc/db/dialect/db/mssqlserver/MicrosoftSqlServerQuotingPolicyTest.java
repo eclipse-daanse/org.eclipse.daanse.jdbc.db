@@ -35,9 +35,9 @@ class MicrosoftSqlServerQuotingPolicyTest {
 
     @Test
     void renameTable_via_spRename_unquoted() {
-        assertThat(dialectNever().ddlGenerator().renameTable(EMP, "PERSON")).doesNotContainPattern("\\[[^]]*\\]") // no
-                                                                                                                  // [bracket]-quoted
-                                                                                                                  // identifiers
+        assertThat(dialectNever().ddlGenerator().renameTable(EMP, "PERSON")).doesNotContainPattern("\\[[^]]*\\]")   // no
+                                                                                                                    // [bracket]-quoted
+                                                                                                                    // identifiers
                 .contains("EMPLOYEES").contains("PERSON");
     }
 
