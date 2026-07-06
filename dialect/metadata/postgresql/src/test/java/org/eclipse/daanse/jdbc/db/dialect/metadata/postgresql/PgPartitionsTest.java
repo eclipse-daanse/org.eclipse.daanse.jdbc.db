@@ -7,7 +7,7 @@
 *
 * SPDX-License-Identifier: EPL-2.0
 */
-package org.eclipse.daanse.jdbc.db.dialect.db.postgresql;
+package org.eclipse.daanse.jdbc.db.dialect.metadata.postgresql;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -42,7 +42,7 @@ class PgPartitionsTest {
                     .withStartupTimeout(Duration.ofMinutes(2)));
 
     private static Connection connection;
-    private static PostgreSqlDialect dialect;
+    private static PostgreSqlMetadataProvider metadataProvider;
 
     @BeforeAll
     static void setUp() throws Exception {
@@ -74,8 +74,7 @@ class PgPartitionsTest {
             stmt.execute("CREATE TABLE customers_eu PARTITION OF customers_by_region FOR VALUES IN ('EU')");
             stmt.execute("CREATE TABLE customers_us PARTITION OF customers_by_region FOR VALUES IN ('US')");
         }
-        dialect = new PostgreSqlDialect(
-                org.eclipse.daanse.jdbc.db.dialect.api.DialectInitData.fromConnection(connection));
+        metadataProvider = new PostgreSqlMetadataProvider();
     }
 
     @AfterAll
@@ -88,14 +87,14 @@ class PgPartitionsTest {
 
     @Test
     void getAllPartitions_findsBothPartitionedTables() throws SQLException {
-        List<Partition> partitions = dialect.getAllPartitions(connection, null, SCHEMA);
+        List<Partition> partitions = metadataProvider.getAllPartitions(connection, null, SCHEMA);
         // 3 sales partitions + 2 customers partitions
         assertThat(partitions).hasSize(5);
     }
 
     @Test
     void getAllPartitions_rangeAndListMethodsBothReported() throws SQLException {
-        List<Partition> partitions = dialect.getAllPartitions(connection, null, SCHEMA);
+        List<Partition> partitions = metadataProvider.getAllPartitions(connection, null, SCHEMA);
         assertThat(partitions).filteredOn(p -> "sales_by_year".equals(p.table().name()))
                 .allMatch(p -> p.method() == PartitionMethod.RANGE);
         assertThat(partitions).filteredOn(p -> "customers_by_region".equals(p.table().name()))
@@ -104,7 +103,7 @@ class PgPartitionsTest {
 
     @Test
     void getAllPartitions_boundsCarryFromTo() throws SQLException {
-        List<Partition> partitions = dialect.getAllPartitions(connection, null, SCHEMA);
+        List<Partition> partitions = metadataProvider.getAllPartitions(connection, null, SCHEMA);
         Partition sales2022 = partitions.stream().filter(p -> "sales_2022".equals(p.name())).findFirst().orElseThrow();
         assertThat(sales2022.description()).isPresent();
         assertThat(sales2022.description().get()).contains("2022-01-01").contains("2023-01-01");
@@ -112,7 +111,7 @@ class PgPartitionsTest {
 
     @Test
     void getAllPartitions_listPartitionDescription() throws SQLException {
-        List<Partition> partitions = dialect.getAllPartitions(connection, null, SCHEMA);
+        List<Partition> partitions = metadataProvider.getAllPartitions(connection, null, SCHEMA);
         Partition eu = partitions.stream().filter(p -> "customers_eu".equals(p.name())).findFirst().orElseThrow();
         assertThat(eu.description()).isPresent();
         assertThat(eu.description().get()).contains("EU");
@@ -120,7 +119,7 @@ class PgPartitionsTest {
 
     @Test
     void getAllPartitions_expressionExtractsPartitionKey() throws SQLException {
-        List<Partition> partitions = dialect.getAllPartitions(connection, null, SCHEMA);
+        List<Partition> partitions = metadataProvider.getAllPartitions(connection, null, SCHEMA);
         Partition any = partitions.stream().filter(p -> "sales_by_year".equals(p.table().name())).findFirst()
                 .orElseThrow();
         assertThat(any.expression()).contains("sale_date");
@@ -128,9 +127,9 @@ class PgPartitionsTest {
 
     @Test
     void getPartitions_perTableFilters() throws SQLException {
-        List<Partition> sales = dialect.getPartitions(connection, null, SCHEMA, "sales_by_year");
+        List<Partition> sales = metadataProvider.getPartitions(connection, null, SCHEMA, "sales_by_year");
         assertThat(sales).hasSize(3);
-        List<Partition> cust = dialect.getPartitions(connection, null, SCHEMA, "customers_by_region");
+        List<Partition> cust = metadataProvider.getPartitions(connection, null, SCHEMA, "customers_by_region");
         assertThat(cust).hasSize(2);
     }
 }

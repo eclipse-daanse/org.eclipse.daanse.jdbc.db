@@ -83,5 +83,12 @@
       <version>3.26.0</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.eclipse.daanse</groupId>
+      <artifactId>
+    		org.eclipse.daanse.jdbc.db.dialect.metadata.h2
+      </artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+    </dependency>
   </dependencies>
 </project>

@@ -11,7 +11,7 @@
  *   SmartCity Jena - initial
  *   Stefan Bischof (bipolis.org) - initial
  */
-package org.eclipse.daanse.jdbc.db.dialect.db.mariadb;
+package org.eclipse.daanse.jdbc.db.dialect.metadata.mariadb;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -59,7 +59,7 @@ class MariaDBMetadataProviderTest {
                     Wait.forLogMessage(".*ready for connections.*\\n", 2).withStartupTimeout(Duration.ofMinutes(2)));
 
     private static Connection connection;
-    private static MariaDBDialect dialect;
+    private static MariaDBMetadataProvider dialect;
 
     @BeforeAll
     static void setUp() throws Exception {
@@ -210,7 +210,7 @@ class MariaDBMetadataProviderTest {
                     )
                     """);
         }
-        dialect = new MariaDBDialect(org.eclipse.daanse.jdbc.db.dialect.api.DialectInitData.fromConnection(connection));
+        dialect = new MariaDBMetadataProvider();
     }
 
     @AfterAll

@@ -11,7 +11,7 @@
  *   SmartCity Jena - initial
  *   Stefan Bischof (bipolis.org) - initial
  */
-package org.eclipse.daanse.jdbc.db.dialect.db.h2;
+package org.eclipse.daanse.jdbc.db.dialect.metadata.h2;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -44,7 +44,7 @@ import org.junit.jupiter.api.Test;
 class H2MetadataProviderTest {
 
     private static Connection connection;
-    private static H2Dialect dialect;
+    private static H2MetadataProvider metadataProvider;
     private static final String SCHEMA = "PUBLIC";
 
     @BeforeAll
@@ -168,7 +168,7 @@ class H2MetadataProviderTest {
                     $$
                     """);
         }
-        dialect = new H2Dialect(org.eclipse.daanse.jdbc.db.dialect.api.DialectInitData.fromConnection(connection));
+        metadataProvider = new H2MetadataProvider();
     }
 
     @AfterAll
@@ -183,13 +183,13 @@ class H2MetadataProviderTest {
 
     @Test
     void getAllTriggers_returnsTwoTriggers() throws SQLException {
-        List<Trigger> triggers = dialect.getAllTriggers(connection, null, SCHEMA);
+        List<Trigger> triggers = metadataProvider.getAllTriggers(connection, null, SCHEMA);
         assertThat(triggers).hasSize(2);
     }
 
     @Test
     void getAllTriggers_correctTimingAndEvent() throws SQLException {
-        List<Trigger> triggers = dialect.getAllTriggers(connection, null, SCHEMA);
+        List<Trigger> triggers = metadataProvider.getAllTriggers(connection, null, SCHEMA);
 
         Trigger empTrigger = findTrigger(triggers, "TRG_EMP_AUDIT");
         assertThat(empTrigger.timing()).isEqualTo(TriggerTiming.AFTER);
@@ -202,7 +202,7 @@ class H2MetadataProviderTest {
 
     @Test
     void getAllTriggers_correctTable() throws SQLException {
-        List<Trigger> triggers = dialect.getAllTriggers(connection, null, SCHEMA);
+        List<Trigger> triggers = metadataProvider.getAllTriggers(connection, null, SCHEMA);
 
         assertThat(findTrigger(triggers, "TRG_EMP_AUDIT").reference().table().name()).isEqualTo("EMPLOYEES");
         assertThat(findTrigger(triggers, "TRG_ORD_AUDIT").reference().table().name()).isEqualTo("ORDERS");
@@ -210,7 +210,7 @@ class H2MetadataProviderTest {
 
     @Test
     void getAllTriggers_bodyContainsClassName() throws SQLException {
-        List<Trigger> triggers = dialect.getAllTriggers(connection, null, SCHEMA);
+        List<Trigger> triggers = metadataProvider.getAllTriggers(connection, null, SCHEMA);
 
         for (Trigger trigger : triggers) {
             assertThat(trigger.body()).isPresent();
@@ -220,7 +220,7 @@ class H2MetadataProviderTest {
 
     @Test
     void getAllTriggers_orientationIsRow() throws SQLException {
-        List<Trigger> triggers = dialect.getAllTriggers(connection, null, SCHEMA);
+        List<Trigger> triggers = metadataProvider.getAllTriggers(connection, null, SCHEMA);
 
         for (Trigger trigger : triggers) {
             assertThat(trigger.orientation()).isPresent();
@@ -230,30 +230,30 @@ class H2MetadataProviderTest {
 
     @Test
     void getTriggers_filtersByTable() throws SQLException {
-        List<Trigger> empTriggers = dialect.getTriggers(connection, null, SCHEMA, "EMPLOYEES");
+        List<Trigger> empTriggers = metadataProvider.getTriggers(connection, null, SCHEMA, "EMPLOYEES");
         assertThat(empTriggers).hasSize(1);
         assertThat(empTriggers.get(0).name()).isEqualTo("TRG_EMP_AUDIT");
 
-        List<Trigger> ordTriggers = dialect.getTriggers(connection, null, SCHEMA, "ORDERS");
+        List<Trigger> ordTriggers = metadataProvider.getTriggers(connection, null, SCHEMA, "ORDERS");
         assertThat(ordTriggers).hasSize(1);
         assertThat(ordTriggers.get(0).name()).isEqualTo("TRG_ORD_AUDIT");
     }
 
     @Test
     void getTriggers_emptyForTableWithNoTriggers() throws SQLException {
-        List<Trigger> triggers = dialect.getTriggers(connection, null, SCHEMA, "DEPARTMENTS");
+        List<Trigger> triggers = metadataProvider.getTriggers(connection, null, SCHEMA, "DEPARTMENTS");
         assertThat(triggers).isEmpty();
     }
 
     @Test
     void getAllSequences_returnsAtLeastTwo() throws SQLException {
-        List<Sequence> sequences = dialect.getAllSequences(connection, null, SCHEMA);
+        List<Sequence> sequences = metadataProvider.getAllSequences(connection, null, SCHEMA);
         assertThat(sequences).hasSizeGreaterThanOrEqualTo(2);
     }
 
     @Test
     void getAllSequences_seqOrderIdProperties() throws SQLException {
-        List<Sequence> sequences = dialect.getAllSequences(connection, null, SCHEMA);
+        List<Sequence> sequences = metadataProvider.getAllSequences(connection, null, SCHEMA);
         Sequence seq = findSequence(sequences, "SEQ_ORDER_ID");
 
         assertThat(seq.startValue()).isEqualTo(1000L);
@@ -263,7 +263,7 @@ class H2MetadataProviderTest {
 
     @Test
     void getAllSequences_seqAuditIdProperties() throws SQLException {
-        List<Sequence> sequences = dialect.getAllSequences(connection, null, SCHEMA);
+        List<Sequence> sequences = metadataProvider.getAllSequences(connection, null, SCHEMA);
         Sequence seq = findSequence(sequences, "SEQ_AUDIT_ID");
 
         assertThat(seq.startValue()).isEqualTo(1L);
@@ -276,7 +276,7 @@ class H2MetadataProviderTest {
 
     @Test
     void getAllSequences_schemaIsPublic() throws SQLException {
-        List<Sequence> sequences = dialect.getAllSequences(connection, null, SCHEMA);
+        List<Sequence> sequences = metadataProvider.getAllSequences(connection, null, SCHEMA);
 
         for (Sequence seq : sequences) {
             assertThat(seq.schema()).isPresent();
@@ -286,7 +286,7 @@ class H2MetadataProviderTest {
 
     @Test
     void getAllCheckConstraints_returnsNamedConstraints() throws SQLException {
-        List<CheckConstraint> constraints = dialect.getAllCheckConstraints(connection, null, SCHEMA);
+        List<CheckConstraint> constraints = metadataProvider.getAllCheckConstraints(connection, null, SCHEMA);
 
         List<String> namedConstraints = constraints.stream().map(CheckConstraint::name)
                 .filter(name -> name.startsWith("CK_")).toList();
@@ -297,7 +297,7 @@ class H2MetadataProviderTest {
 
     @Test
     void getAllCheckConstraints_checkClauseContent() throws SQLException {
-        List<CheckConstraint> constraints = dialect.getAllCheckConstraints(connection, null, SCHEMA);
+        List<CheckConstraint> constraints = metadataProvider.getAllCheckConstraints(connection, null, SCHEMA);
 
         CheckConstraint salaryCheck = constraints.stream().filter(c -> "CK_SALARY_POSITIVE".equals(c.name()))
                 .findFirst().orElseThrow();
@@ -310,7 +310,7 @@ class H2MetadataProviderTest {
 
     @Test
     void getAllCheckConstraints_tableAssociation() throws SQLException {
-        List<CheckConstraint> constraints = dialect.getAllCheckConstraints(connection, null, SCHEMA);
+        List<CheckConstraint> constraints = metadataProvider.getAllCheckConstraints(connection, null, SCHEMA);
 
         CheckConstraint salaryCheck = constraints.stream().filter(c -> "CK_SALARY_POSITIVE".equals(c.name()))
                 .findFirst().orElseThrow();
@@ -323,13 +323,13 @@ class H2MetadataProviderTest {
 
     @Test
     void getCheckConstraints_filtersByTable() throws SQLException {
-        List<CheckConstraint> empConstraints = dialect.getCheckConstraints(connection, null, SCHEMA, "EMPLOYEES");
+        List<CheckConstraint> empConstraints = metadataProvider.getCheckConstraints(connection, null, SCHEMA, "EMPLOYEES");
 
         List<String> namedEmp = empConstraints.stream().map(CheckConstraint::name)
                 .filter(name -> name.startsWith("CK_")).toList();
         assertThat(namedEmp).containsExactly("CK_SALARY_POSITIVE");
 
-        List<CheckConstraint> orderItemConstraints = dialect.getCheckConstraints(connection, null, SCHEMA,
+        List<CheckConstraint> orderItemConstraints = metadataProvider.getCheckConstraints(connection, null, SCHEMA,
                 "ORDER_ITEMS");
 
         List<String> namedOI = orderItemConstraints.stream().map(CheckConstraint::name)
@@ -339,13 +339,13 @@ class H2MetadataProviderTest {
 
     @Test
     void getAllUniqueConstraints_returnsAtLeastThree() throws SQLException {
-        List<UniqueConstraint> constraints = dialect.getAllUniqueConstraints(connection, null, SCHEMA);
+        List<UniqueConstraint> constraints = metadataProvider.getAllUniqueConstraints(connection, null, SCHEMA);
         assertThat(constraints).hasSizeGreaterThanOrEqualTo(3);
     }
 
     @Test
     void getAllUniqueConstraints_singleColumn() throws SQLException {
-        List<UniqueConstraint> constraints = dialect.getAllUniqueConstraints(connection, null, SCHEMA);
+        List<UniqueConstraint> constraints = metadataProvider.getAllUniqueConstraints(connection, null, SCHEMA);
 
         UniqueConstraint uqDeptName = constraints.stream().filter(c -> "UQ_DEPT_NAME".equals(c.name())).findFirst()
                 .orElseThrow();
@@ -356,7 +356,7 @@ class H2MetadataProviderTest {
 
     @Test
     void getAllUniqueConstraints_multiColumn() throws SQLException {
-        List<UniqueConstraint> constraints = dialect.getAllUniqueConstraints(connection, null, SCHEMA);
+        List<UniqueConstraint> constraints = metadataProvider.getAllUniqueConstraints(connection, null, SCHEMA);
 
         UniqueConstraint uqAudit = constraints.stream().filter(c -> "UQ_AUDIT_UNIQUE".equals(c.name())).findFirst()
                 .orElseThrow();
@@ -369,29 +369,29 @@ class H2MetadataProviderTest {
 
     @Test
     void getUniqueConstraints_filtersByTable() throws SQLException {
-        List<UniqueConstraint> deptConstraints = dialect.getUniqueConstraints(connection, null, SCHEMA, "DEPARTMENTS");
+        List<UniqueConstraint> deptConstraints = metadataProvider.getUniqueConstraints(connection, null, SCHEMA, "DEPARTMENTS");
         assertThat(deptConstraints).hasSize(1);
         assertThat(deptConstraints.get(0).name()).isEqualTo("UQ_DEPT_NAME");
 
-        List<UniqueConstraint> orderConstraints = dialect.getUniqueConstraints(connection, null, SCHEMA, "ORDERS");
+        List<UniqueConstraint> orderConstraints = metadataProvider.getUniqueConstraints(connection, null, SCHEMA, "ORDERS");
         assertThat(orderConstraints).isEmpty();
     }
 
     @Test
     void getAllPrimaryKeys_isPresent() throws SQLException {
-        Optional<List<PrimaryKey>> result = dialect.getAllPrimaryKeys(connection, null, SCHEMA);
+        Optional<List<PrimaryKey>> result = metadataProvider.getAllPrimaryKeys(connection, null, SCHEMA);
         assertThat(result).isPresent();
     }
 
     @Test
     void getAllPrimaryKeys_returnsFive() throws SQLException {
-        List<PrimaryKey> primaryKeys = dialect.getAllPrimaryKeys(connection, null, SCHEMA).orElseThrow();
+        List<PrimaryKey> primaryKeys = metadataProvider.getAllPrimaryKeys(connection, null, SCHEMA).orElseThrow();
         assertThat(primaryKeys).hasSize(5);
     }
 
     @Test
     void getAllPrimaryKeys_simplePrimaryKey() throws SQLException {
-        List<PrimaryKey> primaryKeys = dialect.getAllPrimaryKeys(connection, null, SCHEMA).orElseThrow();
+        List<PrimaryKey> primaryKeys = metadataProvider.getAllPrimaryKeys(connection, null, SCHEMA).orElseThrow();
 
         PrimaryKey deptPk = primaryKeys.stream().filter(pk -> "DEPARTMENTS".equals(pk.table().name())).findFirst()
                 .orElseThrow();
@@ -402,7 +402,7 @@ class H2MetadataProviderTest {
 
     @Test
     void getAllPrimaryKeys_compositePrimaryKey() throws SQLException {
-        List<PrimaryKey> primaryKeys = dialect.getAllPrimaryKeys(connection, null, SCHEMA).orElseThrow();
+        List<PrimaryKey> primaryKeys = metadataProvider.getAllPrimaryKeys(connection, null, SCHEMA).orElseThrow();
 
         PrimaryKey oiPk = primaryKeys.stream().filter(pk -> "ORDER_ITEMS".equals(pk.table().name())).findFirst()
                 .orElseThrow();
@@ -415,19 +415,19 @@ class H2MetadataProviderTest {
 
     @Test
     void getAllImportedKeys_isPresent() throws SQLException {
-        Optional<List<ImportedKey>> result = dialect.getAllImportedKeys(connection, null, SCHEMA);
+        Optional<List<ImportedKey>> result = metadataProvider.getAllImportedKeys(connection, null, SCHEMA);
         assertThat(result).isPresent();
     }
 
     @Test
     void getAllImportedKeys_returnsThree() throws SQLException {
-        List<ImportedKey> importedKeys = dialect.getAllImportedKeys(connection, null, SCHEMA).orElseThrow();
+        List<ImportedKey> importedKeys = metadataProvider.getAllImportedKeys(connection, null, SCHEMA).orElseThrow();
         assertThat(importedKeys).hasSize(3);
     }
 
     @Test
     void getAllImportedKeys_fkEmpDeptDetails() throws SQLException {
-        List<ImportedKey> importedKeys = dialect.getAllImportedKeys(connection, null, SCHEMA).orElseThrow();
+        List<ImportedKey> importedKeys = metadataProvider.getAllImportedKeys(connection, null, SCHEMA).orElseThrow();
 
         ImportedKey fkEmpDept = importedKeys.stream().filter(fk -> "FK_EMP_DEPT".equals(fk.name())).findFirst()
                 .orElseThrow();
@@ -446,7 +446,7 @@ class H2MetadataProviderTest {
 
     @Test
     void getAllImportedKeys_keySequence() throws SQLException {
-        List<ImportedKey> importedKeys = dialect.getAllImportedKeys(connection, null, SCHEMA).orElseThrow();
+        List<ImportedKey> importedKeys = metadataProvider.getAllImportedKeys(connection, null, SCHEMA).orElseThrow();
 
         for (ImportedKey fk : importedKeys) {
             assertThat(fk.keySequence()).isGreaterThanOrEqualTo(1);
@@ -455,13 +455,13 @@ class H2MetadataProviderTest {
 
     @Test
     void getAllIndexInfo_isPresent() throws SQLException {
-        Optional<List<IndexInfo>> result = dialect.getAllIndexInfo(connection, null, SCHEMA);
+        Optional<List<IndexInfo>> result = metadataProvider.getAllIndexInfo(connection, null, SCHEMA);
         assertThat(result).isPresent();
     }
 
     @Test
     void getAllIndexInfo_containsUserIndexes() throws SQLException {
-        List<IndexInfo> indexInfos = dialect.getAllIndexInfo(connection, null, SCHEMA).orElseThrow();
+        List<IndexInfo> indexInfos = metadataProvider.getAllIndexInfo(connection, null, SCHEMA).orElseThrow();
 
         List<String> allIndexNames = indexInfos.stream().flatMap(ii -> ii.indexInfoItems().stream())
                 .map(IndexInfoItem::indexName).filter(Optional::isPresent).map(Optional::get).toList();
@@ -471,7 +471,7 @@ class H2MetadataProviderTest {
 
     @Test
     void getAllIndexInfo_nonUniqueIndex() throws SQLException {
-        List<IndexInfo> indexInfos = dialect.getAllIndexInfo(connection, null, SCHEMA).orElseThrow();
+        List<IndexInfo> indexInfos = metadataProvider.getAllIndexInfo(connection, null, SCHEMA).orElseThrow();
 
         IndexInfoItem lastNameIdx = findIndexItem(indexInfos, "IDX_EMP_LAST_NAME");
         assertThat(lastNameIdx.unique()).isFalse();
@@ -481,7 +481,7 @@ class H2MetadataProviderTest {
 
     @Test
     void getAllIndexInfo_uniqueIndex() throws SQLException {
-        List<IndexInfo> indexInfos = dialect.getAllIndexInfo(connection, null, SCHEMA).orElseThrow();
+        List<IndexInfo> indexInfos = metadataProvider.getAllIndexInfo(connection, null, SCHEMA).orElseThrow();
 
         List<IndexInfoItem> empDateItems = indexInfos.stream().flatMap(ii -> ii.indexInfoItems().stream())
                 .filter(item -> item.indexName().isPresent() && "IDX_ORD_EMP_DATE".equals(item.indexName().get()))
@@ -493,7 +493,7 @@ class H2MetadataProviderTest {
 
     @Test
     void getAllIndexInfo_multiColumnIndex() throws SQLException {
-        List<IndexInfo> indexInfos = dialect.getAllIndexInfo(connection, null, SCHEMA).orElseThrow();
+        List<IndexInfo> indexInfos = metadataProvider.getAllIndexInfo(connection, null, SCHEMA).orElseThrow();
 
         List<IndexInfoItem> empDateItems = indexInfos.stream().flatMap(ii -> ii.indexInfoItems().stream())
                 .filter(item -> item.indexName().isPresent() && "IDX_ORD_EMP_DATE".equals(item.indexName().get()))
@@ -508,7 +508,7 @@ class H2MetadataProviderTest {
 
     @Test
     void getAllIndexInfo_groupedByTable() throws SQLException {
-        List<IndexInfo> indexInfos = dialect.getAllIndexInfo(connection, null, SCHEMA).orElseThrow();
+        List<IndexInfo> indexInfos = metadataProvider.getAllIndexInfo(connection, null, SCHEMA).orElseThrow();
 
         List<String> tableNames = indexInfos.stream().map(ii -> ii.tableReference().name()).toList();
 
@@ -518,13 +518,13 @@ class H2MetadataProviderTest {
 
     @Test
     void getAllViewDefinitions_returnsTwo() throws SQLException {
-        List<ViewDefinition> views = dialect.getAllViewDefinitions(connection, null, SCHEMA);
+        List<ViewDefinition> views = metadataProvider.getAllViewDefinitions(connection, null, SCHEMA);
         assertThat(views).hasSize(2);
     }
 
     @Test
     void getAllViewDefinitions_bodyIsPresent() throws SQLException {
-        List<ViewDefinition> views = dialect.getAllViewDefinitions(connection, null, SCHEMA);
+        List<ViewDefinition> views = metadataProvider.getAllViewDefinitions(connection, null, SCHEMA);
 
         for (ViewDefinition view : views) {
             assertThat(view.viewBody()).isPresent();
@@ -534,7 +534,7 @@ class H2MetadataProviderTest {
 
     @Test
     void getAllViewDefinitions_bodyContainsSelect() throws SQLException {
-        List<ViewDefinition> views = dialect.getAllViewDefinitions(connection, null, SCHEMA);
+        List<ViewDefinition> views = metadataProvider.getAllViewDefinitions(connection, null, SCHEMA);
 
         for (ViewDefinition view : views) {
             assertThat(view.viewBody().get()).containsIgnoringCase("SELECT");
@@ -543,7 +543,7 @@ class H2MetadataProviderTest {
 
     @Test
     void getAllViewDefinitions_viewType() throws SQLException {
-        List<ViewDefinition> views = dialect.getAllViewDefinitions(connection, null, SCHEMA);
+        List<ViewDefinition> views = metadataProvider.getAllViewDefinitions(connection, null, SCHEMA);
 
         List<String> viewNames = views.stream().map(v -> v.view().name()).toList();
         assertThat(viewNames).containsExactlyInAnyOrder("V_EMP_DEPT", "V_ORDER_SUMMARY");
@@ -557,31 +557,31 @@ class H2MetadataProviderTest {
     void getAllProcedures_returnsEmpty() throws SQLException {
         // H2 does not have stored procedures in INFORMATION_SCHEMA.ROUTINES by default
         // (CREATE ALIAS creates functions, not procedures)
-        List<Procedure> procedures = dialect.getAllProcedures(connection, null, SCHEMA);
+        List<Procedure> procedures = metadataProvider.getAllProcedures(connection, null, SCHEMA);
         assertThat(procedures).isNotNull();
     }
 
     @Test
     void getAllFunctions_returnsAliases() throws SQLException {
-        List<Function> functions = dialect.getAllFunctions(connection, null, SCHEMA);
+        List<Function> functions = metadataProvider.getAllFunctions(connection, null, SCHEMA);
         assertThat(functions).isNotEmpty();
     }
 
     @Test
     void getAllFunctions_containsToUpper() throws SQLException {
-        List<Function> functions = dialect.getAllFunctions(connection, null, SCHEMA);
+        List<Function> functions = metadataProvider.getAllFunctions(connection, null, SCHEMA);
         assertThat(functions).anyMatch(f -> "TO_UPPER".equals(f.reference().name()));
     }
 
     @Test
     void getAllFunctions_containsAddNumbers() throws SQLException {
-        List<Function> functions = dialect.getAllFunctions(connection, null, SCHEMA);
+        List<Function> functions = metadataProvider.getAllFunctions(connection, null, SCHEMA);
         assertThat(functions).anyMatch(f -> "ADD_NUMBERS".equals(f.reference().name()));
     }
 
     @Test
     void getAllFunctions_addNumbersHasParameters() throws SQLException {
-        List<Function> functions = dialect.getAllFunctions(connection, null, SCHEMA);
+        List<Function> functions = metadataProvider.getAllFunctions(connection, null, SCHEMA);
         Function addNumbers = functions.stream().filter(f -> "ADD_NUMBERS".equals(f.reference().name())).findFirst()
                 .orElseThrow();
         assertThat(addNumbers.columns()).hasSizeGreaterThanOrEqualTo(2);
@@ -589,7 +589,7 @@ class H2MetadataProviderTest {
 
     @Test
     void getAllFunctions_schemaIsPublic() throws SQLException {
-        List<Function> functions = dialect.getAllFunctions(connection, null, SCHEMA);
+        List<Function> functions = metadataProvider.getAllFunctions(connection, null, SCHEMA);
         for (Function func : functions) {
             assertThat(func.reference().schema()).isPresent();
             assertThat(func.reference().schema().get().name()).isEqualTo("PUBLIC");
@@ -598,7 +598,7 @@ class H2MetadataProviderTest {
 
     @Test
     void getAllFunctions_bodyIsPresent() throws SQLException {
-        List<Function> functions = dialect.getAllFunctions(connection, null, SCHEMA);
+        List<Function> functions = metadataProvider.getAllFunctions(connection, null, SCHEMA);
         // H2 stores the Java source of CREATE ALIAS functions in ROUTINE_DEFINITION.
         Function toUpper = functions.stream().filter(f -> "TO_UPPER".equals(f.reference().name())).findFirst()
                 .orElseThrow();
@@ -608,7 +608,7 @@ class H2MetadataProviderTest {
 
     @Test
     void getAllFunctions_addNumbersBodyContainsReturn() throws SQLException {
-        List<Function> functions = dialect.getAllFunctions(connection, null, SCHEMA);
+        List<Function> functions = metadataProvider.getAllFunctions(connection, null, SCHEMA);
         Function addNumbers = functions.stream().filter(f -> "ADD_NUMBERS".equals(f.reference().name())).findFirst()
                 .orElseThrow();
         assertThat(addNumbers.body()).isPresent();
@@ -619,7 +619,7 @@ class H2MetadataProviderTest {
     void getAllFunctions_fullDefinitionEmpty_forH2() throws SQLException {
         // H2's INFORMATION_SCHEMA.ROUTINES has no full CREATE DDL; the dialect reports
         // empty.
-        List<Function> functions = dialect.getAllFunctions(connection, null, SCHEMA);
+        List<Function> functions = metadataProvider.getAllFunctions(connection, null, SCHEMA);
         for (Function func : functions) {
             assertThat(func.fullDefinition()).isNotPresent();
         }
@@ -627,7 +627,7 @@ class H2MetadataProviderTest {
 
     @Test
     void getAllUserDefinedTypes_returnsEmpty() throws SQLException {
-        List<UserDefinedType> udts = dialect.getAllUserDefinedTypes(connection, null, SCHEMA);
+        List<UserDefinedType> udts = metadataProvider.getAllUserDefinedTypes(connection, null, SCHEMA);
         assertThat(udts).isEmpty();
     }
 

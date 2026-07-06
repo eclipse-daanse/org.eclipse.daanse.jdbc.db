@@ -22,6 +22,7 @@ import java.sql.Statement;
 import org.eclipse.daanse.jdbc.db.api.meta.MetaInfo;
 import org.eclipse.daanse.jdbc.db.api.meta.StructureInfo;
 import org.eclipse.daanse.jdbc.db.dialect.db.h2.H2Dialect;
+import org.eclipse.daanse.jdbc.db.dialect.metadata.h2.H2MetadataProvider;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -29,7 +30,7 @@ import org.junit.jupiter.api.Test;
 class DatabaseServiceImplProviderH2Test {
 
     private static Connection connection;
-    private static H2Dialect dialect;
+    private static H2MetadataProvider metadataProvider;
     private static MetaInfo metaInfo;
 
     @BeforeAll
@@ -137,9 +138,9 @@ class DatabaseServiceImplProviderH2Test {
                     """);
         }
 
-        dialect = new H2Dialect(org.eclipse.daanse.jdbc.db.dialect.api.DialectInitData.fromConnection(connection));
+        metadataProvider = new H2MetadataProvider();
         DatabaseServiceImpl service = new DatabaseServiceImpl();
-        metaInfo = service.createMetaInfo(connection, dialect);
+        metaInfo = service.createMetaInfo(connection, metadataProvider);
     }
 
     @AfterAll

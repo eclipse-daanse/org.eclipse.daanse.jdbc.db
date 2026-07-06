@@ -29,6 +29,7 @@ import org.eclipse.daanse.jdbc.db.api.schema.PrimaryKey;
 import org.eclipse.daanse.jdbc.db.api.schema.TableDefinition;
 import org.eclipse.daanse.jdbc.db.impl.DatabaseServiceImpl;
 import org.eclipse.daanse.jdbc.db.dialect.db.h2.H2Dialect;
+import org.eclipse.daanse.jdbc.db.dialect.metadata.h2.H2MetadataProvider;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -38,6 +39,7 @@ class DialectDdlH2Test {
     private static Connection connection;
     private static H2Dialect dialect;
     private static MetaInfo metaInfo;
+	private static H2MetadataProvider metadataProvider;
 
     @BeforeAll
     static void setUp() throws Exception {
@@ -52,8 +54,8 @@ class DialectDdlH2Test {
                     )
                     """);
         }
-        dialect = new H2Dialect(org.eclipse.daanse.jdbc.db.dialect.api.DialectInitData.fromConnection(connection));
-        metaInfo = new DatabaseServiceImpl().createMetaInfo(connection, dialect);
+        metadataProvider = new H2MetadataProvider();
+        metaInfo = new DatabaseServiceImpl().createMetaInfo(connection, metadataProvider);
     }
 
     @AfterAll

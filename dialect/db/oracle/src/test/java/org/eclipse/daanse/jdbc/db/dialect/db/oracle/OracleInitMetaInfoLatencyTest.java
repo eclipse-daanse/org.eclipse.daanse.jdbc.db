@@ -18,6 +18,7 @@ import java.sql.Statement;
 import javax.sql.DataSource;
 
 import org.eclipse.daanse.jdbc.db.api.DatabaseService;
+import org.eclipse.daanse.jdbc.db.dialect.metadata.oracle.OracleMetadataProvider;
 import org.eclipse.daanse.jdbc.db.impl.DatabaseServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.OracleContainer;
@@ -61,7 +62,7 @@ class OracleInitMetaInfoLatencyTest {
     private void runMetaInfo(DataSource ds) throws SQLException {
         try (Connection c = ds.getConnection()) {
             service.createMetaInfo(c,
-                    new OracleDialect(org.eclipse.daanse.jdbc.db.dialect.api.DialectInitData.fromConnection(c)));
+                    new OracleMetadataProvider());
         }
     }
 

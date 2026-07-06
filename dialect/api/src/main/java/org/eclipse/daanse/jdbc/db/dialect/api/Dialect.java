@@ -29,7 +29,6 @@ package org.eclipse.daanse.jdbc.db.dialect.api;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
-import org.eclipse.daanse.jdbc.db.api.MetadataProvider;
 import org.eclipse.daanse.jdbc.db.dialect.api.capability.DialectCapabilitiesProvider;
 import org.eclipse.daanse.jdbc.db.dialect.api.generator.AggregationGenerator;
 import org.eclipse.daanse.jdbc.db.dialect.api.generator.CastGenerator;
@@ -50,7 +49,7 @@ import org.eclipse.daanse.jdbc.db.dialect.api.type.BestFitColumnType;
 import org.eclipse.daanse.jdbc.db.dialect.api.type.TypeMapper;
 
 public interface Dialect
-        extends IdentifierQuoter, LiteralQuoter, DialectCapabilitiesProvider, TypeMapper, MetadataProvider {
+        extends IdentifierQuoter, LiteralQuoter, DialectCapabilitiesProvider, TypeMapper {
 
     /**
      * Whether double values need an explicit {@code "E0"} exponent (LucidDB quirk).

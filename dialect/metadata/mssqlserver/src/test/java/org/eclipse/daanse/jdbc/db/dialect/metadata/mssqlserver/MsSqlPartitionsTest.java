@@ -7,7 +7,7 @@
 *
 * SPDX-License-Identifier: EPL-2.0
 */
-package org.eclipse.daanse.jdbc.db.dialect.db.mssqlserver;
+package org.eclipse.daanse.jdbc.db.dialect.metadata.mssqlserver;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -41,7 +41,7 @@ class MsSqlPartitionsTest {
     private static final String SCHEMA = "dbo";
 
     private static Connection connection;
-    private static MicrosoftSqlServerDialect dialect;
+    private static MicrosoftSqlServerMetadataProvider metadataProvider;
 
     @BeforeAll
     void setUp() throws Exception {
@@ -61,7 +61,7 @@ class MsSqlPartitionsTest {
                     ) ON ps_sales_year(sale_year)
                     """);
         }
-        dialect = new MicrosoftSqlServerDialect();
+        metadataProvider = new MicrosoftSqlServerMetadataProvider();
     }
 
     @AfterAll
@@ -73,7 +73,7 @@ class MsSqlPartitionsTest {
 
     @Test
     void getAllPartitions_returnsFourPartitions() throws SQLException {
-        List<Partition> partitions = dialect.getAllPartitions(connection, null, SCHEMA);
+        List<Partition> partitions = metadataProvider.getAllPartitions(connection, null, SCHEMA);
         // RANGE RIGHT FOR VALUES (2023, 2024, 2025) → 4 partitions
         assertThat(partitions).hasSize(4);
         assertThat(partitions).allMatch(p -> p.method() == PartitionMethod.RANGE);
@@ -81,21 +81,21 @@ class MsSqlPartitionsTest {
 
     @Test
     void getAllPartitions_partitionColumnIsSaleYear() throws SQLException {
-        List<Partition> partitions = dialect.getAllPartitions(connection, null, SCHEMA);
+        List<Partition> partitions = metadataProvider.getAllPartitions(connection, null, SCHEMA);
         assertThat(partitions)
                 .allMatch(p -> p.expression().isPresent() && "sale_year".equalsIgnoreCase(p.expression().get()));
     }
 
     @Test
     void getAllPartitions_ordinalPositionsAreSequential() throws SQLException {
-        List<Partition> partitions = dialect.getAllPartitions(connection, null, SCHEMA);
+        List<Partition> partitions = metadataProvider.getAllPartitions(connection, null, SCHEMA);
         assertThat(partitions).extracting(p -> p.ordinalPosition().orElseThrow()).containsExactly(1, 2, 3, 4);
     }
 
     @Test
     void getPartitions_perTableMatchesAll() throws SQLException {
-        List<Partition> all = dialect.getAllPartitions(connection, null, SCHEMA);
-        List<Partition> sales = dialect.getPartitions(connection, null, SCHEMA, "sales_by_year");
+        List<Partition> all = metadataProvider.getAllPartitions(connection, null, SCHEMA);
+        List<Partition> sales = metadataProvider.getPartitions(connection, null, SCHEMA, "sales_by_year");
         assertThat(sales).hasSameSizeAs(all);
     }
 }

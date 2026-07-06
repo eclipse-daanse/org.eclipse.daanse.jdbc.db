@@ -30,5 +30,6 @@
   <modules>
     <module>api</module>
     <module>db</module>
+    <module>metadata</module>
   </modules>
 </project>
