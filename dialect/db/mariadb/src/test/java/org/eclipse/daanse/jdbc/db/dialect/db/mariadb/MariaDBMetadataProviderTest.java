@@ -152,13 +152,13 @@ class MariaDBMetadataProviderTest {
             stmt.execute("""
                     CREATE VIEW V_EMP_DEPT AS
                         SELECT E.EMP_ID, E.FIRST_NAME, E.LAST_NAME, E.EMAIL, E.SALARY,
-                               D.DEPT_NAME, D.LOCATION
+                                D.DEPT_NAME, D.LOCATION
                         FROM EMPLOYEES E LEFT JOIN DEPARTMENTS D ON E.DEPT_ID = D.DEPT_ID
                     """);
             stmt.execute("""
                     CREATE VIEW V_ORDER_SUMMARY AS
                         SELECT O.ORDER_ID, O.ORDER_DATE, O.STATUS,
-                               CONCAT(E.FIRST_NAME, ' ', E.LAST_NAME) AS EMP_NAME
+                                CONCAT(E.FIRST_NAME, ' ', E.LAST_NAME) AS EMP_NAME
                         FROM ORDERS O JOIN EMPLOYEES E ON O.EMP_ID = E.EMP_ID
                     """);
 

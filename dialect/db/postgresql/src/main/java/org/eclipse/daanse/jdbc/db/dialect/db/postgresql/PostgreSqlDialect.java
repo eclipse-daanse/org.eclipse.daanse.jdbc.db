@@ -429,8 +429,8 @@ public class PostgreSqlDialect extends AbstractJdbcDialect {
     public List<Trigger> getAllTriggers(Connection connection, String catalog, String schema) throws SQLException {
         String sql = """
                 SELECT t.tgname AS trigger_name, c.relname AS table_name, n.nspname AS schema_name,
-                       pg_get_triggerdef(t.oid) AS definition,
-                       p.prosrc AS proc_body
+                        pg_get_triggerdef(t.oid) AS definition,
+                        p.prosrc AS proc_body
                 FROM pg_trigger t
                 JOIN pg_class c ON c.oid = t.tgrelid
                 JOIN pg_namespace n ON n.oid = c.relnamespace
@@ -456,8 +456,8 @@ public class PostgreSqlDialect extends AbstractJdbcDialect {
             throws SQLException {
         String sql = """
                 SELECT t.tgname AS trigger_name, c.relname AS table_name, n.nspname AS schema_name,
-                       pg_get_triggerdef(t.oid) AS definition,
-                       p.prosrc AS proc_body
+                        pg_get_triggerdef(t.oid) AS definition,
+                        p.prosrc AS proc_body
                 FROM pg_trigger t
                 JOIN pg_class c ON c.oid = t.tgrelid
                 JOIN pg_namespace n ON n.oid = c.relnamespace
@@ -483,7 +483,7 @@ public class PostgreSqlDialect extends AbstractJdbcDialect {
     public List<Sequence> getAllSequences(Connection connection, String catalog, String schema) throws SQLException {
         String sql = """
                 SELECT sequence_name, start_value, increment, minimum_value, maximum_value,
-                       cycle_option, data_type
+                        cycle_option, data_type
                 FROM information_schema.sequences
                 WHERE sequence_schema = ?
                 ORDER BY sequence_name
@@ -527,11 +527,11 @@ public class PostgreSqlDialect extends AbstractJdbcDialect {
         // pg_get_partkeydef returns the partition key like "RANGE (year)".
         String sql = """
                 SELECT p.relname AS parent_table,
-                       c.relname AS partition_name,
-                       pt.partstrat AS strategy,
-                       pg_get_expr(c.relpartbound, c.oid) AS bound,
-                       c.reltuples::bigint AS row_count,
-                       pg_get_partkeydef(p.oid) AS keydef
+                        c.relname AS partition_name,
+                        pt.partstrat AS strategy,
+                        pg_get_expr(c.relpartbound, c.oid) AS bound,
+                        c.reltuples::bigint AS row_count,
+                        pg_get_partkeydef(p.oid) AS keydef
                 FROM pg_inherits i
                 JOIN pg_class c ON c.oid = i.inhrelid
                 JOIN pg_class p ON p.oid = i.inhparent
@@ -558,9 +558,9 @@ public class PostgreSqlDialect extends AbstractJdbcDialect {
                     String expression = extractPartitionKey(keydef);
 
                     TableReference tableRef = new TableReference(oSchema, parentTable);
-                    partitions.add(new PartitionRecord(partitionName, tableRef, Optional.empty(), // PostgreSQL has no
-                                                                                                  // native ordinal
-                                                                                                  // position
+                    partitions.add(new PartitionRecord(partitionName, tableRef, Optional.empty(),   // PostgreSQL has no
+                                                                                                    // native ordinal
+                                                                                                    // position
                             method, expression == null ? Optional.empty() : Optional.of(expression),
                             bound == null ? Optional.empty() : Optional.of(bound),
                             rs.wasNull() ? Optional.empty() : Optional.of(rowCount), Optional.empty(), Optional.empty(),
@@ -731,8 +731,8 @@ public class PostgreSqlDialect extends AbstractJdbcDialect {
             throws SQLException {
         String sql = """
                 SELECT con.conname AS fk_name, fk_class.relname AS fk_table, fk_att.attname AS fk_column,
-                       pk_class.relname AS pk_table, pk_att.attname AS pk_column,
-                       cols.ord AS key_seq, con.confdeltype AS delete_rule, con.confupdtype AS update_rule
+                        pk_class.relname AS pk_table, pk_att.attname AS pk_column,
+                        cols.ord AS key_seq, con.confdeltype AS delete_rule, con.confupdtype AS update_rule
                 FROM pg_constraint con
                 JOIN pg_class fk_class ON fk_class.oid = con.conrelid
                 JOIN pg_namespace n ON n.oid = fk_class.relnamespace
@@ -763,8 +763,8 @@ public class PostgreSqlDialect extends AbstractJdbcDialect {
         // (PK-side) table.
         String sql = """
                 SELECT con.conname AS fk_name, fk_class.relname AS fk_table, fk_att.attname AS fk_column,
-                       pk_class.relname AS pk_table, pk_att.attname AS pk_column,
-                       cols.ord AS key_seq, con.confdeltype AS delete_rule, con.confupdtype AS update_rule
+                        pk_class.relname AS pk_table, pk_att.attname AS pk_column,
+                        cols.ord AS key_seq, con.confdeltype AS delete_rule, con.confupdtype AS update_rule
                 FROM pg_constraint con
                 JOIN pg_class fk_class ON fk_class.oid = con.conrelid
                 JOIN pg_class pk_class ON pk_class.oid = con.confrelid
@@ -793,9 +793,9 @@ public class PostgreSqlDialect extends AbstractJdbcDialect {
             throws SQLException {
         String sql = """
                 SELECT c.relname AS table_name, i_class.relname AS index_name,
-                       a.attname AS column_name, array_position(ix.indkey, a.attnum) AS ordinal,
-                       ix.indisunique AS is_unique,
-                       am.amname AS index_type
+                        a.attname AS column_name, array_position(ix.indkey, a.attnum) AS ordinal,
+                        ix.indisunique AS is_unique,
+                        am.amname AS index_type
                 FROM pg_index ix
                 JOIN pg_class c ON c.oid = ix.indrelid
                 JOIN pg_class i_class ON i_class.oid = ix.indexrelid
@@ -921,8 +921,8 @@ public class PostgreSqlDialect extends AbstractJdbcDialect {
     public List<Procedure> getAllProcedures(Connection connection, String catalog, String schema) throws SQLException {
         String sql = """
                 SELECT p.proname AS routine_name, p.oid::text AS specific_name,
-                       d.description AS remarks, p.prosrc AS body,
-                       pg_get_functiondef(p.oid) AS full_def
+                        d.description AS remarks, p.prosrc AS body,
+                        pg_get_functiondef(p.oid) AS full_def
                 FROM pg_proc p
                 JOIN pg_namespace n ON n.oid = p.pronamespace
                 LEFT JOIN pg_description d ON d.objoid = p.oid AND d.classoid = 'pg_proc'::regclass
@@ -962,9 +962,9 @@ public class PostgreSqlDialect extends AbstractJdbcDialect {
     public List<Function> getAllFunctions(Connection connection, String catalog, String schema) throws SQLException {
         String sql = """
                 SELECT p.proname AS routine_name, p.oid::text AS specific_name,
-                       d.description AS remarks, p.prosrc AS body,
-                       pg_get_functiondef(p.oid) AS full_def,
-                       CASE WHEN p.proretset THEN 'TABLE' ELSE 'SCALAR' END AS return_type
+                        d.description AS remarks, p.prosrc AS body,
+                        pg_get_functiondef(p.oid) AS full_def,
+                        CASE WHEN p.proretset THEN 'TABLE' ELSE 'SCALAR' END AS return_type
                 FROM pg_proc p
                 JOIN pg_namespace n ON n.oid = p.pronamespace
                 LEFT JOIN pg_description d ON d.objoid = p.oid AND d.classoid = 'pg_proc'::regclass
@@ -1009,19 +1009,19 @@ public class PostgreSqlDialect extends AbstractJdbcDialect {
             throws SQLException {
         String sql = """
                 SELECT t.typname AS type_name, n.nspname AS schema_name,
-                       t.typtype AS type_type,
-                       CASE t.typtype
-                           WHEN 'c' THEN 'STRUCT'
-                           WHEN 'e' THEN 'ENUM'
-                           WHEN 'd' THEN 'DISTINCT'
-                           ELSE 'OTHER'
-                       END AS class_name,
-                       obj_description(t.oid, 'pg_type') AS remarks
+                        t.typtype AS type_type,
+                        CASE t.typtype
+                            WHEN 'c' THEN 'STRUCT'
+                            WHEN 'e' THEN 'ENUM'
+                            WHEN 'd' THEN 'DISTINCT'
+                            ELSE 'OTHER'
+                        END AS class_name,
+                        obj_description(t.oid, 'pg_type') AS remarks
                 FROM pg_type t
                 JOIN pg_namespace n ON n.oid = t.typnamespace
                 WHERE n.nspname = ?
-                  AND t.typtype IN ('c', 'e', 'd')
-                  AND NOT EXISTS (SELECT 1 FROM pg_class c WHERE c.reltype = t.oid AND c.relkind IN ('r', 'v', 'm'))
+                    AND t.typtype IN ('c', 'e', 'd')
+                    AND NOT EXISTS (SELECT 1 FROM pg_class c WHERE c.reltype = t.oid AND c.relkind IN ('r', 'v', 'm'))
                 ORDER BY t.typname
                 """;
         String schemaName = resolveSchema(schema, connection);

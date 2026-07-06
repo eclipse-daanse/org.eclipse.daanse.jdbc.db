@@ -564,7 +564,7 @@ public class MySqlDialect extends AbstractJdbcDialect {
     public List<Trigger> getAllTriggers(Connection connection, String catalog, String schema) throws SQLException {
         String sql = """
                 SELECT TRIGGER_NAME, EVENT_OBJECT_TABLE, ACTION_TIMING, EVENT_MANIPULATION,
-                       ACTION_STATEMENT, ACTION_ORIENTATION
+                        ACTION_STATEMENT, ACTION_ORIENTATION
                 FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA = ?
                 ORDER BY EVENT_OBJECT_TABLE, TRIGGER_NAME
                 """;
@@ -586,7 +586,7 @@ public class MySqlDialect extends AbstractJdbcDialect {
             throws SQLException {
         String sql = """
                 SELECT TRIGGER_NAME, EVENT_OBJECT_TABLE, ACTION_TIMING, EVENT_MANIPULATION,
-                       ACTION_STATEMENT, ACTION_ORIENTATION
+                        ACTION_STATEMENT, ACTION_ORIENTATION
                 FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA = ? AND EVENT_OBJECT_TABLE = ?
                 ORDER BY TRIGGER_NAME
                 """;
@@ -618,11 +618,11 @@ public class MySqlDialect extends AbstractJdbcDialect {
         // We filter out the PARTITION_NAME IS NULL rows.
         String sql = """
                 SELECT TABLE_NAME, PARTITION_NAME, SUBPARTITION_NAME,
-                       PARTITION_METHOD, SUBPARTITION_METHOD,
-                       PARTITION_EXPRESSION, SUBPARTITION_EXPRESSION,
-                       PARTITION_DESCRIPTION,
-                       PARTITION_ORDINAL_POSITION, SUBPARTITION_ORDINAL_POSITION,
-                       TABLE_ROWS
+                        PARTITION_METHOD, SUBPARTITION_METHOD,
+                        PARTITION_EXPRESSION, SUBPARTITION_EXPRESSION,
+                        PARTITION_DESCRIPTION,
+                        PARTITION_ORDINAL_POSITION, SUBPARTITION_ORDINAL_POSITION,
+                        TABLE_ROWS
                 FROM information_schema.PARTITIONS
                 WHERE TABLE_SCHEMA = ? AND PARTITION_NAME IS NOT NULL
                 ORDER BY TABLE_NAME, PARTITION_ORDINAL_POSITION, SUBPARTITION_ORDINAL_POSITION
@@ -685,7 +685,7 @@ public class MySqlDialect extends AbstractJdbcDialect {
                 SELECT cc.CONSTRAINT_NAME, cc.CHECK_CLAUSE, tc.TABLE_NAME
                 FROM information_schema.CHECK_CONSTRAINTS cc
                 JOIN information_schema.TABLE_CONSTRAINTS tc
-                  ON cc.CONSTRAINT_SCHEMA = tc.CONSTRAINT_SCHEMA AND cc.CONSTRAINT_NAME = tc.CONSTRAINT_NAME
+                    ON cc.CONSTRAINT_SCHEMA = tc.CONSTRAINT_SCHEMA AND cc.CONSTRAINT_NAME = tc.CONSTRAINT_NAME
                 WHERE cc.CONSTRAINT_SCHEMA = ? AND tc.CONSTRAINT_TYPE = 'CHECK'
                 ORDER BY tc.TABLE_NAME, cc.CONSTRAINT_NAME
                 """;
@@ -719,7 +719,7 @@ public class MySqlDialect extends AbstractJdbcDialect {
                 SELECT cc.CONSTRAINT_NAME, cc.CHECK_CLAUSE, tc.TABLE_NAME
                 FROM information_schema.CHECK_CONSTRAINTS cc
                 JOIN information_schema.TABLE_CONSTRAINTS tc
-                  ON cc.CONSTRAINT_SCHEMA = tc.CONSTRAINT_SCHEMA AND cc.CONSTRAINT_NAME = tc.CONSTRAINT_NAME
+                    ON cc.CONSTRAINT_SCHEMA = tc.CONSTRAINT_SCHEMA AND cc.CONSTRAINT_NAME = tc.CONSTRAINT_NAME
                 WHERE cc.CONSTRAINT_SCHEMA = ? AND tc.TABLE_NAME = ? AND tc.CONSTRAINT_TYPE = 'CHECK'
                 ORDER BY cc.CONSTRAINT_NAME
                 """;
@@ -753,7 +753,7 @@ public class MySqlDialect extends AbstractJdbcDialect {
                 SELECT tc.CONSTRAINT_NAME, tc.TABLE_NAME, kcu.COLUMN_NAME, kcu.ORDINAL_POSITION
                 FROM information_schema.TABLE_CONSTRAINTS tc
                 JOIN information_schema.KEY_COLUMN_USAGE kcu
-                  ON tc.CONSTRAINT_SCHEMA = kcu.CONSTRAINT_SCHEMA AND tc.CONSTRAINT_NAME = kcu.CONSTRAINT_NAME AND tc.TABLE_NAME = kcu.TABLE_NAME
+                    ON tc.CONSTRAINT_SCHEMA = kcu.CONSTRAINT_SCHEMA AND tc.CONSTRAINT_NAME = kcu.CONSTRAINT_NAME AND tc.TABLE_NAME = kcu.TABLE_NAME
                 WHERE tc.CONSTRAINT_TYPE = 'UNIQUE' AND tc.TABLE_SCHEMA = ?
                 ORDER BY tc.TABLE_NAME, tc.CONSTRAINT_NAME, kcu.ORDINAL_POSITION
                 """;
@@ -767,7 +767,7 @@ public class MySqlDialect extends AbstractJdbcDialect {
                 SELECT tc.CONSTRAINT_NAME, tc.TABLE_NAME, kcu.COLUMN_NAME, kcu.ORDINAL_POSITION
                 FROM information_schema.TABLE_CONSTRAINTS tc
                 JOIN information_schema.KEY_COLUMN_USAGE kcu
-                  ON tc.CONSTRAINT_SCHEMA = kcu.CONSTRAINT_SCHEMA AND tc.CONSTRAINT_NAME = kcu.CONSTRAINT_NAME AND tc.TABLE_NAME = kcu.TABLE_NAME
+                    ON tc.CONSTRAINT_SCHEMA = kcu.CONSTRAINT_SCHEMA AND tc.CONSTRAINT_NAME = kcu.CONSTRAINT_NAME AND tc.TABLE_NAME = kcu.TABLE_NAME
                 WHERE tc.CONSTRAINT_TYPE = 'UNIQUE' AND tc.TABLE_SCHEMA = ? AND tc.TABLE_NAME = ?
                 ORDER BY tc.CONSTRAINT_NAME, kcu.ORDINAL_POSITION
                 """;
@@ -781,7 +781,7 @@ public class MySqlDialect extends AbstractJdbcDialect {
                 SELECT tc.TABLE_NAME, tc.CONSTRAINT_NAME, kcu.COLUMN_NAME, kcu.ORDINAL_POSITION
                 FROM information_schema.TABLE_CONSTRAINTS tc
                 JOIN information_schema.KEY_COLUMN_USAGE kcu
-                  ON tc.CONSTRAINT_SCHEMA = kcu.CONSTRAINT_SCHEMA AND tc.CONSTRAINT_NAME = kcu.CONSTRAINT_NAME AND tc.TABLE_NAME = kcu.TABLE_NAME
+                    ON tc.CONSTRAINT_SCHEMA = kcu.CONSTRAINT_SCHEMA AND tc.CONSTRAINT_NAME = kcu.CONSTRAINT_NAME AND tc.TABLE_NAME = kcu.TABLE_NAME
                 WHERE tc.CONSTRAINT_TYPE = 'PRIMARY KEY' AND tc.TABLE_SCHEMA = ?
                 ORDER BY tc.TABLE_NAME, kcu.ORDINAL_POSITION
                 """;
@@ -813,13 +813,13 @@ public class MySqlDialect extends AbstractJdbcDialect {
             throws SQLException {
         String sql = """
                 SELECT tc.CONSTRAINT_NAME AS FK_NAME, kcu.TABLE_NAME AS FK_TABLE, kcu.COLUMN_NAME AS FK_COLUMN,
-                       kcu.REFERENCED_TABLE_NAME AS PK_TABLE, kcu.REFERENCED_COLUMN_NAME AS PK_COLUMN,
-                       kcu.ORDINAL_POSITION AS KEY_SEQ, rc.DELETE_RULE, rc.UPDATE_RULE
+                        kcu.REFERENCED_TABLE_NAME AS PK_TABLE, kcu.REFERENCED_COLUMN_NAME AS PK_COLUMN,
+                        kcu.ORDINAL_POSITION AS KEY_SEQ, rc.DELETE_RULE, rc.UPDATE_RULE
                 FROM information_schema.TABLE_CONSTRAINTS tc
                 JOIN information_schema.KEY_COLUMN_USAGE kcu
-                  ON tc.CONSTRAINT_SCHEMA = kcu.CONSTRAINT_SCHEMA AND tc.CONSTRAINT_NAME = kcu.CONSTRAINT_NAME AND tc.TABLE_NAME = kcu.TABLE_NAME
+                    ON tc.CONSTRAINT_SCHEMA = kcu.CONSTRAINT_SCHEMA AND tc.CONSTRAINT_NAME = kcu.CONSTRAINT_NAME AND tc.TABLE_NAME = kcu.TABLE_NAME
                 JOIN information_schema.REFERENTIAL_CONSTRAINTS rc
-                  ON tc.CONSTRAINT_SCHEMA = rc.CONSTRAINT_SCHEMA AND tc.CONSTRAINT_NAME = rc.CONSTRAINT_NAME
+                    ON tc.CONSTRAINT_SCHEMA = rc.CONSTRAINT_SCHEMA AND tc.CONSTRAINT_NAME = rc.CONSTRAINT_NAME
                 WHERE tc.CONSTRAINT_TYPE = 'FOREIGN KEY' AND tc.TABLE_SCHEMA = ?
                 ORDER BY kcu.TABLE_NAME, tc.CONSTRAINT_NAME, kcu.ORDINAL_POSITION
                 """;
@@ -843,13 +843,13 @@ public class MySqlDialect extends AbstractJdbcDialect {
         // schema.
         String sql = """
                 SELECT tc.CONSTRAINT_NAME AS FK_NAME, kcu.TABLE_NAME AS FK_TABLE, kcu.COLUMN_NAME AS FK_COLUMN,
-                       kcu.REFERENCED_TABLE_NAME AS PK_TABLE, kcu.REFERENCED_COLUMN_NAME AS PK_COLUMN,
-                       kcu.ORDINAL_POSITION AS KEY_SEQ, rc.DELETE_RULE, rc.UPDATE_RULE
+                        kcu.REFERENCED_TABLE_NAME AS PK_TABLE, kcu.REFERENCED_COLUMN_NAME AS PK_COLUMN,
+                        kcu.ORDINAL_POSITION AS KEY_SEQ, rc.DELETE_RULE, rc.UPDATE_RULE
                 FROM information_schema.TABLE_CONSTRAINTS tc
                 JOIN information_schema.KEY_COLUMN_USAGE kcu
-                  ON tc.CONSTRAINT_SCHEMA = kcu.CONSTRAINT_SCHEMA AND tc.CONSTRAINT_NAME = kcu.CONSTRAINT_NAME AND tc.TABLE_NAME = kcu.TABLE_NAME
+                    ON tc.CONSTRAINT_SCHEMA = kcu.CONSTRAINT_SCHEMA AND tc.CONSTRAINT_NAME = kcu.CONSTRAINT_NAME AND tc.TABLE_NAME = kcu.TABLE_NAME
                 JOIN information_schema.REFERENTIAL_CONSTRAINTS rc
-                  ON tc.CONSTRAINT_SCHEMA = rc.CONSTRAINT_SCHEMA AND tc.CONSTRAINT_NAME = rc.CONSTRAINT_NAME
+                    ON tc.CONSTRAINT_SCHEMA = rc.CONSTRAINT_SCHEMA AND tc.CONSTRAINT_NAME = rc.CONSTRAINT_NAME
                 WHERE tc.CONSTRAINT_TYPE = 'FOREIGN KEY' AND kcu.REFERENCED_TABLE_SCHEMA = ?
                 ORDER BY kcu.REFERENCED_TABLE_NAME, tc.CONSTRAINT_NAME, kcu.ORDINAL_POSITION
                 """;
@@ -1039,7 +1039,7 @@ public class MySqlDialect extends AbstractJdbcDialect {
             throws SQLException {
         String sql = """
                 SELECT SPECIFIC_NAME, PARAMETER_NAME, PARAMETER_MODE, DATA_TYPE,
-                       ORDINAL_POSITION, NUMERIC_PRECISION, NUMERIC_SCALE
+                        ORDINAL_POSITION, NUMERIC_PRECISION, NUMERIC_SCALE
                 FROM information_schema.PARAMETERS
                 WHERE SPECIFIC_SCHEMA = ? AND ORDINAL_POSITION > 0
                 ORDER BY SPECIFIC_NAME, ORDINAL_POSITION
@@ -1079,7 +1079,7 @@ public class MySqlDialect extends AbstractJdbcDialect {
             throws SQLException {
         String sql = """
                 SELECT SPECIFIC_NAME, PARAMETER_NAME, PARAMETER_MODE, DATA_TYPE,
-                       ORDINAL_POSITION, NUMERIC_PRECISION, NUMERIC_SCALE
+                        ORDINAL_POSITION, NUMERIC_PRECISION, NUMERIC_SCALE
                 FROM information_schema.PARAMETERS
                 WHERE SPECIFIC_SCHEMA = ?
                 ORDER BY SPECIFIC_NAME, ORDINAL_POSITION

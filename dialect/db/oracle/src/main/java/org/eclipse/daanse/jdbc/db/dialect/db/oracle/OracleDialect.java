@@ -652,30 +652,30 @@ public class OracleDialect extends AbstractJdbcDialect {
         // ALL_TAB_SUBPARTITIONS row.
         String partitionSql = """
                 SELECT atp.TABLE_NAME, atp.PARTITION_NAME, atp.PARTITION_POSITION,
-                       atp.HIGH_VALUE, atp.NUM_ROWS,
-                       apt.PARTITIONING_TYPE, apt.SUBPARTITIONING_TYPE,
-                       (SELECT LISTAGG(akc.COLUMN_NAME, ',') WITHIN GROUP (ORDER BY akc.COLUMN_POSITION)
+                        atp.HIGH_VALUE, atp.NUM_ROWS,
+                        apt.PARTITIONING_TYPE, apt.SUBPARTITIONING_TYPE,
+                        (SELECT LISTAGG(akc.COLUMN_NAME, ',') WITHIN GROUP (ORDER BY akc.COLUMN_POSITION)
                         FROM ALL_PART_KEY_COLUMNS akc
                         WHERE akc.OWNER = atp.TABLE_OWNER AND akc.NAME = atp.TABLE_NAME) AS PART_KEY,
-                       (SELECT LISTAGG(askc.COLUMN_NAME, ',') WITHIN GROUP (ORDER BY askc.COLUMN_POSITION)
+                        (SELECT LISTAGG(askc.COLUMN_NAME, ',') WITHIN GROUP (ORDER BY askc.COLUMN_POSITION)
                         FROM ALL_SUBPART_KEY_COLUMNS askc
                         WHERE askc.OWNER = atp.TABLE_OWNER AND askc.NAME = atp.TABLE_NAME) AS SUBPART_KEY
                 FROM ALL_TAB_PARTITIONS atp
                 JOIN ALL_PART_TABLES apt
-                  ON apt.OWNER = atp.TABLE_OWNER AND apt.TABLE_NAME = atp.TABLE_NAME
+                    ON apt.OWNER = atp.TABLE_OWNER AND apt.TABLE_NAME = atp.TABLE_NAME
                 WHERE atp.TABLE_OWNER = ?
                 ORDER BY atp.TABLE_NAME, atp.PARTITION_POSITION
                 """;
         String subPartitionSql = """
                 SELECT atsp.TABLE_NAME, atsp.PARTITION_NAME, atsp.SUBPARTITION_NAME,
-                       atsp.SUBPARTITION_POSITION, atsp.HIGH_VALUE, atsp.NUM_ROWS,
-                       apt.SUBPARTITIONING_TYPE,
-                       (SELECT LISTAGG(askc.COLUMN_NAME, ',') WITHIN GROUP (ORDER BY askc.COLUMN_POSITION)
+                        atsp.SUBPARTITION_POSITION, atsp.HIGH_VALUE, atsp.NUM_ROWS,
+                        apt.SUBPARTITIONING_TYPE,
+                        (SELECT LISTAGG(askc.COLUMN_NAME, ',') WITHIN GROUP (ORDER BY askc.COLUMN_POSITION)
                         FROM ALL_SUBPART_KEY_COLUMNS askc
                         WHERE askc.OWNER = atsp.TABLE_OWNER AND askc.NAME = atsp.TABLE_NAME) AS SUBPART_KEY
                 FROM ALL_TAB_SUBPARTITIONS atsp
                 JOIN ALL_PART_TABLES apt
-                  ON apt.OWNER = atsp.TABLE_OWNER AND apt.TABLE_NAME = atsp.TABLE_NAME
+                    ON apt.OWNER = atsp.TABLE_OWNER AND apt.TABLE_NAME = atsp.TABLE_NAME
                 WHERE atsp.TABLE_OWNER = ?
                 ORDER BY atsp.TABLE_NAME, atsp.PARTITION_NAME, atsp.SUBPARTITION_POSITION
                 """;
@@ -831,14 +831,14 @@ public class OracleDialect extends AbstractJdbcDialect {
             throws SQLException {
         String sql = """
                 SELECT fk.CONSTRAINT_NAME AS FK_NAME, fk.TABLE_NAME AS FK_TABLE,
-                       fk_col.COLUMN_NAME AS FK_COLUMN, pk.TABLE_NAME AS PK_TABLE,
-                       pk_col.COLUMN_NAME AS PK_COLUMN, fk_col.POSITION AS KEY_SEQ,
-                       fk.DELETE_RULE, pk.CONSTRAINT_NAME AS PK_NAME
+                        fk_col.COLUMN_NAME AS FK_COLUMN, pk.TABLE_NAME AS PK_TABLE,
+                        pk_col.COLUMN_NAME AS PK_COLUMN, fk_col.POSITION AS KEY_SEQ,
+                        fk.DELETE_RULE, pk.CONSTRAINT_NAME AS PK_NAME
                 FROM ALL_CONSTRAINTS fk
                 JOIN ALL_CONS_COLUMNS fk_col ON fk.OWNER = fk_col.OWNER AND fk.CONSTRAINT_NAME = fk_col.CONSTRAINT_NAME
                 JOIN ALL_CONSTRAINTS pk ON fk.R_OWNER = pk.OWNER AND fk.R_CONSTRAINT_NAME = pk.CONSTRAINT_NAME
                 JOIN ALL_CONS_COLUMNS pk_col ON pk.OWNER = pk_col.OWNER AND pk.CONSTRAINT_NAME = pk_col.CONSTRAINT_NAME
-                     AND fk_col.POSITION = pk_col.POSITION
+                    AND fk_col.POSITION = pk_col.POSITION
                 WHERE fk.OWNER = ? AND fk.CONSTRAINT_TYPE = 'R'
                 ORDER BY fk.TABLE_NAME, fk.CONSTRAINT_NAME, fk_col.POSITION
                 """;
@@ -862,14 +862,14 @@ public class OracleDialect extends AbstractJdbcDialect {
         // is the given schema.
         String sql = """
                 SELECT fk.CONSTRAINT_NAME AS FK_NAME, fk.TABLE_NAME AS FK_TABLE,
-                       fk_col.COLUMN_NAME AS FK_COLUMN, pk.TABLE_NAME AS PK_TABLE,
-                       pk_col.COLUMN_NAME AS PK_COLUMN, fk_col.POSITION AS KEY_SEQ,
-                       fk.DELETE_RULE, pk.CONSTRAINT_NAME AS PK_NAME
+                        fk_col.COLUMN_NAME AS FK_COLUMN, pk.TABLE_NAME AS PK_TABLE,
+                        pk_col.COLUMN_NAME AS PK_COLUMN, fk_col.POSITION AS KEY_SEQ,
+                        fk.DELETE_RULE, pk.CONSTRAINT_NAME AS PK_NAME
                 FROM ALL_CONSTRAINTS fk
                 JOIN ALL_CONS_COLUMNS fk_col ON fk.OWNER = fk_col.OWNER AND fk.CONSTRAINT_NAME = fk_col.CONSTRAINT_NAME
                 JOIN ALL_CONSTRAINTS pk ON fk.R_OWNER = pk.OWNER AND fk.R_CONSTRAINT_NAME = pk.CONSTRAINT_NAME
                 JOIN ALL_CONS_COLUMNS pk_col ON pk.OWNER = pk_col.OWNER AND pk.CONSTRAINT_NAME = pk_col.CONSTRAINT_NAME
-                     AND fk_col.POSITION = pk_col.POSITION
+                    AND fk_col.POSITION = pk_col.POSITION
                 WHERE fk.R_OWNER = ? AND fk.CONSTRAINT_TYPE = 'R'
                 ORDER BY pk.TABLE_NAME, fk.CONSTRAINT_NAME, fk_col.POSITION
                 """;
@@ -891,7 +891,7 @@ public class OracleDialect extends AbstractJdbcDialect {
             throws SQLException {
         String sql = """
                 SELECT i.INDEX_NAME, i.INDEX_TYPE, i.TABLE_NAME, i.UNIQUENESS,
-                       ic.COLUMN_NAME, ic.COLUMN_POSITION, ic.DESCEND
+                        ic.COLUMN_NAME, ic.COLUMN_POSITION, ic.DESCEND
                 FROM ALL_INDEXES i
                 JOIN ALL_IND_COLUMNS ic ON i.OWNER = ic.INDEX_OWNER AND i.INDEX_NAME = ic.INDEX_NAME
                 WHERE i.TABLE_OWNER = ? ORDER BY i.TABLE_NAME, i.INDEX_NAME, ic.COLUMN_POSITION
@@ -1195,7 +1195,7 @@ public class OracleDialect extends AbstractJdbcDialect {
             throws SQLException {
         String sql = """
                 SELECT a.OBJECT_NAME, a.ARGUMENT_NAME, a.IN_OUT, a.DATA_TYPE,
-                       a.POSITION, a.DATA_PRECISION, a.DATA_SCALE
+                        a.POSITION, a.DATA_PRECISION, a.DATA_SCALE
                 FROM ALL_ARGUMENTS a
                 JOIN ALL_PROCEDURES p ON a.OBJECT_ID = p.OBJECT_ID AND a.SUBPROGRAM_ID = p.SUBPROGRAM_ID
                 WHERE a.OWNER = ? AND p.OBJECT_TYPE = 'PROCEDURE' AND a.POSITION > 0
@@ -1236,7 +1236,7 @@ public class OracleDialect extends AbstractJdbcDialect {
             throws SQLException {
         String sql = """
                 SELECT a.OBJECT_NAME, a.ARGUMENT_NAME, a.IN_OUT, a.DATA_TYPE,
-                       a.POSITION, a.DATA_PRECISION, a.DATA_SCALE
+                        a.POSITION, a.DATA_PRECISION, a.DATA_SCALE
                 FROM ALL_ARGUMENTS a
                 JOIN ALL_PROCEDURES p ON a.OBJECT_ID = p.OBJECT_ID AND a.SUBPROGRAM_ID = p.SUBPROGRAM_ID
                 WHERE a.OWNER = ? AND p.OBJECT_TYPE = 'FUNCTION'
@@ -1367,11 +1367,11 @@ public class OracleDialect extends AbstractJdbcDialect {
         TableReference pkTableRef = new TableReference(pkSchemaRef, pkTable);
         ColumnReference pkColRef = new ColumnReference(Optional.of(pkTableRef), pkColumn);
 
-        return new ImportedKeyRecord(pkColRef, fkColRef, fkName, keySeq, ImportedKey.ReferentialAction.NO_ACTION, // Oracle
-                                                                                                                  // doesn't
-                                                                                                                  // support
-                                                                                                                  // UPDATE
-                                                                                                                  // CASCADE
+        return new ImportedKeyRecord(pkColRef, fkColRef, fkName, keySeq, ImportedKey.ReferentialAction.NO_ACTION,   // Oracle
+                                                                                                                    // doesn't
+                                                                                                                    // support
+                                                                                                                    // UPDATE
+                                                                                                                    // CASCADE
                 mapOracleDeleteRule(deleteRule), Optional.ofNullable(pkName), ImportedKey.Deferrability.NOT_DEFERRABLE);
     }
 
@@ -1722,7 +1722,7 @@ public class OracleDialect extends AbstractJdbcDialect {
         // tracking columns, etc.) that never show up via getPseudoColumns.
         StringBuilder sql = new StringBuilder("""
                 SELECT c.OWNER, c.TABLE_NAME, c.COLUMN_NAME, c.DATA_TYPE, c.DATA_LENGTH,
-                       c.DATA_PRECISION, c.DATA_SCALE, c.NULLABLE
+                        c.DATA_PRECISION, c.DATA_SCALE, c.NULLABLE
                 FROM ALL_TAB_COLS c
                 WHERE c.HIDDEN_COLUMN = 'YES' AND c.OWNER = ?
                 """);
@@ -1897,7 +1897,7 @@ public class OracleDialect extends AbstractJdbcDialect {
             String columnNamePattern) throws SQLException {
         String sql = """
                 SELECT OWNER, TABLE_NAME, COLUMN_NAME, DATA_TYPE, DATA_LENGTH, DATA_PRECISION,
-                       DATA_SCALE, NULLABLE, DATA_DEFAULT, COLUMN_ID
+                        DATA_SCALE, NULLABLE, DATA_DEFAULT, COLUMN_ID
                 FROM ALL_TAB_COLS
                 WHERE OWNER = ? AND HIDDEN_COLUMN = 'NO'
                 ORDER BY OWNER, TABLE_NAME, COLUMN_ID
