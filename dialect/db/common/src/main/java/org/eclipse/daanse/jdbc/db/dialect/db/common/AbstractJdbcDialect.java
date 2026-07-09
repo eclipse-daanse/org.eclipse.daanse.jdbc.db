@@ -47,8 +47,8 @@ import org.eclipse.daanse.jdbc.db.dialect.api.generator.HintGenerator;
 import org.eclipse.daanse.jdbc.db.dialect.api.generator.OrderByGenerator;
 import org.eclipse.daanse.jdbc.db.dialect.api.generator.RegexGenerator;
 import org.eclipse.daanse.jdbc.db.dialect.api.generator.SqlGenerator;
-import org.eclipse.daanse.jdbc.db.dialect.api.type.BestFitColumnType;
-import org.eclipse.daanse.jdbc.db.dialect.api.type.Datatype;
+import org.eclipse.daanse.jdbc.db.api.type.BestFitColumnType;
+import org.eclipse.daanse.jdbc.db.api.type.Datatype;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

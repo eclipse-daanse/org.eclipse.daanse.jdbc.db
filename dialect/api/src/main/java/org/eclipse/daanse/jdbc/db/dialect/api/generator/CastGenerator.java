@@ -7,7 +7,7 @@
  */
 package org.eclipse.daanse.jdbc.db.dialect.api.generator;
 
-import org.eclipse.daanse.jdbc.db.dialect.api.type.Datatype;
+import org.eclipse.daanse.jdbc.db.api.type.Datatype;
 
 public interface CastGenerator {
 

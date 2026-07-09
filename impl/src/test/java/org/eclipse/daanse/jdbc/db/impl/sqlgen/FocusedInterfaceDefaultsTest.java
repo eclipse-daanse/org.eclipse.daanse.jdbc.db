@@ -16,12 +16,12 @@ import java.util.Map;
 
 import org.eclipse.daanse.jdbc.db.dialect.api.Dialect;
 import org.eclipse.daanse.jdbc.db.dialect.api.generator.AggregationGenerator;
-import org.eclipse.daanse.jdbc.db.dialect.api.generator.BitOperation;
+import org.eclipse.daanse.jdbc.db.api.sql.BitOperation;
 import org.eclipse.daanse.jdbc.db.dialect.api.generator.FunctionGenerator;
 import org.eclipse.daanse.jdbc.db.dialect.api.generator.HintGenerator;
 import org.eclipse.daanse.jdbc.db.dialect.api.generator.OrderByGenerator;
 import org.eclipse.daanse.jdbc.db.dialect.api.generator.RegexGenerator;
-import org.eclipse.daanse.jdbc.db.dialect.api.type.Datatype;
+import org.eclipse.daanse.jdbc.db.api.type.Datatype;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.AnsiDialect;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

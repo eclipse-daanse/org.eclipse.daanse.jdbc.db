@@ -19,11 +19,10 @@
  *   SmartCity Jena - initial adapt parts of Syntax.class
  *   Stefan Bischof (bipolis.org) - initial
  */
-package org.eclipse.daanse.jdbc.db.dialect.api.type;
+package org.eclipse.daanse.jdbc.db.api.type;
 
 import java.util.stream.Stream;
 
-import org.eclipse.daanse.jdbc.db.dialect.api.Dialect;
 
 /**
  * Engine-neutral SQL data type tag used by literal-quoting and DDL emission.
@@ -83,23 +82,6 @@ public enum Datatype {
     /** @return the canonical mixed-case display name (e.g. {@code BigInt}) */
     public String getValue() {
         return value;
-    }
-
-    /**
-     * @param buf     destination buffer (the literal is appended)
-     * @param dialect dialect supplying the per-engine quoting rules
-     * @param value   raw literal text in the canonical SQL form for this type
-     */
-    public void quoteValue(StringBuilder buf, Dialect dialect, String value) {
-        switch (this) {
-        case VARCHAR, UUID, JSON, XML, INTERVAL, ARRAY, STRUCT, BINARY -> dialect.quoteStringLiteral(buf, value);
-        case NUMERIC, INTEGER, DECIMAL, FLOAT, REAL, BIGINT, SMALLINT, DOUBLE ->
-            dialect.quoteNumericLiteral(buf, value);
-        case BOOLEAN -> dialect.quoteBooleanLiteral(buf, value);
-        case DATE -> dialect.quoteDateLiteral(buf, value);
-        case TIME -> dialect.quoteTimeLiteral(buf, value);
-        case TIMESTAMP -> dialect.quoteTimestampLiteral(buf, value);
-        }
     }
 
     /** @return true if this datatype represents a numeric value */

@@ -16,7 +16,7 @@ package org.eclipse.daanse.jdbc.db.dialect.db.configurable;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import org.eclipse.daanse.jdbc.db.dialect.api.generator.BitOperation;
+import org.eclipse.daanse.jdbc.db.api.sql.BitOperation;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

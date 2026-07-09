@@ -71,7 +71,7 @@ import org.eclipse.daanse.jdbc.db.api.schema.UserDefinedTypeReference;
 import org.eclipse.daanse.jdbc.db.api.schema.ViewDefinition;
 import org.eclipse.daanse.jdbc.db.dialect.api.generator.KnownFunction;
 import org.eclipse.daanse.jdbc.db.dialect.api.generator.StatementHint;
-import org.eclipse.daanse.jdbc.db.dialect.api.sql.OrderedColumn;
+import org.eclipse.daanse.jdbc.db.api.sql.OrderedColumn;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.AbstractJdbcDialect;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.DialectUtil;
 import org.eclipse.daanse.jdbc.db.record.schema.CheckConstraintRecord;

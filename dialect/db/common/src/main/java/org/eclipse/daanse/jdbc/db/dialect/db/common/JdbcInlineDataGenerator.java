@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.daanse.jdbc.db.dialect.api.Dialect;
-import org.eclipse.daanse.jdbc.db.dialect.api.type.Datatype;
+import org.eclipse.daanse.jdbc.db.api.type.Datatype;
 
 /**
  * Default emission of inline data ({@code SELECT … UNION ALL} and SQL-2003
@@ -113,7 +113,7 @@ final class JdbcInlineDataGenerator {
             if (dialect.needsExponent(value, valueString)) {
                 valueString += "E0";
             }
-            datatype.quoteValue(buf, dialect, valueString);
+            dialect.quoteLiteral(datatype, buf, valueString);
         }
     }
 
