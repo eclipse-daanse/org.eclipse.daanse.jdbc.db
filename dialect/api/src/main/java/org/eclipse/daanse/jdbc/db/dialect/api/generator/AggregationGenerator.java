@@ -9,9 +9,11 @@
  */
 package org.eclipse.daanse.jdbc.db.dialect.api.generator;
 
+import org.eclipse.daanse.jdbc.db.api.sql.BitOperation;
+
 import java.util.List;
 
-import org.eclipse.daanse.jdbc.db.dialect.api.sql.OrderedColumn;
+import org.eclipse.daanse.jdbc.db.api.sql.OrderedColumn;
 
 public interface AggregationGenerator extends IdentifierQuoter {
 

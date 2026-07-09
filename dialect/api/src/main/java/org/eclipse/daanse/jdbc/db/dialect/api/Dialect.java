@@ -46,7 +46,8 @@ import org.eclipse.daanse.jdbc.db.dialect.api.generator.ParameterPlaceholderGene
 import org.eclipse.daanse.jdbc.db.dialect.api.generator.RegexGenerator;
 import org.eclipse.daanse.jdbc.db.dialect.api.generator.ReturningGenerator;
 import org.eclipse.daanse.jdbc.db.dialect.api.generator.SqlGenerator;
-import org.eclipse.daanse.jdbc.db.dialect.api.type.BestFitColumnType;
+import org.eclipse.daanse.jdbc.db.api.type.BestFitColumnType;
+import org.eclipse.daanse.jdbc.db.api.type.Datatype;
 import org.eclipse.daanse.jdbc.db.dialect.api.type.TypeMapper;
 
 public interface Dialect
@@ -179,6 +180,26 @@ public interface Dialect
      */
     default String unionDistinctKeyword() {
         return "union";
+    }
+
+    /**
+     * Appends {@code value} to {@code buf} as a literal quoted for {@code datatype} — routing each
+     * type category to the matching {@code quote*Literal} rule. Lives here (not on the neutral
+     * {@link Datatype} type model) so the type model carries no dialect dependency.
+     *
+     * @param datatype the column type whose category selects the quoting rule
+     * @param buf      destination buffer (the literal is appended)
+     * @param value    raw literal text in the canonical SQL form for this type
+     */
+    default void quoteLiteral(Datatype datatype, StringBuilder buf, String value) {
+        switch (datatype) {
+        case VARCHAR, UUID, JSON, XML, INTERVAL, ARRAY, STRUCT, BINARY -> quoteStringLiteral(buf, value);
+        case NUMERIC, INTEGER, DECIMAL, FLOAT, REAL, BIGINT, SMALLINT, DOUBLE -> quoteNumericLiteral(buf, value);
+        case BOOLEAN -> quoteBooleanLiteral(buf, value);
+        case DATE -> quoteDateLiteral(buf, value);
+        case TIME -> quoteTimeLiteral(buf, value);
+        case TIMESTAMP -> quoteTimestampLiteral(buf, value);
+        }
     }
 
 }

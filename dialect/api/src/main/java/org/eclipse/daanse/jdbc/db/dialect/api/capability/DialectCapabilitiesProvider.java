@@ -77,6 +77,16 @@ public interface DialectCapabilitiesProvider {
     }
 
     /**
+     * @return true if the dialect supports plain b-tree {@code CREATE INDEX} DDL at all.
+     *         ClickHouse for example rejects {@code CREATE INDEX} without a data-skipping
+     *         {@code TYPE} clause (INCORRECT_QUERY 80) — tools generating index DDL must
+     *         skip or specialize there.
+     */
+    default boolean supportsIndexDdl() {
+        return true;
+    }
+
+    /**
      * @return true if the dialect honours {@code IF NOT EXISTS} on
      *         {@code CREATE INDEX}
      */

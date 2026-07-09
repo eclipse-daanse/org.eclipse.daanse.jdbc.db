@@ -16,6 +16,8 @@ package org.eclipse.daanse.jdbc.db.dialect.api.type;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
+import org.eclipse.daanse.jdbc.db.api.type.BestFitColumnType;
+
 public interface TypeMapper {
 
     /**

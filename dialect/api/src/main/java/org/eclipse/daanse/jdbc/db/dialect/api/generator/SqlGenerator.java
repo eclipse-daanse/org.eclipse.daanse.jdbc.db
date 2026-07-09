@@ -16,7 +16,7 @@ package org.eclipse.daanse.jdbc.db.dialect.api.generator;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.daanse.jdbc.db.dialect.api.type.Datatype;
+import org.eclipse.daanse.jdbc.db.api.type.Datatype;
 
 public interface SqlGenerator {
 

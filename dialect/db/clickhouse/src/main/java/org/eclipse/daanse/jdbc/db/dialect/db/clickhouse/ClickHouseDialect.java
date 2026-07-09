@@ -20,11 +20,18 @@ package org.eclipse.daanse.jdbc.db.dialect.db.clickhouse;
 
 import java.util.List;
 
-import org.eclipse.daanse.jdbc.db.dialect.api.generator.BitOperation;
-import org.eclipse.daanse.jdbc.db.dialect.api.sql.OrderedColumn;
+import org.eclipse.daanse.jdbc.db.api.sql.BitOperation;
+import org.eclipse.daanse.jdbc.db.api.sql.OrderedColumn;
 import org.eclipse.daanse.jdbc.db.dialect.db.common.AbstractJdbcDialect;
 
 public class ClickHouseDialect extends AbstractJdbcDialect {
+
+    /** ClickHouse rejects plain {@code CREATE INDEX} without a data-skipping {@code TYPE}
+     *  clause (INCORRECT_QUERY 80) — b-tree index DDL is not expressible. */
+    @Override
+    public boolean supportsIndexDdl() {
+        return false;
+    }
 
     private static final String SUPPORTED_PRODUCT_NAME = "CLICKHOUSE";
 

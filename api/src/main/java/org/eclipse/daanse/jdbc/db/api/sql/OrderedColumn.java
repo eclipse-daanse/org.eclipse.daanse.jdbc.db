@@ -11,12 +11,10 @@
  *   SmartCity Jena - initial
  *   Stefan Bischof (bipolis.org) - initial
  */
-package org.eclipse.daanse.jdbc.db.dialect.api.sql;
+package org.eclipse.daanse.jdbc.db.api.sql;
 
 import java.util.Optional;
 
-import org.eclipse.daanse.jdbc.db.dialect.api.generator.NullsOrder;
-import org.eclipse.daanse.jdbc.db.dialect.api.generator.SortDirection;
 
 /**
  * @param tableName     the name of the table (may be null for unqualified

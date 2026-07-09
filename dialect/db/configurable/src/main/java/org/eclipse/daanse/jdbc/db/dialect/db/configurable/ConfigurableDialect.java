@@ -23,16 +23,16 @@ import java.util.Set;
 
 import org.eclipse.daanse.jdbc.db.dialect.api.Dialect;
 import org.eclipse.daanse.jdbc.db.dialect.api.generator.AggregationGenerator;
-import org.eclipse.daanse.jdbc.db.dialect.api.generator.BitOperation;
+import org.eclipse.daanse.jdbc.db.api.sql.BitOperation;
 import org.eclipse.daanse.jdbc.db.dialect.api.generator.DdlGenerator;
 import org.eclipse.daanse.jdbc.db.dialect.api.generator.FunctionGenerator;
 import org.eclipse.daanse.jdbc.db.dialect.api.generator.HintGenerator;
 import org.eclipse.daanse.jdbc.db.dialect.api.generator.OrderByGenerator;
 import org.eclipse.daanse.jdbc.db.dialect.api.generator.RegexGenerator;
 import org.eclipse.daanse.jdbc.db.dialect.api.generator.SqlGenerator;
-import org.eclipse.daanse.jdbc.db.dialect.api.sql.OrderedColumn;
-import org.eclipse.daanse.jdbc.db.dialect.api.type.BestFitColumnType;
-import org.eclipse.daanse.jdbc.db.dialect.api.type.Datatype;
+import org.eclipse.daanse.jdbc.db.api.sql.OrderedColumn;
+import org.eclipse.daanse.jdbc.db.api.type.BestFitColumnType;
+import org.eclipse.daanse.jdbc.db.api.type.Datatype;
 
 public class ConfigurableDialect implements Dialect, SqlGenerator, DdlGenerator, OrderByGenerator, RegexGenerator,
         AggregationGenerator, FunctionGenerator, HintGenerator {
@@ -412,7 +412,7 @@ public class ConfigurableDialect implements Dialect, SqlGenerator, DdlGenerator,
         if (value == null) {
             buf.append("null");
         } else {
-            datatype.quoteValue(buf, this, value.toString());
+            quoteLiteral(datatype, buf, value.toString());
         }
     }
 

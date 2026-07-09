@@ -12,7 +12,7 @@
 *   Stefan Bischof (bipolis.org) - initial
 *   Sergei Semenkov - initial
 */
-package org.eclipse.daanse.jdbc.db.dialect.api.type;
+package org.eclipse.daanse.jdbc.db.api.type;
 
 /** Java result-set value type that best represents a JDBC column. */
 public enum BestFitColumnType {

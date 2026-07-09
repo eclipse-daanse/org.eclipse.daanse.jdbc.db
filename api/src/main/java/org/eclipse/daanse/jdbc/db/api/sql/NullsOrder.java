@@ -11,7 +11,7 @@
  *   SmartCity Jena - initial
  *   Stefan Bischof (bipolis.org) - initial
  */
-package org.eclipse.daanse.jdbc.db.dialect.api.generator;
+package org.eclipse.daanse.jdbc.db.api.sql;
 
 /** Where {@code NULL} values appear within an {@code ORDER BY} result. */
 public enum NullsOrder {
