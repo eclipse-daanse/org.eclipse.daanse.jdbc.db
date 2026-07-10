@@ -141,9 +141,11 @@ public class DuckDbDialect extends AbstractJdbcDialect {
         }
         final StringBuilder sb = new StringBuilder();
         sb.append(source);
-        sb.append(" IS NOT NULL AND regexp_matches(");
+        // regexp_matches needs VARCHAR; DuckDB won't coerce numeric columns (e.g. store_sqft),
+        // so cast like PostgreSqlDialect does.
+        sb.append(" IS NOT NULL AND regexp_matches(CAST(");
         sb.append(source);
-        sb.append(", ");
+        sb.append(" AS VARCHAR), ");
         quoteStringLiteral(sb, javaRegex);
         if (mappedFlags.length() > 0) {
             sb.append(", ");
