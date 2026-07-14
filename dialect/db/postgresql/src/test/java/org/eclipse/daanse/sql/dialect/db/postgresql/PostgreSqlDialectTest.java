@@ -29,7 +29,7 @@ import static org.mockito.Mockito.when;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 
-import org.eclipse.daanse.jdbc.db.api.meta.IdentifierInfo;
+import org.eclipse.daanse.sql.jdbc.api.meta.IdentifierInfo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

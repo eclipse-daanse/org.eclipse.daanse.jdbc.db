@@ -15,15 +15,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.OptionalInt;
 
-import org.eclipse.daanse.jdbc.db.api.schema.CatalogReference;
-import org.eclipse.daanse.jdbc.db.api.schema.ColumnDefinition;
-import org.eclipse.daanse.jdbc.db.api.schema.ColumnMetaData;
-import org.eclipse.daanse.jdbc.db.api.schema.ColumnReference;
-import org.eclipse.daanse.jdbc.db.api.schema.PrimaryKey;
-import org.eclipse.daanse.jdbc.db.api.schema.SchemaReference;
-import org.eclipse.daanse.jdbc.db.api.schema.TableDefinition;
-import org.eclipse.daanse.jdbc.db.api.schema.TableReference;
-import org.eclipse.daanse.jdbc.db.api.schema.Trigger;
+import org.eclipse.daanse.sql.model.schema.CatalogReference;
+import org.eclipse.daanse.sql.model.schema.ColumnDefinition;
+import org.eclipse.daanse.sql.model.schema.ColumnMetaData;
+import org.eclipse.daanse.sql.model.schema.ColumnReference;
+import org.eclipse.daanse.sql.model.schema.PrimaryKey;
+import org.eclipse.daanse.sql.model.schema.SchemaReference;
+import org.eclipse.daanse.sql.model.schema.TableReference;
+import org.eclipse.daanse.sql.model.schema.Trigger;
 import org.eclipse.daanse.sql.dialect.api.capability.DialectCapabilitiesProvider;
 
 public interface DdlGenerator extends IdentifierQuoter, DialectCapabilitiesProvider {
@@ -86,12 +85,6 @@ public interface DdlGenerator extends IdentifierQuoter, DialectCapabilitiesProvi
         }
         sb.append("\n)");
         return sb.toString();
-    }
-
-    /** Convenience overload: accepts a {@link TableDefinition}. */
-    default String createTable(TableDefinition table, List<ColumnDefinition> columns, PrimaryKey primaryKey,
-            boolean ifNotExists) {
-        return createTable(table.table(), columns, primaryKey, ifNotExists);
     }
 
     // -------------------- DML --------------------

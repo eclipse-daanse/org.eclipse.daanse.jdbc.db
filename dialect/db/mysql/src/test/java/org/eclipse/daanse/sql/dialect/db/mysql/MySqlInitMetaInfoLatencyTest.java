@@ -17,8 +17,8 @@ import java.sql.Statement;
 
 import javax.sql.DataSource;
 
-import org.eclipse.daanse.jdbc.db.api.DatabaseService;
-import org.eclipse.daanse.jdbc.db.impl.DatabaseServiceImpl;
+import org.eclipse.daanse.sql.jdbc.api.DatabaseService;
+import org.eclipse.daanse.sql.jdbc.impl.DatabaseServiceImpl;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;

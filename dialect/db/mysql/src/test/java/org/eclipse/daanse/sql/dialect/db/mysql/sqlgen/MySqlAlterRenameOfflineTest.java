@@ -16,11 +16,11 @@ import java.sql.JDBCType;
 import java.util.Optional;
 import java.util.OptionalInt;
 
-import org.eclipse.daanse.jdbc.db.api.schema.ColumnMetaData;
-import org.eclipse.daanse.jdbc.db.api.schema.SchemaReference;
-import org.eclipse.daanse.jdbc.db.api.schema.TableReference;
+import org.eclipse.daanse.sql.model.schema.ColumnMetaData;
+import org.eclipse.daanse.sql.model.schema.SchemaReference;
+import org.eclipse.daanse.sql.model.schema.TableReference;
 import org.eclipse.daanse.sql.dialect.db.mysql.MySqlDialect;
-import org.eclipse.daanse.jdbc.db.record.schema.ColumnMetaDataRecord;
+import org.eclipse.daanse.sql.jdbc.record.schema.ColumnMetaDataRecord;
 import org.junit.jupiter.api.Test;
 
 /**

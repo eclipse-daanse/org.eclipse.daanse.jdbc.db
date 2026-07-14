@@ -30,16 +30,16 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import org.eclipse.daanse.jdbc.db.api.schema.ColumnMetaData;
-import org.eclipse.daanse.jdbc.db.api.schema.TableReference;
-import org.eclipse.daanse.jdbc.db.api.schema.Trigger;
-import org.eclipse.daanse.jdbc.db.api.schema.Trigger.TriggerEvent;
-import org.eclipse.daanse.jdbc.db.api.schema.Trigger.TriggerTiming;
-import org.eclipse.daanse.jdbc.db.api.sql.BitOperation;
+import org.eclipse.daanse.sql.model.schema.ColumnMetaData;
+import org.eclipse.daanse.sql.model.schema.TableReference;
+import org.eclipse.daanse.sql.model.schema.Trigger;
+import org.eclipse.daanse.sql.model.schema.Trigger.TriggerEvent;
+import org.eclipse.daanse.sql.model.schema.Trigger.TriggerTiming;
+import org.eclipse.daanse.sql.model.sql.BitOperation;
 import org.eclipse.daanse.sql.dialect.api.generator.KnownFunction;
 import org.eclipse.daanse.sql.dialect.api.generator.StatementHint;
-import org.eclipse.daanse.jdbc.db.api.sql.OrderedColumn;
-import org.eclipse.daanse.jdbc.db.api.type.BestFitColumnType;
+import org.eclipse.daanse.sql.model.sql.OrderedColumn;
+import org.eclipse.daanse.sql.model.type.BestFitColumnType;
 import org.eclipse.daanse.sql.dialect.db.common.AbstractJdbcDialect;
 import org.eclipse.daanse.sql.dialect.db.common.DialectUtil;
 
@@ -522,10 +522,10 @@ public class OracleDialect extends AbstractJdbcDialect {
 
     @Override
     public String createTriggerUsingProcedure(String triggerName, String schemaName,
-            org.eclipse.daanse.jdbc.db.api.schema.Trigger.TriggerTiming timing,
-            org.eclipse.daanse.jdbc.db.api.schema.Trigger.TriggerEvent event,
-            org.eclipse.daanse.jdbc.db.api.schema.TableReference table,
-            org.eclipse.daanse.jdbc.db.api.schema.Trigger.TriggerScope scope, String whenCondition,
+            org.eclipse.daanse.sql.model.schema.Trigger.TriggerTiming timing,
+            org.eclipse.daanse.sql.model.schema.Trigger.TriggerEvent event,
+            org.eclipse.daanse.sql.model.schema.TableReference table,
+            org.eclipse.daanse.sql.model.schema.Trigger.TriggerScope scope, String whenCondition,
             String procedureName) {
         String qualified = schemaName != null && !schemaName.isBlank()
                 ? quoteIdentifier(schemaName, procedureName).toString()
@@ -570,7 +570,7 @@ public class OracleDialect extends AbstractJdbcDialect {
      */
     @Override
     public String alterTableAddColumn(TableReference table,
-            org.eclipse.daanse.jdbc.db.api.schema.ColumnDefinition column) {
+            org.eclipse.daanse.sql.model.schema.ColumnDefinition column) {
         StringBuilder sb = new StringBuilder("ALTER TABLE ");
         sb.append(qualified(table));
         sb.append(" ADD ");

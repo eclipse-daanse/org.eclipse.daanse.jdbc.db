@@ -28,6 +28,12 @@
     comprehensive SQL support for analytical operations.</description>
   <dependencies>
     <dependency>
+      <groupId>org.eclipse.daanse</groupId>
+      <artifactId>org.eclipse.daanse.sql.jdbc.api</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
@@ -48,7 +54,7 @@
     <!-- In-memory round-trip — no docker. JUnit + assertj come from parent. -->
     <dependency>
       <groupId>org.eclipse.daanse</groupId>
-      <artifactId>org.eclipse.daanse.jdbc.db.impl</artifactId>
+      <artifactId>org.eclipse.daanse.sql.jdbc.impl</artifactId>
       <version>0.0.1-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>

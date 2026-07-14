@@ -18,8 +18,8 @@ import java.time.Duration;
 
 import javax.sql.DataSource;
 
-import org.eclipse.daanse.jdbc.db.api.DatabaseService;
-import org.eclipse.daanse.jdbc.db.impl.DatabaseServiceImpl;
+import org.eclipse.daanse.sql.jdbc.api.DatabaseService;
+import org.eclipse.daanse.sql.jdbc.impl.DatabaseServiceImpl;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;

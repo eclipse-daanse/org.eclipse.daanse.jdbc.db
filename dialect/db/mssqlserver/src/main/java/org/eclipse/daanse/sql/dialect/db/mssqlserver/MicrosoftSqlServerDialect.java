@@ -28,15 +28,15 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Optional;
 
-import org.eclipse.daanse.jdbc.db.api.schema.ColumnDefinition;
-import org.eclipse.daanse.jdbc.db.api.schema.ColumnMetaData;
-import org.eclipse.daanse.jdbc.db.api.schema.TableReference;
-import org.eclipse.daanse.jdbc.db.api.schema.Trigger;
-import org.eclipse.daanse.jdbc.db.api.schema.Trigger.TriggerEvent;
-import org.eclipse.daanse.jdbc.db.api.schema.Trigger.TriggerTiming;
+import org.eclipse.daanse.sql.model.schema.ColumnDefinition;
+import org.eclipse.daanse.sql.model.schema.ColumnMetaData;
+import org.eclipse.daanse.sql.model.schema.TableReference;
+import org.eclipse.daanse.sql.model.schema.Trigger;
+import org.eclipse.daanse.sql.model.schema.Trigger.TriggerEvent;
+import org.eclipse.daanse.sql.model.schema.Trigger.TriggerTiming;
 import org.eclipse.daanse.sql.dialect.api.generator.KnownFunction;
 import org.eclipse.daanse.sql.dialect.api.generator.StatementHint;
-import org.eclipse.daanse.jdbc.db.api.sql.OrderedColumn;
+import org.eclipse.daanse.sql.model.sql.OrderedColumn;
 import org.eclipse.daanse.sql.dialect.db.common.AbstractJdbcDialect;
 import org.eclipse.daanse.sql.dialect.db.common.DialectUtil;
 
@@ -469,10 +469,10 @@ public class MicrosoftSqlServerDialect extends AbstractJdbcDialect {
     }
 
     @Override
-    public String createTrigger(String triggerName, org.eclipse.daanse.jdbc.db.api.schema.Trigger.TriggerTiming timing,
-            org.eclipse.daanse.jdbc.db.api.schema.Trigger.TriggerEvent event,
-            org.eclipse.daanse.jdbc.db.api.schema.TableReference table,
-            org.eclipse.daanse.jdbc.db.api.schema.Trigger.TriggerScope scope, String whenCondition, String body) {
+    public String createTrigger(String triggerName, org.eclipse.daanse.sql.model.schema.Trigger.TriggerTiming timing,
+            org.eclipse.daanse.sql.model.schema.Trigger.TriggerEvent event,
+            org.eclipse.daanse.sql.model.schema.TableReference table,
+            org.eclipse.daanse.sql.model.schema.Trigger.TriggerScope scope, String whenCondition, String body) {
         if (body == null || body.isBlank()) {
             throw new IllegalArgumentException("body must not be blank for SQL Server CREATE TRIGGER");
         }
@@ -480,7 +480,7 @@ public class MicrosoftSqlServerDialect extends AbstractJdbcDialect {
         sb.append(quoteIdentifier(triggerName));
         sb.append(" ON ").append(qualified(table));
         // SQL Server: AFTER (or FOR), INSTEAD OF — no BEFORE.
-        if (timing == org.eclipse.daanse.jdbc.db.api.schema.Trigger.TriggerTiming.INSTEAD_OF) {
+        if (timing == org.eclipse.daanse.sql.model.schema.Trigger.TriggerTiming.INSTEAD_OF) {
             sb.append(" INSTEAD OF ");
         } else {
             sb.append(" AFTER ");
@@ -512,10 +512,10 @@ public class MicrosoftSqlServerDialect extends AbstractJdbcDialect {
 
     @Override
     public String createTriggerUsingProcedure(String triggerName, String schemaName,
-            org.eclipse.daanse.jdbc.db.api.schema.Trigger.TriggerTiming timing,
-            org.eclipse.daanse.jdbc.db.api.schema.Trigger.TriggerEvent event,
-            org.eclipse.daanse.jdbc.db.api.schema.TableReference table,
-            org.eclipse.daanse.jdbc.db.api.schema.Trigger.TriggerScope scope, String whenCondition,
+            org.eclipse.daanse.sql.model.schema.Trigger.TriggerTiming timing,
+            org.eclipse.daanse.sql.model.schema.Trigger.TriggerEvent event,
+            org.eclipse.daanse.sql.model.schema.TableReference table,
+            org.eclipse.daanse.sql.model.schema.Trigger.TriggerScope scope, String whenCondition,
             String procedureName) {
         String qualified = schemaName != null && !schemaName.isBlank()
                 ? quoteIdentifier(schemaName, procedureName).toString()

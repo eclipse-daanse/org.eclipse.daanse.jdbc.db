@@ -22,7 +22,7 @@ import static org.mockito.Mockito.when;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 
-import org.eclipse.daanse.jdbc.db.api.sql.BitOperation;
+import org.eclipse.daanse.sql.model.sql.BitOperation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

@@ -23,10 +23,10 @@ import java.sql.DatabaseMetaData;
 import java.util.List;
 import java.util.Optional;
 
-import org.eclipse.daanse.jdbc.db.api.sql.BitOperation;
-import org.eclipse.daanse.jdbc.db.api.sql.NullsOrder;
-import org.eclipse.daanse.jdbc.db.api.sql.SortDirection;
-import org.eclipse.daanse.jdbc.db.api.sql.OrderedColumn;
+import org.eclipse.daanse.sql.model.sql.BitOperation;
+import org.eclipse.daanse.sql.model.sql.NullsOrder;
+import org.eclipse.daanse.sql.model.sql.SortDirection;
+import org.eclipse.daanse.sql.model.sql.OrderedColumn;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

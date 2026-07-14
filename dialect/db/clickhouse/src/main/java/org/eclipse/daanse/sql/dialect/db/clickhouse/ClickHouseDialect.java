@@ -20,8 +20,8 @@ package org.eclipse.daanse.sql.dialect.db.clickhouse;
 
 import java.util.List;
 
-import org.eclipse.daanse.jdbc.db.api.sql.BitOperation;
-import org.eclipse.daanse.jdbc.db.api.sql.OrderedColumn;
+import org.eclipse.daanse.sql.model.sql.BitOperation;
+import org.eclipse.daanse.sql.model.sql.OrderedColumn;
 import org.eclipse.daanse.sql.dialect.db.common.AbstractJdbcDialect;
 
 public class ClickHouseDialect extends AbstractJdbcDialect {

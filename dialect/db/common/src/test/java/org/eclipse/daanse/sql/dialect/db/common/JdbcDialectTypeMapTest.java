@@ -18,7 +18,7 @@ import java.sql.SQLException;
 import java.sql.Types;
 
 import org.eclipse.daanse.sql.dialect.api.DialectInitData;
-import org.eclipse.daanse.jdbc.db.api.type.BestFitColumnType;
+import org.eclipse.daanse.sql.model.type.BestFitColumnType;
 import org.junit.jupiter.api.Test;
 
 class JdbcDialectTypeMapTest {

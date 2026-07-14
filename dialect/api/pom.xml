@@ -29,7 +29,7 @@
   <dependencies>
     <dependency>
       <groupId>org.eclipse.daanse</groupId>
-      <artifactId>org.eclipse.daanse.jdbc.db.api</artifactId>
+      <artifactId>org.eclipse.daanse.sql.model</artifactId>
       <version>0.0.1-SNAPSHOT</version>
     </dependency>
   </dependencies>

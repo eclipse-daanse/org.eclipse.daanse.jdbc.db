@@ -19,9 +19,9 @@
     <artifactId>org.eclipse.daanse.jdbc.db</artifactId>
     <version>${revision}</version>
   </parent>
-  <artifactId>org.eclipse.daanse.jdbc.db.importer</artifactId>
+  <artifactId>org.eclipse.daanse.sql.jdbc.importer</artifactId>
   <packaging>pom</packaging>
-  <name>Daanse JDBC DB Importer</name>
+  <name>Eclipse Daanse SQL JDBC Importer</name>
   <description>Parent module for JDBC database import utilities. Contains
     components for importing data from various sources into database systems,
     supporting different file formats and data transformation operations.</description>
