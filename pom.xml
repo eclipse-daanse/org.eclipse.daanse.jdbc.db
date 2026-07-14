@@ -68,14 +68,15 @@
     </dependencies>
   </dependencyManagement>
 
+  <!--
+    This reactor no longer builds anything.
+
+    model/, dialect/ and the org.eclipse.daanse.sql.jdbc.* modules (api, record, metadata,
+    impl, importer) now live in the org.eclipse.daanse.sql repository, which builds them as
+    one acyclic reactor. Their sources are left in place here, unbuilt, alongside the
+    unported dialect/db/* attic.
+  -->
   <modules>
-    <module>model</module>
-    <module>api</module>
-    <module>record</module>
-    <module>metadata</module>
-    <module>impl</module>
-    <module>dialect</module>
-    <module>importer</module>
   </modules>
 
 </project>
