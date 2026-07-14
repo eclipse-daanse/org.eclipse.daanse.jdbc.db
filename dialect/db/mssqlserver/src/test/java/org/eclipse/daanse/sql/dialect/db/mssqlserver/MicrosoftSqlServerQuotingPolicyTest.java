@@ -14,8 +14,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 import java.util.Optional;
 
-import org.eclipse.daanse.jdbc.db.api.schema.SchemaReference;
-import org.eclipse.daanse.jdbc.db.api.schema.TableReference;
+import org.eclipse.daanse.sql.model.schema.SchemaReference;
+import org.eclipse.daanse.sql.model.schema.TableReference;
 import org.eclipse.daanse.sql.dialect.api.IdentifierQuotingPolicy;
 import org.junit.jupiter.api.Test;
 
@@ -56,9 +56,9 @@ class MicrosoftSqlServerQuotingPolicyTest {
     @Test
     void createTrigger_unquoted() {
         assertThat(dialectNever().ddlGenerator().createTrigger("TRG_EMP",
-                org.eclipse.daanse.jdbc.db.api.schema.Trigger.TriggerTiming.AFTER,
-                org.eclipse.daanse.jdbc.db.api.schema.Trigger.TriggerEvent.INSERT, EMP,
-                org.eclipse.daanse.jdbc.db.api.schema.Trigger.TriggerScope.ROW, null, "INSERT INTO LOG VALUES (1)"))
+                org.eclipse.daanse.sql.model.schema.Trigger.TriggerTiming.AFTER,
+                org.eclipse.daanse.sql.model.schema.Trigger.TriggerEvent.INSERT, EMP,
+                org.eclipse.daanse.sql.model.schema.Trigger.TriggerScope.ROW, null, "INSERT INTO LOG VALUES (1)"))
                 .doesNotContainPattern("\\[[^]]*\\]").contains("TRG_EMP").contains("EMPLOYEES");
     }
 

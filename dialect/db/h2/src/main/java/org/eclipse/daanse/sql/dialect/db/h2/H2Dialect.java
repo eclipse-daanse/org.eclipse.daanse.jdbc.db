@@ -16,8 +16,8 @@ package org.eclipse.daanse.sql.dialect.db.h2;
 import java.util.List;
 import java.util.Optional;
 
-import org.eclipse.daanse.jdbc.db.api.sql.BitOperation;
-import org.eclipse.daanse.jdbc.db.api.sql.OrderedColumn;
+import org.eclipse.daanse.sql.model.sql.BitOperation;
+import org.eclipse.daanse.sql.model.sql.OrderedColumn;
 import org.eclipse.daanse.sql.dialect.db.common.AbstractJdbcDialect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

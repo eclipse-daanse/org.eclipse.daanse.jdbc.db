@@ -45,8 +45,8 @@ import org.eclipse.daanse.sql.dialect.api.generator.ParameterPlaceholderGenerato
 import org.eclipse.daanse.sql.dialect.api.generator.RegexGenerator;
 import org.eclipse.daanse.sql.dialect.api.generator.ReturningGenerator;
 import org.eclipse.daanse.sql.dialect.api.generator.SqlGenerator;
-import org.eclipse.daanse.jdbc.db.api.type.BestFitColumnType;
-import org.eclipse.daanse.jdbc.db.api.type.Datatype;
+import org.eclipse.daanse.sql.model.type.BestFitColumnType;
+import org.eclipse.daanse.sql.model.type.Datatype;
 import org.eclipse.daanse.sql.dialect.api.type.TypeMapper;
 
 public interface Dialect

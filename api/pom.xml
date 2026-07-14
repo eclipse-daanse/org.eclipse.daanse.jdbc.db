@@ -19,10 +19,18 @@
     <artifactId>org.eclipse.daanse.jdbc.db</artifactId>
     <version>${revision}</version>
   </parent>
-  <artifactId>org.eclipse.daanse.jdbc.db.api</artifactId>
-  <name>Eclipse Daanse JDBC DB API</name>
+  <artifactId>org.eclipse.daanse.sql.jdbc.api</artifactId>
+  <name>Eclipse Daanse SQL JDBC API</name>
   <description>Core API definitions for JDBC database operations in Daanse.
     Provides interfaces and contracts for database connectivity, SQL execution,
     and database metadata access across different database systems and dialects.</description>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.eclipse.daanse</groupId>
+      <artifactId>org.eclipse.daanse.sql.model</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+    </dependency>
+  </dependencies>
 
 </project>

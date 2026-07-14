@@ -10,7 +10,7 @@ package org.eclipse.daanse.sql.dialect.api.generator;
 import java.util.List;
 import java.util.Optional;
 
-import org.eclipse.daanse.jdbc.db.api.schema.TableReference;
+import org.eclipse.daanse.sql.model.schema.TableReference;
 
 public interface MergeGenerator {
 

@@ -19,25 +19,30 @@
     <artifactId>org.eclipse.daanse.jdbc.db</artifactId>
     <version>${revision}</version>
   </parent>
-  <artifactId>org.eclipse.daanse.jdbc.db.impl</artifactId>
-  <name>Eclipse Daanse JDBC DB Core</name>
+  <artifactId>org.eclipse.daanse.sql.jdbc.impl</artifactId>
+  <name>Eclipse Daanse SQL JDBC Impl</name>
   <description>Core implementation of JDBC database operations for Daanse.
     Provides concrete implementations of database connectivity, SQL execution,
     and database metadata services with support for multiple database dialects.</description>
 
   <dependencies>
     <dependency>
+      <groupId>org.eclipse.daanse</groupId>
+      <artifactId>org.eclipse.daanse.sql.model</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.eclipse.daanse</groupId>
-      <artifactId>org.eclipse.daanse.jdbc.db.api</artifactId>
+      <artifactId>org.eclipse.daanse.sql.jdbc.api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.daanse</groupId>
-      <artifactId>org.eclipse.daanse.jdbc.db.record</artifactId>
+      <artifactId>org.eclipse.daanse.sql.jdbc.record</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -48,7 +53,7 @@
     </dependency>
     <dependency>
       <groupId>org.eclipse.daanse</groupId>
-      <artifactId>org.eclipse.daanse.jdbc.db.metadata</artifactId>
+      <artifactId>org.eclipse.daanse.sql.jdbc.metadata</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

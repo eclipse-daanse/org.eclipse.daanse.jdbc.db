@@ -16,11 +16,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.OptionalInt;
 
-import org.eclipse.daanse.jdbc.db.api.schema.ColumnMetaData;
-import org.eclipse.daanse.jdbc.db.api.schema.SchemaReference;
-import org.eclipse.daanse.jdbc.db.api.schema.TableReference;
+import org.eclipse.daanse.sql.model.schema.ColumnMetaData;
+import org.eclipse.daanse.sql.model.schema.SchemaReference;
+import org.eclipse.daanse.sql.model.schema.TableReference;
 import org.eclipse.daanse.sql.dialect.api.IdentifierQuotingPolicy;
-import org.eclipse.daanse.jdbc.db.record.schema.ColumnMetaDataRecord;
+import org.eclipse.daanse.sql.jdbc.record.schema.ColumnMetaDataRecord;
 import org.junit.jupiter.api.Test;
 
 class OracleQuotingPolicyTest {
@@ -46,8 +46,8 @@ class OracleQuotingPolicyTest {
     @Test
     void alterTableAddColumn_unquoted() {
         assertThat(dialectNever().ddlGenerator().alterTableAddColumn(EMP,
-                new org.eclipse.daanse.jdbc.db.record.schema.ColumnDefinitionRecord(
-                        new org.eclipse.daanse.jdbc.db.api.schema.ColumnReference(Optional.of(EMP), "NEW_COL"),
+                new org.eclipse.daanse.sql.jdbc.record.schema.ColumnDefinitionRecord(
+                        new org.eclipse.daanse.sql.model.schema.ColumnReference(Optional.of(EMP), "NEW_COL"),
                         numColumn())))
                 .doesNotContain("\"").contains("EMPLOYEES").contains("NEW_COL");
     }

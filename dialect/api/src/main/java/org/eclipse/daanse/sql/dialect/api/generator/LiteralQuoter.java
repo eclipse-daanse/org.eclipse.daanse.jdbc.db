@@ -13,7 +13,7 @@
  */
 package org.eclipse.daanse.sql.dialect.api.generator;
 
-import org.eclipse.daanse.jdbc.db.api.type.Datatype;
+import org.eclipse.daanse.sql.model.type.Datatype;
 
 public interface LiteralQuoter {
 

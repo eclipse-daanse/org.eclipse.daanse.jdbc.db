@@ -69,6 +69,7 @@
   </dependencyManagement>
 
   <modules>
+    <module>model</module>
     <module>api</module>
     <module>record</module>
     <module>metadata</module>

@@ -19,8 +19,8 @@
     <artifactId>org.eclipse.daanse.jdbc.db</artifactId>
     <version>${revision}</version>
   </parent>
-  <artifactId>org.eclipse.daanse.jdbc.db.record</artifactId>
-  <name>Daanse JDBC DB Record</name>
+  <artifactId>org.eclipse.daanse.sql.jdbc.record</artifactId>
+  <name>Eclipse Daanse SQL JDBC Record</name>
   <description>Record-based implementation of JDBC database operations for
     Daanse. Provides immutable Java record classes for representing database
     entities and query results with efficient memory usage and type safety.</description>
@@ -28,7 +28,12 @@
   <dependencies>
     <dependency>
       <groupId>org.eclipse.daanse</groupId>
-      <artifactId>org.eclipse.daanse.jdbc.db.api</artifactId>
+      <artifactId>org.eclipse.daanse.sql.model</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.daanse</groupId>
+      <artifactId>org.eclipse.daanse.sql.jdbc.api</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>
