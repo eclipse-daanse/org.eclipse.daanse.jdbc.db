@@ -16,11 +16,11 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.eclipse.daanse</groupId>
-    <artifactId>org.eclipse.daanse.jdbc.db.dialect.db</artifactId>
+    <artifactId>org.eclipse.daanse.sql.dialect.db</artifactId>
     <version>${revision}</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
-  <artifactId>org.eclipse.daanse.jdbc.db.dialect.db.duckdb</artifactId>
+  <artifactId>org.eclipse.daanse.sql.dialect.db.duckdb</artifactId>
   <name>Eclipse Daanse JDBC DB Dialect DuckDB</name>
   <description>DuckDB database dialect implementation. DuckDB is an embedded,
     Postgres-flavored ANSI analytical database; this dialect mostly inherits
@@ -34,12 +34,12 @@
     </dependency>
     <dependency>
       <groupId>org.eclipse.daanse</groupId>
-      <artifactId>org.eclipse.daanse.jdbc.db.dialect.api</artifactId>
+      <artifactId>org.eclipse.daanse.sql.dialect.api</artifactId>
       <version>${revision}</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.daanse</groupId>
-      <artifactId>org.eclipse.daanse.jdbc.db.dialect.db.common</artifactId>
+      <artifactId>org.eclipse.daanse.sql.dialect.db.common</artifactId>
       <version>${revision}</version>
     </dependency>
     <dependency>

@@ -16,11 +16,11 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.eclipse.daanse</groupId>
-    <artifactId>org.eclipse.daanse.jdbc.db.dialect.db</artifactId>
+    <artifactId>org.eclipse.daanse.sql.dialect.db</artifactId>
     <version>${revision}</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
-  <artifactId>org.eclipse.daanse.jdbc.db.dialect.db.derby</artifactId>
+  <artifactId>org.eclipse.daanse.sql.dialect.db.derby</artifactId>
   <name>Eclipse Daanse JDBC DB Dialect Derby</name>
   <description>Apache Derby database dialect implementation providing
     Derby-specific SQL generation, query optimization, and embedded database
@@ -33,12 +33,12 @@
     </dependency>
     <dependency>
       <groupId>org.eclipse.daanse</groupId>
-      <artifactId>org.eclipse.daanse.jdbc.db.dialect.api</artifactId>
+      <artifactId>org.eclipse.daanse.sql.dialect.api</artifactId>
       <version>${revision}</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.daanse</groupId>
-      <artifactId>org.eclipse.daanse.jdbc.db.dialect.db.common</artifactId>
+      <artifactId>org.eclipse.daanse.sql.dialect.db.common</artifactId>
       <version>${revision}</version>
     </dependency>
     <dependency>
@@ -49,7 +49,7 @@
     <dependency>
       <groupId>org.eclipse.daanse</groupId>
       <artifactId>org.eclipse.daanse.jdbc.db.impl</artifactId>
-      <version>${revision}</version>
+      <version>0.0.1-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
     <dependency>

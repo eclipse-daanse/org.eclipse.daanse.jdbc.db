@@ -431,9 +431,6 @@ public class ConfigurableDialect implements Dialect, SqlGenerator, DdlGenerator,
     }
 
     @Override
-    public StringBuilder generateCountExpression(CharSequence exp) {
-        return new StringBuilder(exp);
-    }
 
     @Override
     public Optional<String> generateRegularExpression(String source, String javaRegExp) {
@@ -509,27 +506,6 @@ public class ConfigurableDialect implements Dialect, SqlGenerator, DdlGenerator,
     }
 
     @Override
-    public StringBuilder generateUnionAllSql(List<Map<String, Map.Entry<Datatype, Object>>> valueList) {
-        StringBuilder buf = new StringBuilder();
-        for (Map<String, Map.Entry<Datatype, Object>> m : valueList) {
-            buf.append(" UNION ALL SELECT ");
-            boolean first = true;
-            for (Map.Entry<String, Map.Entry<Datatype, Object>> en : m.entrySet()) {
-                if (!first) {
-                    buf.append(", ");
-                }
-                first = false;
-                quote(buf, en.getValue().getValue(), en.getValue().getKey());
-                if (allowsFromAlias()) {
-                    buf.append(" AS ");
-                } else {
-                    buf.append(' ');
-                }
-                quoteIdentifier(en.getKey(), buf);
-            }
-        }
-        return buf;
-    }
 
     // ========== Bit Aggregation Functions ==========
 

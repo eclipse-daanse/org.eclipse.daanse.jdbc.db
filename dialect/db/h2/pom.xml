@@ -16,11 +16,11 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.eclipse.daanse</groupId>
-    <artifactId>org.eclipse.daanse.jdbc.db.dialect.db</artifactId>
+    <artifactId>org.eclipse.daanse.sql.dialect.db</artifactId>
     <version>${revision}</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
-  <artifactId>org.eclipse.daanse.jdbc.db.dialect.db.h2</artifactId>
+  <artifactId>org.eclipse.daanse.sql.dialect.db.h2</artifactId>
   <name>Eclipse Daanse JDBC DB Dialect H2</name>
   <description>H2 database dialect implementation providing H2-specific SQL
     generation, query optimization, and database feature handling. Supports H2
@@ -33,17 +33,12 @@
     </dependency>
     <dependency>
       <groupId>org.eclipse.daanse</groupId>
-      <artifactId>org.eclipse.daanse.jdbc.db.dialect.api</artifactId>
+      <artifactId>org.eclipse.daanse.sql.dialect.api</artifactId>
       <version>${revision}</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.daanse</groupId>
-      <artifactId>org.eclipse.daanse.jdbc.db.dialect.db.common</artifactId>
-      <version>${revision}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.daanse</groupId>
-      <artifactId>org.eclipse.daanse.jdbc.db.record</artifactId>
+      <artifactId>org.eclipse.daanse.sql.dialect.db.common</artifactId>
       <version>${revision}</version>
     </dependency>
     <dependency>

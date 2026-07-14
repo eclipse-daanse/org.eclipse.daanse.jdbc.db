@@ -16,7 +16,7 @@ import java.util.UUID;
 
 import javax.sql.DataSource;
 
-import org.eclipse.daanse.jdbc.db.dialect.api.DialectInitData;
+import org.eclipse.daanse.sql.dialect.api.DialectInitData;
 import org.h2.jdbcx.JdbcDataSource;
 import org.junit.jupiter.api.Test;
 

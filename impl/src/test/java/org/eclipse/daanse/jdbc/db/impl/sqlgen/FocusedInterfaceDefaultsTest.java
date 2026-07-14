@@ -14,15 +14,15 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.Map;
 
-import org.eclipse.daanse.jdbc.db.dialect.api.Dialect;
-import org.eclipse.daanse.jdbc.db.dialect.api.generator.AggregationGenerator;
+import org.eclipse.daanse.sql.dialect.api.Dialect;
+import org.eclipse.daanse.sql.dialect.api.generator.AggregationGenerator;
 import org.eclipse.daanse.jdbc.db.api.sql.BitOperation;
-import org.eclipse.daanse.jdbc.db.dialect.api.generator.FunctionGenerator;
-import org.eclipse.daanse.jdbc.db.dialect.api.generator.HintGenerator;
-import org.eclipse.daanse.jdbc.db.dialect.api.generator.OrderByGenerator;
-import org.eclipse.daanse.jdbc.db.dialect.api.generator.RegexGenerator;
+import org.eclipse.daanse.sql.dialect.api.generator.FunctionGenerator;
+import org.eclipse.daanse.sql.dialect.api.generator.HintGenerator;
+import org.eclipse.daanse.sql.dialect.api.generator.OrderByGenerator;
+import org.eclipse.daanse.sql.dialect.api.generator.RegexGenerator;
 import org.eclipse.daanse.jdbc.db.api.type.Datatype;
-import org.eclipse.daanse.jdbc.db.dialect.db.common.AnsiDialect;
+import org.eclipse.daanse.sql.dialect.db.common.AnsiDialect;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -145,10 +145,6 @@ class FocusedInterfaceDefaultsTest {
                     .isEqualTo("CASE WHEN a > b THEN a ELSE b END");
         }
 
-        @Test
-        void count_expression_passes_through() {
-            assertThat(g.generateCountExpression("col").toString()).isEqualTo("col");
-        }
     }
 
     // -------------------- AggregationGenerator --------------------
