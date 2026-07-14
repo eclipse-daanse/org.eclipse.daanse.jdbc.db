@@ -42,8 +42,15 @@
     </dependency>
     <dependency>
       <groupId>org.eclipse.daanse</groupId>
-      <artifactId>org.eclipse.daanse.jdbc.db.dialect.api</artifactId>
+      <artifactId>org.eclipse.daanse.sql.dialect.api</artifactId>
       <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.daanse</groupId>
+      <artifactId>org.eclipse.daanse.jdbc.db.metadata</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
@@ -54,13 +61,13 @@
     </dependency>
     <dependency>
       <groupId>org.eclipse.daanse</groupId>
-      <artifactId>org.eclipse.daanse.jdbc.db.dialect.db.h2</artifactId>
+      <artifactId>org.eclipse.daanse.sql.dialect.db.h2</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.eclipse.daanse</groupId>
-      <artifactId>org.eclipse.daanse.jdbc.db.dialect.db.common</artifactId>
+      <artifactId>org.eclipse.daanse.sql.dialect.db.common</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

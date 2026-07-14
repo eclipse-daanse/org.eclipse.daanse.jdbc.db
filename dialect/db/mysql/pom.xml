@@ -16,11 +16,11 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.eclipse.daanse</groupId>
-    <artifactId>org.eclipse.daanse.jdbc.db.dialect.db</artifactId>
+    <artifactId>org.eclipse.daanse.sql.dialect.db</artifactId>
     <version>${revision}</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
-  <artifactId>org.eclipse.daanse.jdbc.db.dialect.db.mysql</artifactId>
+  <artifactId>org.eclipse.daanse.sql.dialect.db.mysql</artifactId>
   <name>Eclipse Daanse JDBC DB Dialect MySQL</name>
   <description>MySQL database dialect implementation for Daanse JDBC. Provides
     MySQL-specific SQL generation, query optimization, and database feature
@@ -32,25 +32,26 @@
     </dependency>
     <dependency>
       <groupId>org.eclipse.daanse</groupId>
-      <artifactId>org.eclipse.daanse.jdbc.db.dialect.api</artifactId>
+      <artifactId>org.eclipse.daanse.sql.dialect.api</artifactId>
       <version>${revision}</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.daanse</groupId>
-      <artifactId>org.eclipse.daanse.jdbc.db.dialect.db.common</artifactId>
+      <artifactId>org.eclipse.daanse.sql.dialect.db.common</artifactId>
       <version>${revision}</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.daanse</groupId>
       <artifactId>org.eclipse.daanse.jdbc.db.record</artifactId>
-      <version>${revision}</version>
+      <version>0.0.1-SNAPSHOT</version>
+      <scope>test</scope>
     </dependency>
     <!-- Round-trip test (Testcontainer-backed). JUnit + assertj come from
     parent. -->
     <dependency>
       <groupId>org.eclipse.daanse</groupId>
       <artifactId>org.eclipse.daanse.jdbc.db.impl</artifactId>
-      <version>${revision}</version>
+      <version>0.0.1-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -73,7 +74,7 @@
     </dependency>
     <dependency>
       <groupId>org.eclipse.daanse</groupId>
-      <artifactId>org.eclipse.daanse.jdbc.db.dialect.db.test-support</artifactId>
+      <artifactId>org.eclipse.daanse.sql.dialect.db.test-support</artifactId>
       <version>${revision}</version>
       <scope>test</scope>
     </dependency>

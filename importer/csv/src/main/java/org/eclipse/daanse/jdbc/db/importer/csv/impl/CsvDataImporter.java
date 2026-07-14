@@ -44,8 +44,8 @@ import org.eclipse.daanse.jdbc.db.api.schema.ColumnReference;
 import org.eclipse.daanse.jdbc.db.api.schema.SchemaReference;
 import org.eclipse.daanse.jdbc.db.api.schema.TableDefinition;
 import org.eclipse.daanse.jdbc.db.api.schema.TableReference;
-import org.eclipse.daanse.jdbc.db.dialect.api.Dialect;
-import org.eclipse.daanse.jdbc.db.dialect.api.DialectFactory;
+import org.eclipse.daanse.sql.dialect.api.Dialect;
+import org.eclipse.daanse.sql.dialect.api.DialectFactory;
 import org.eclipse.daanse.jdbc.db.importer.csv.api.Constants;
 import org.eclipse.daanse.jdbc.db.record.schema.ColumnDefinitionRecord;
 import org.eclipse.daanse.jdbc.db.record.schema.ColumnMetaDataRecord;
@@ -128,7 +128,7 @@ public class CsvDataImporter implements FileSystemWatcherListener {
         this.config = config;
         metaInfo = databaseService.createMetaInfo(dataSource);
         dialect = dialectFactory.createDialect(
-                org.eclipse.daanse.jdbc.db.dialect.api.DialectInitData.fromDataSource(dataSource));
+                org.eclipse.daanse.sql.dialect.api.DialectInitData.fromDataSource(dataSource));
     }
 
     @Deactivate

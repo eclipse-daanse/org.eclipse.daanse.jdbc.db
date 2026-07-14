@@ -28,7 +28,7 @@ import org.eclipse.daanse.jdbc.db.api.schema.ColumnDefinition;
 import org.eclipse.daanse.jdbc.db.api.schema.PrimaryKey;
 import org.eclipse.daanse.jdbc.db.api.schema.TableDefinition;
 import org.eclipse.daanse.jdbc.db.impl.DatabaseServiceImpl;
-import org.eclipse.daanse.jdbc.db.dialect.db.h2.H2Dialect;
+import org.eclipse.daanse.sql.dialect.db.h2.H2Dialect;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -52,8 +52,8 @@ class DialectDdlH2Test {
                     )
                     """);
         }
-        dialect = new H2Dialect(org.eclipse.daanse.jdbc.db.dialect.api.DialectInitData.fromConnection(connection));
-        metaInfo = new DatabaseServiceImpl().createMetaInfo(connection, dialect);
+        dialect = new H2Dialect(org.eclipse.daanse.sql.dialect.api.DialectInitData.fromConnection(connection));
+        metaInfo = new DatabaseServiceImpl().createMetaInfo(connection, new org.eclipse.daanse.jdbc.db.metadata.H2MetadataProvider());
     }
 
     @AfterAll

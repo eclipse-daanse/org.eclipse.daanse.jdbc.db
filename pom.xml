@@ -71,6 +71,7 @@
   <modules>
     <module>api</module>
     <module>record</module>
+    <module>metadata</module>
     <module>impl</module>
     <module>dialect</module>
     <module>importer</module>
